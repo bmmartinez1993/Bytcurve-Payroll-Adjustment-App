@@ -1,0 +1,177 @@
+AI-generated content may be incorrect
+
+Brando Manuel Martinez Hernandez started transcription
+
+Jennifer Michell Esquivel Guillin
+6 minutes 47 seconds6:47
+Jennifer Michell Esquivel Guillin 6 minutes 47 seconds
+Listo, de regreso, Brando, ¿estás por allí?
+
+Brando Manuel Martinez Hernandez
+6 minutes 53 seconds6:53
+Brando Manuel Martinez Hernandez 6 minutes 53 seconds
+Sí, hola, aquí sí, aquí estoy.
+
+Jennifer Michell Esquivel Guillin
+6 minutes 55 seconds6:55
+Jennifer Michell Esquivel Guillin 6 minutes 55 seconds
+Hola, qué pena contigo, este que tú me dijiste que para empezar a las 9:00, pero es que a esa hora pues estaba en una mini y hasta hace poquito fue que salí. Entonces no podía empezar a esa hora. ¿Cómo estás?
+
+Brando Manuel Martinez Hernandez
+7 minutes 6 seconds7:06
+Brando Manuel Martinez Hernandez 7 minutes 6 seconds
+Did you so?
+Brando Manuel Martinez Hernandez 7 minutes 13 seconds
+Estoy igual estaba viendo para ver si se podía hacer más temprano para salir de eso temprano, pero si tienes una no hay problema. Igual solamente vamos a tomar 1 hora cada día, no la hora y media total.
+
+Jennifer Michell Esquivel Guillin
+7 minutes 24 seconds7:24
+Jennifer Michell Esquivel Guillin 7 minutes 24 seconds
+sí, vamos a vamos a empezar, pues espérame que estoy compartiendo el que no es.
+
+Brando Manuel Martinez Hernandez
+7 minutes 27 seconds7:27
+Brando Manuel Martinez Hernandez 7 minutes 27 seconds
+Protection.
+Brando Manuel Martinez Hernandez 7 minutes 29 seconds
+The history about powerless comes in today is built up.
+
+Jennifer Michell Esquivel Guillin
+7 minutes 35 seconds7:35
+Jennifer Michell Esquivel Guillin 7 minutes 35 seconds
+Sí, pues igual de todas maneras, este es más que todo para mostrarte los procesos, para que vayas teniendo idea de cómo se hace y ya cuando tengas los las credenciales, ahí sí puedes decir, puedes empezar o si quieres también.
+
+Brando Manuel Martinez Hernandez
+7 minutes 35 seconds7:35
+Brando Manuel Martinez Hernandez 7 minutes 35 seconds
+I.
+
+Jennifer Michell Esquivel Guillin
+1 hour 6 minutes 36 seconds1:06:36
+Jennifer Michell Esquivel Guillin 1 hour 6 minutes 36 seconds
+O K, como por ejemplo, cómo hacerlo.
+
+Brando Manuel Martinez Hernandez
+1 hour 6 minutes 39 seconds1:06:39
+Brando Manuel Martinez Hernandez 1 hour 6 minutes 39 seconds
+No es que yo tengo conocimientos en programación y estoy viendo la forma de poder automatizarlo sino que estoy viendo más que todo entender todos los paso a paso que tú estás haciendo para saber cómo decirle al al Bot cómo hacerlo en Sí ya sé qué restricciones agregarle
+
+Jennifer Michell Esquivel Guillin
+1 hour 6 minutes 50 seconds1:06:50
+Jennifer Michell Esquivel Guillin 1 hour 6 minutes 50 seconds
+Okay.
+Jennifer Michell Esquivel Guillin 1 hour 7 minutes
+O K.
+
+Brando Manuel Martinez Hernandez
+1 hour 7 minutes1:07:00
+Brando Manuel Martinez Hernandez 1 hour 7 minutes
+¿Qué hacer y demás? Así me has explicado bastante bien. Eso sí, tengo que hacerlo yo de mi parte primero para saber bien el paso a paso, ¿no?
+
+Jennifer Michell Esquivel Guillin
+1 hour 7 minutes 8 seconds1:07:08
+Jennifer Michell Esquivel Guillin 1 hour 7 minutes 8 seconds
+Okay, okay, no cualquier cosita que de pronto no entiendas en todo el paso a paso, porque es que realmente como es algo tan mecanizado, como es algo tan mecánico, por ejemplo, siempre es un día el día anterior, siempre hay que verificar que no haya más horas en la en el extra work, en el SST.
+
+Brando Manuel Martinez Hernandez
+1 hour 7 minutes 10 seconds1:07:10
+Brando Manuel Martinez Hernandez 1 hour 7 minutes 10 seconds
+Sí.
+
+Jennifer Michell Esquivel Guillin
+1 hour 7 minutes 28 seconds1:07:28
+Jennifer Michell Esquivel Guillin 1 hour 7 minutes 28 seconds
+¿Que es homes to school? O sea, son cositas que cuando ya tú las tienes claras y ya las tienes en mente, pues ya tú lo haces fácil. Y bueno, me imagino cuando ya hayas hecho algo así, pues me dice, me muestras para ver qué.
+Jennifer Michell Esquivel Guillin 1 hour 7 minutes 45 seconds
+¿Qué hiciste?
+
+Brando Manuel Martinez Hernandez
+1 hour 7 minutes 45 seconds1:07:45
+Brando Manuel Martinez Hernandez 1 hour 7 minutes 45 seconds
+Sí, es que en realidad ya unos trabajos que había hecho de mi parte acá ya había automatizado unas ciertas tareas que eran también mecanizadas. Por ejemplo, en Fleetwave, la parte de poder verificar ciertas valores de unos vehículos que estaban como mal era muy mecanizado porque solamente era cambiar cierto valor a un valor fee.
+
+Jennifer Michell Esquivel Guillin
+1 hour 7 minutes 50 seconds1:07:50
+Jennifer Michell Esquivel Guillin 1 hour 7 minutes 50 seconds
+Mhm.
+Jennifer Michell Esquivel Guillin 1 hour 7 minutes 54 seconds
+Ajá.
+Jennifer Michell Esquivel Guillin 1 hour 8 minutes 4 seconds
+Ajá.
+Jennifer Michell Esquivel Guillin 1 hour 8 minutes 8 seconds
+Okay.
+
+Brando Manuel Martinez Hernandez
+1 hour 8 minutes 9 seconds1:08:09
+Brando Manuel Martinez Hernandez 1 hour 8 minutes 9 seconds
+Entonces, y el bot yo le di los pasos de cómo tenía que hacer eso y la o sea automático.
+
+Jennifer Michell Esquivel Guillin
+1 hour 8 minutes 14 seconds1:08:14
+Jennifer Michell Esquivel Guillin 1 hour 8 minutes 14 seconds
+¿Guau, y eso cómo lo haces? Ay.
+
+Brando Manuel Martinez Hernandez
+1 hour 8 minutes 20 seconds1:08:20
+Brando Manuel Martinez Hernandez 1 hour 8 minutes 20 seconds
+Yo utilicé el lenguaje Python con Selenium, que fue el primero que yo hice, esos son.
+Brando Manuel Martinez Hernandez 1 hour 8 minutes 30 seconds
+Como lenguaje que se utiliza para poder hacer programación de automatización.
+
+Jennifer Michell Esquivel Guillin
+1 hour 8 minutes 33 seconds1:08:33
+Jennifer Michell Esquivel Guillin 1 hour 8 minutes 33 seconds
+O K, uy, no, pero ya esos son otros libres, plan, no, la verdad.
+Jennifer Michell Esquivel Guillin 1 hour 8 minutes 39 seconds
+Bueno, qué chévere ya.
+
+Brando Manuel Martinez Hernandez
+1 hour 8 minutes 41 seconds1:08:41
+Brando Manuel Martinez Hernandez 1 hour 8 minutes 41 seconds
+Bueno, entonces voy preparándome para la reunión, entonces.
+
+Jennifer Michell Esquivel Guillin
+1 hour 8 minutes 45 seconds1:08:45
+Jennifer Michell Esquivel Guillin 1 hour 8 minutes 45 seconds
+Vale, querido.
+
+Brando Manuel Martinez Hernandez
+1 hour 8 minutes 46 seconds1:08:46
+Brando Manuel Martinez Hernandez 1 hour 8 minutes 46 seconds
+Estamos hablando mañana, me imagino que vamos, voy a ver si pregunto otra vez acá de mi lado, ahorita después de la reunión.
+
+Jennifer Michell Esquivel Guillin
+1 hour 8 minutes 54 seconds1:08:54
+Jennifer Michell Esquivel Guillin 1 hour 8 minutes 54 seconds
+Ajá, ajá, por tus credencias.
+
+Brando Manuel Martinez Hernandez
+1 hour 8 minutes 55 seconds1:08:55
+Brando Manuel Martinez Hernandez 1 hour 8 minutes 55 seconds
+Para ver con quién es que tengo que mandarle el caso del biker y del Routefinder para tener esas credenciales hoy y poder practicar contigo mañana en la hora.
+
+Jennifer Michell Esquivel Guillin
+1 hour 8 minutes 59 seconds1:08:59
+Jennifer Michell Esquivel Guillin 1 hour 8 minutes 59 seconds
+Yeah.
+Jennifer Michell Esquivel Guillin 1 hour 9 minutes 3 seconds
+Dale, súper, dale, soa, dale que estés bien, cuídate mucho.
+
+Brando Manuel Martinez Hernandez
+1 hour 9 minutes 5 seconds1:09:05
+Brando Manuel Martinez Hernandez 1 hour 9 minutes 5 seconds
+Listo.
+Brando Manuel Martinez Hernandez 1 hour 9 minutes 8 seconds
+Estamos hablando, te cuidas.
+
+Jennifer Michell Esquivel Guillin
+1 hour 9 minutes 9 seconds1:09:09
+Jennifer Michell Esquivel Guillin 1 hour 9 minutes 9 seconds
+Vale, chaito.
+
+Brando Manuel Martinez Hernandez
+1 hour 9 minutes 11 seconds1:09:11
+Brando Manuel Martinez Hernandez 1 hour 9 minutes 11 seconds
+What?
+
+Fireflies.ai Notetaker Camilo stopped transcription
