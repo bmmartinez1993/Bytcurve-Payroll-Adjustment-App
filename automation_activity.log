@@ -831,3 +831,198 @@ Call log:
 2026-06-01 18:13:34,991 [ERROR] Row processing error: Locator.inner_text: Target page, context or browser has been closed
 2026-06-01 18:13:34,991 [WARNING] Bulk verification skipped due to flagged rows or detected overlaps.
 2026-06-01 18:13:34,991 [INFO] Done.
+2026-06-02 09:20:38,831 [INFO] Navigating to https://app.bytecurve360.com/portal/core/#/login...
+2026-06-02 09:20:57,885 [INFO] Cookie consent accepted.
+2026-06-02 09:20:57,960 [INFO] Logged in successfully.
+2026-06-02 09:20:57,960 [INFO] Navigating to Timesheets...
+2026-06-02 09:21:00,709 [INFO] Filtering for date: 2026-06-01
+2026-06-02 09:21:30,738 [CRITICAL] CRITICAL: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_test_id("weekly-view-btn")
+    - locator resolved to <a href="#/payroll/weekly" _ngcontent-ng-c661027303="" data-testid="weekly-view-btn">Weekly View</a>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="page-loading" _ngcontent-ng-c3262153939="">…</div> from <page-loader _nghost-ng-c3262153939="" _ngcontent-ng-c661027303="">…</page-loader> subtree intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <div class="page-loading" _ngcontent-ng-c3262153939="">…</div> from <page-loader _nghost-ng-c3262153939="" _ngcontent-ng-c661027303="">…</page-loader> subtree intercepts pointer events
+  - retrying click action
+    - waiting 100ms
+    - waiting for element to be visible, enabled and stable
+    - element is not stable
+  - retrying click action
+    - waiting 100ms
+    5 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="page-loading" _ngcontent-ng-c3262153939="">…</div> from <page-loader _nghost-ng-c3262153939="" _ngcontent-ng-c661027303="">…</page-loader> subtree intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+2026-06-02 09:21:44,715 [INFO] Navigating to https://app.bytecurve360.com/portal/core/#/login...
+2026-06-02 09:21:52,807 [INFO] Cookie consent accepted.
+2026-06-02 09:21:52,885 [INFO] Logged in successfully.
+2026-06-02 09:21:52,886 [INFO] Navigating to Timesheets...
+2026-06-02 09:21:54,484 [INFO] Filtering for date: 2026-06-01
+2026-06-02 09:22:08,194 [INFO] ACTION: Flagged hours for Judy Brayboy. Opening details...
+2026-06-02 09:22:12,112 [INFO] PROCESS: Reviewing task details for Judy Brayboy...
+2026-06-02 09:22:12,335 [INFO] OK: No unverified tasks for Judy Brayboy.
+2026-06-02 09:22:17,598 [INFO] ACTION: Flagged hours for Miriam Miranda. Opening details...
+2026-06-02 09:22:18,418 [INFO] PROCESS: Reviewing task details for Miriam Miranda...
+2026-06-02 09:22:48,663 [ERROR] Error in detail row: Locator.check: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-testid='payload-task-grid'] tr.k-master-row").first.locator("input[aria-label='verify']")
+    - locator resolved to <input disabled type="checkbox" kendocheckbox="" aria-label="verify" class="me-2 k-checkbox k-checkbox-md k-rounded-md"/>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+      - waiting 100ms
+    58 × waiting for element to be visible, enabled and stable
+       - element is not enabled
+     - retrying click action
+       - waiting 500ms
+2026-06-02 09:22:54,918 [INFO] Done.
+2026-06-02 11:10:59,700 [INFO] Navigating to https://app.bytecurve360.com/portal/core/#/login...
+2026-06-02 11:11:04,511 [INFO] Cookie consent accepted.
+2026-06-02 11:11:04,601 [INFO] Logged in successfully.
+2026-06-02 11:11:04,602 [INFO] Navigating to Timesheets...
+2026-06-02 11:11:06,147 [INFO] Filtering for date: 2026-06-01
+2026-06-02 11:11:43,938 [CRITICAL] CRITICAL: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_role("columnheader", name="Employee").get_by_role("link")
+2026-06-02 11:18:58,758 [INFO] Navigating to https://app.bytecurve360.com/portal/core/#/login...
+2026-06-02 11:19:05,402 [INFO] Cookie consent accepted.
+2026-06-02 11:19:05,480 [INFO] Logged in successfully.
+2026-06-02 11:19:05,481 [INFO] Navigating to Timesheets...
+2026-06-02 11:19:07,540 [INFO] Filtering for date: 2026-06-01
+2026-06-02 11:19:25,831 [ERROR] Failed to sort employee column: Locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for get_by_role("columnheader", name="Name").get_by_role("link")
+2026-06-02 11:19:25,872 [INFO] ADJUSTING: Setting Paid times for Christopher Gomez to 01:15 AM-02:27 AM
+2026-06-02 11:19:55,930 [ERROR] ACTION: Failed to adjust time: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-testid='payload-task-grid'] tr.k-master-row").first.locator("button.k-grid-save-command")
+    - locator resolved to <button disabled dir="ltr" type="button" title="Update" kendogridsavecommand="" class="table-cmn-icon table-cmn-icon-2 cmn-transition-effect cstm-btn-1 k-button k-disabled k-grid-save-command k-button-md k-rounded-md k-button-solid-base k-button-solid">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+      - waiting 100ms
+    58 × waiting for element to be visible, enabled and stable
+       - element is not enabled
+     - retrying click action
+       - waiting 500ms
+2026-06-02 11:19:55,932 [ERROR] VERIFICATION: Failed for worker Christopher Gomez
+2026-06-02 11:19:55,968 [INFO] ADJUSTING: Setting Paid times for Isaac Pierce to 04:00 AM-06:00 AM
+2026-06-02 11:19:56,082 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" id="timepicker-2" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka locator("#timepicker-2")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" id="timepicker-3" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka locator("#timepicker-3")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:56,082 [ERROR] VERIFICATION: Failed for worker Isaac Pierce
+2026-06-02 11:19:56,175 [INFO] ADJUSTING: Setting Paid times for Joseph Wright to 04:30 AM-06:00 AM
+2026-06-02 11:19:56,297 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" id="timepicker-4" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name="04:00 AM Toggle time list").get_by_placeholder("null")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" id="timepicker-5" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name="06:00 AM Toggle time list").get_by_placeholder("null")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:56,298 [ERROR] VERIFICATION: Failed for worker Joseph Wright
+2026-06-02 11:19:56,396 [INFO] ADJUSTING: Setting Paid times for Bectol Rodriguez to 04:30 AM-06:00 AM
+2026-06-02 11:19:56,512 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" id="timepicker-6" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name="05:00 AM Toggle time list").get_by_placeholder("null")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" id="timepicker-7" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name="06:00 AM Toggle time list").get_by_placeholder("null")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:56,512 [ERROR] VERIFICATION: Failed for worker Bectol Rodriguez
+2026-06-02 11:19:56,604 [INFO] ADJUSTING: Setting Paid times for Eugenia Lozada Otero to 04:30 AM-06:00 AM
+2026-06-02 11:19:56,710 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" id="timepicker-8" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":30 AM Toggle time list").get_by_placeholder("null")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" id="timepicker-9" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":15 AM Toggle time list").get_by_placeholder("null")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:56,710 [ERROR] VERIFICATION: Failed for worker Eugenia Lozada Otero
+2026-06-02 11:19:56,801 [INFO] ADJUSTING: Setting Paid times for Shaquinthia Gilbert to 04:30 AM-06:00 AM
+2026-06-02 11:19:56,904 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-10" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":30 AM Toggle time list").get_by_placeholder("null")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-11" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":00 AM Toggle time list").get_by_placeholder("null")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:56,904 [ERROR] VERIFICATION: Failed for worker Shaquinthia Gilbert
+2026-06-02 11:19:56,997 [INFO] ADJUSTING: Setting Paid times for Lynford Arnold to 04:30 AM-05:30 AM
+2026-06-02 11:19:57,167 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-14" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka locator("#timepicker-14")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-15" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka locator("#timepicker-15")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:57,168 [ERROR] VERIFICATION: Failed for worker Lynford Arnold
+2026-06-02 11:19:57,214 [INFO] ADJUSTING: Setting Paid times for Luella Pettway to 04:39 AM-09:03 AM
+2026-06-02 11:19:57,322 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-14" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka locator("#timepicker-14")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-15" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka locator("#timepicker-15")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:57,322 [ERROR] VERIFICATION: Failed for worker Luella Pettway
+2026-06-02 11:19:57,418 [INFO] ADJUSTING: Setting Paid times for Norma Soto to 05:03 AM-09:00 AM
+2026-06-02 11:19:57,521 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-16" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":45 AM Toggle time list").get_by_placeholder("null")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-17" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":00 AM Toggle time list").get_by_placeholder("null")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:57,521 [ERROR] VERIFICATION: Failed for worker Norma Soto
+2026-06-02 11:19:57,622 [INFO] ADJUSTING: Setting Paid times for Angelina Van Norden to 05:15 AM-08:58 AM
+2026-06-02 11:19:57,724 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-18" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":30 AM Toggle time list").get_by_placeholder("null")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-19" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":00 AM Toggle time list").get_by_placeholder("null")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:57,724 [ERROR] VERIFICATION: Failed for worker Angelina Van Norden
+2026-06-02 11:19:57,831 [INFO] ADJUSTING: Setting Paid times for Elizabeth Baez to 05:17 AM-07:29 AM
+2026-06-02 11:19:57,934 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-20" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":30 AM Toggle time list").get_by_placeholder("null")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-21" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":00 AM Toggle time list").get_by_placeholder("null")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:57,935 [ERROR] VERIFICATION: Failed for worker Elizabeth Baez
+2026-06-02 11:19:58,018 [INFO] ADJUSTING: Setting Paid times for Cassandra Diaz to 05:17 AM-09:07 AM
+2026-06-02 11:19:58,119 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-22" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":30 AM Toggle time list").get_by_placeholder("null")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-23" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":00 AM Toggle time list").get_by_placeholder("null")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:19:58,120 [ERROR] VERIFICATION: Failed for worker Cassandra Diaz
+2026-06-02 11:19:58,206 [INFO] ADJUSTING: Setting Paid times for Wismick Germain to 05:19 AM-09:14 AM
+2026-06-02 11:19:58,320 [ERROR] ACTION: Failed to adjust time: Locator.fill: Error: strict mode violation: locator("input.k-input-inner") resolved to 3 elements:
+    1) <input title="" tabindex="0" role="combobox" autocorrect="off" id="datepicker-1" autocomplete="off" spellcheck="false" placeholder="null" autocapitalize="off" aria-haspopup="grid" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false"/> aka get_by_test_id("filter-date-input").get_by_role("combobox", name="null")
+    2) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-24" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":15 AM Toggle time list").get_by_placeholder("null")
+    3) <input title="" tabindex="0" role="combobox" autocorrect="off" autocomplete="off" spellcheck="false" id="timepicker-25" placeholder="null" autocapitalize="off" aria-invalid="false" class="k-input-inner" aria-readonly="false" aria-expanded="false" aria-haspopup="dialog"/> aka get_by_role("gridcell", name=":00 AM Toggle time list").get_by_placeholder("null")
+Call log:
+  - waiting for locator("input.k-input-inner")
+2026-06-02 11:20:01,298 [ERROR] VERIFICATION: Failed for worker Altagracia Martinez Escolastico
+2026-06-02 11:20:01,298 [INFO] Done.
