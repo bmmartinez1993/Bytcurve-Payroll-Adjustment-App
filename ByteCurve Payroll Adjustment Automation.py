@@ -642,7 +642,6 @@ def validate_and_process_rows(page: Page, target_date: str):
     # 4. Loop through rows and verify tasks
     processed_workers = set()
     scroll_container_selector = f"{SELECTORS['payload_task_grid']} div.k-grid-content"
-
     while not AUTOMATION_STOP_FLAG:
         wait_for_loading(page)
         try:
@@ -650,39 +649,30 @@ def validate_and_process_rows(page: Page, target_date: str):
         except Exception:
             logging.info("No task rows found.")
             break
-        
         scroll_container = page.locator(scroll_container_selector)
         scroll_top = scroll_container.evaluate("el => el.scrollTop")
-        
-        # Identify the next worker block to process
         task_rows = page.locator(f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row").all()
         target_worker = ""
         target_worker_display = ""
         worker_rows_locators = []
         is_block_complete = False
-
         for i, row in enumerate(task_rows):
             row_date = (row.locator(SELECTORS["row_date"]).text_content(timeout=2000) or "").strip()
             if row_date != target_date_full: continue
-            
             name_span = row.locator(SELECTORS["row_worker_name"]).locator("span[title]").first
             emp_id = (name_span.get_attribute("title", timeout=2000) or "").strip()
             emp_name = (name_span.text_content(timeout=2000) or "").strip()
             worker_id = emp_id or emp_name
-            
             if not worker_id or worker_id in processed_workers: continue
-
             if not target_worker:
                 target_worker = worker_id
                 target_worker_display = f"{emp_name} ({emp_id})" if emp_id else emp_name
-            
             if worker_id == target_worker:
                 worker_rows_locators.append(row)
                 if i < len(task_rows) - 1:
                     next_row_name = task_rows[i+1].locator(SELECTORS["row_worker_name"]).locator("span[title]").first
-                    next_id = next_row_name.get_attribute("title") or next_row_name.text_content().strip()
+                    next_id = (next_row_name.get_attribute("title") or next_row_name.text_content()).strip()
                     if next_id != target_worker: is_block_complete = True
-
         if not target_worker:
             scroll_container.evaluate("el => el.scrollTop += 800")
             page.wait_for_timeout(1000)
@@ -690,83 +680,82 @@ def validate_and_process_rows(page: Page, target_date: str):
                 logging.info("All workers processed.")
                 break
             continue
-
         if not is_block_complete:
             worker_rows_locators[-1].scroll_into_view_if_needed()
             page.wait_for_timeout(500)
             continue
-
-        # Process target_worker completely
+        # PHASE 5: Looping the previous phases per employee
         worker_fully_processed = False
         while not worker_fully_processed and not AUTOMATION_STOP_FLAG:
             wait_for_loading(page)
-            # Re-map tasks into memory (handles grid refreshes)
+            # PHASE 1: Identification of verified task or not per employee
             worker_tasks = []
             fixed_intervals = []
             rows = page.locator(f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row").all()
-            
             for row in rows:
                 name_span = row.locator(SELECTORS["row_worker_name"]).locator("span[title]").first
                 row_id = (name_span.get_attribute("title") or name_span.text_content()).strip()
                 if row_id != target_worker: continue
-                
                 is_verified = row.locator(SELECTORS["row_checkbox"]).is_checked()
-                t_code = row.locator(SELECTORS["row_task_code"]).text_content().strip()
+                t_code_text = row.locator(SELECTORS["row_task_code"]).text_content().strip()
                 p_start = parse_kendo_time(row.locator(SELECTORS["row_paid_start"]).text_content() or "")
                 p_end = parse_kendo_time(row.locator(SELECTORS["row_paid_end"]).text_content() or "")
-                s_range = (row.locator(SELECTORS["row_sched_range"]).text_content() or "").split('-')
-                
-                task_info = {'row': row, 'verified': is_verified, 'code': t_code, 'p_start': p_start, 'p_end': p_end, 's_range': s_range}
+                s_text = row.locator(SELECTORS["row_sched_range"]).text_content() or ""
+                s_range = s_text.split('-')
+                task_info = {
+                    'row': row, 
+                    'verified': is_verified, 
+                    'code': t_code_text, 
+                    'p_start': p_start, 
+                    'p_end': p_end, 
+                    's_range': s_range
+                }
                 worker_tasks.append(task_info)
                 if is_verified:
                     s_dt = parse_time_to_datetime(p_start, target_dt)
                     e_dt = parse_time_to_datetime(p_end, target_dt)
                     if s_dt and e_dt: fixed_intervals.append((s_dt, e_dt))
-
-            # 1. Adjust first unverified task that needs it
+            # PHASE 2: Adjustment of Paid time according to current conditionals
             adjustment_made = False
             for task in worker_tasks:
                 if task['verified'] or len(task['s_range']) < 2: continue
-                
-                prop_start_dt = parse_time_to_datetime(parse_kendo_time(task['s_range'][0]), target_dt)
-                prop_end_dt = parse_time_to_datetime(parse_kendo_time(task['s_range'][1]), target_dt)
-                if "Extra Work" in task['code'] or "Charter" in task['code']:
+                s_sched_str = parse_kendo_time(task['s_range'][0])
+                e_sched_str = parse_kendo_time(task['s_range'][1])
+                prop_start_dt = parse_time_to_datetime(s_sched_str, target_dt)
+                prop_end_dt = parse_time_to_datetime(e_sched_str, target_dt)
+                if not prop_start_dt or not prop_end_dt: continue
+                if "Extra Work" in task['code'] or "S2S Charter" in task['code']:
                     prop_end_dt = prop_start_dt + datetime.timedelta(minutes=1)
-
                 final_s, final_e = get_non_overlapping_interval(prop_start_dt, prop_end_dt, fixed_intervals)
                 t_start, t_end = final_s.strftime("%I:%M %p"), final_e.strftime("%I:%M %p")
-
                 if task['p_start'] != t_start or task['p_end'] != t_end:
-                    logging.info(f"ADJUST: Updating {task['code']} for {target_worker_display}")
+                    logging.info(f"PHASE 2: Adjustment needed for {task['code']} for {target_worker_display}")
+                    # PHASE 3: Save/Update the changes
                     if adjust_time_entry(page, task['row'], 10, t_start) and adjust_time_entry(page, task['row'], 11, t_end):
                         save_btn = task['row'].locator(SELECTORS["row_save_btn"])
                         if save_btn.is_enabled():
                             save_btn.click(force=True)
-                            page.wait_for_timeout(2000)
+                            page.wait_for_timeout(1500)
                             wait_for_loading(page)
                             adjustment_made = True
                             break # Break for-loop to re-map after save
-            
             if adjustment_made: continue # Restart the while-loop to re-map
-
-            # 3. Final Check: Ensure all times match and mark checkboxes
-            # We re-map one last time to ensure we have fresh row objects
+            # PHASE 4: Mark down adjusted tasks and click Verify button
             rows = page.locator(f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row").all()
-            worker_tasks = [] 
-            # (Re-mapping logic simplified for brevity, assume similar to above)
-            
             checked_count = 0
-            for task in worker_tasks:
-                if not task['verified']:
-                    if verify_task_checkbox(page, task['row'], task['code'], target_worker_display):
+            for row in rows:
+                name_span = row.locator(SELECTORS["row_worker_name"]).locator("span[title]").first
+                row_id = (name_span.get_attribute("title") or name_span.text_content()).strip()
+                if row_id != target_worker: continue
+                if not row.locator(SELECTORS["row_checkbox"]).is_checked():
+                    logging.info(f"PHASE 4: Marking {target_worker_display} task for verification")
+                    if verify_task_checkbox(page, row, "N/A", target_worker_display):
                         checked_count += 1
-            
             if checked_count > 0:
                 if click_verify_button(page, target_worker_display):
-                    logging.info(f"VERIFIED: {target_worker_display} complete.")
+                    logging.info(f"PHASE 4: Bulk verification complete for {target_worker_display}")
                 else:
-                    logging.error(f"FAILED: Verification button failure for {target_worker_display}.")
-            
+                    logging.error(f"PHASE 4: Failed to click Verify button for {target_worker_display}")
             processed_workers.add(target_worker)
             worker_fully_processed = True
             scroll_container.evaluate("el => el.scrollTop = 0")
