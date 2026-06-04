@@ -3,8 +3,11 @@
 import datetime
 from datetime import datetime as dt
 import os
+import re
+import random
+import time
+import pyautogui
 import logging
-# Removed getpass as it's not needed for GUI input
 import customtkinter as ctk # Import customtkinter
 from tkinter import messagebox # Import messagebox for warnings
 import threading
@@ -43,18 +46,61 @@ BS_PRIMARY = "#0d6efd"
 
 # --- CONFIGURATION / PLACEHOLDERS ---
 BYTECURVE_URL = "https://app.bytecurve360.com/portal/core/#/login"
+KEY_FILE = "secret.key"
+CREDENTIAL_FILE = "credentials.enc"
 
-def decrypt_credential(encrypted_value: str) -> str:
-    """Decrypts a value using the key stored in environment variables."""
-    key = os.getenv("BYTECURVE_CRYPTO_KEY")
-    if not key or not encrypted_value:
-        return encrypted_value  # Returns value as-is if no key exists
+def generate_key():
+    key = Fernet.generate_key()
+    with open(KEY_FILE, "wb") as key_file:
+        key_file.write(key)
+    return key
+
+def load_key():
+    if not os.path.exists(KEY_FILE):
+        return generate_key()
+    with open(KEY_FILE, "rb") as key_file:
+        return key_file.read()
+
+def encrypt_credentials(username, password, key):
+    f = Fernet(key)
+    data = f"{username}:{password}".encode()
+    encrypted = f.encrypt(data)
+    with open(CREDENTIAL_FILE, "wb") as file:
+        file.write(encrypted)
+
+def decrypt_credentials(key):
+    if not os.path.exists(CREDENTIAL_FILE):
+        return "", ""
     try:
-        f = Fernet(key.encode())
-        return f.decrypt(encrypted_value.encode()).decode()
+        f = Fernet(key)
+        with open(CREDENTIAL_FILE, "rb") as file:
+            encrypted = file.read()
+        decrypted = f.decrypt(encrypted).decode()
+        username, password = decrypted.split(":", 1)
+        return username, password
     except Exception as e:
-        logging.error(f"Decryption failed: {e}")
-        return encrypted_value
+        # If decryption fails, return empty credentials
+        logging.warning(f"Could not decrypt credentials: {e}")
+        return "", ""
+
+def keep_active(stop_event, interval=10):
+    """Keep system active by periodic mouse movements, clicks and keyboard input for Insightful."""
+    pyautogui.FAILSAFE = False
+    while not stop_event.is_set():
+        try:
+            # Simulate human-like mouse wiggle and scroll
+            dist = random.randint(10, 30)
+            pyautogui.moveRel(dist, 0, duration=0.2)
+            pyautogui.moveRel(-dist, 0, duration=0.2)
+            pyautogui.scroll(random.choice([-1, 1]))
+            
+            pyautogui.press('f15')
+            
+            # Randomize sleep to avoid pattern detection (e.g., 8-12 seconds)
+            time.sleep(interval + random.uniform(-2, 2))
+        except Exception as e:
+            logging.error(f"Error in keep_active: {e}")
+            time.sleep(interval)
 
 # --- Custom Tkinter Log Handler ---
 class TkinterLogHandler(logging.Handler):
@@ -79,6 +125,7 @@ class TkinterLogHandler(logging.Handler):
 USERNAME, PASSWORD = "", ""
 AUTOMATION_STOP_FLAG = False  # Flag to signal automation to stop
 AUTOMATION_THREAD = None  # Reference to the automation thread
+KEEP_ACTIVE_STOP_EVENT = threading.Event()  # Global event to control keep_active
 
 # Task-specific policies for adjustments
 TASK_POLICIES = {
@@ -159,6 +206,14 @@ def parse_kendo_time(time_str: str) -> str:
             
     return f"{time_val} {meridiem}"
 
+def times_match(t1: str, t2: str) -> bool:
+    """Intelligently compares two time strings regardless of leading zeros or whitespace."""
+    clean_t1 = parse_kendo_time(t1 or "").lower().strip()
+    clean_t2 = parse_kendo_time(t2 or "").lower().strip()
+    if not clean_t1 or not clean_t2:
+        return clean_t1 == clean_t2
+    return clean_t1 == clean_t2
+
 def login(page: Page):
     """Handles login authentication."""
     logging.info(f"Navigating to {BYTECURVE_URL}...")
@@ -222,71 +277,59 @@ def adjust_time_entry(page: Page, row, col_index: int, new_time_str: str) -> boo
         page.locator(scroll_container_selector).evaluate(f"el => el.scrollTop = {row_top} - 100")
         page.wait_for_timeout(200)
 
-        # Get the cell (td with aria-colindex)
         cell = row.locator(f"td[aria-colindex='{col_index}']")
         cell.wait_for(state="visible", timeout=10000)
         
-        logging.info(f"TIMEPICKER: Activating cell (aria-colindex={col_index}) for value: {new_time_str}")
-        
-        # Click the cell to activate the timepicker (this will show the input field)
-        # Use bounding box to ensure we click the center of the cell
-        box = cell.bounding_box()
-        if box:
-            page.mouse.click(box['x'] + box['width'] / 2, box['y'] + box['height'] / 2)
-        else:
-            cell.click(force=True, timeout=5000)
+        # Robust Check: If input is already present, don't dblclick (it might close the editor)
+        input_field = cell.locator("input")
+        if input_field.count() == 0:
+            logging.info(f"TIMEPICKER: Activating cell (aria-colindex={col_index}) for value: {new_time_str}")
+            cell.dblclick(timeout=5000)
+            page.wait_for_timeout(500)
+            input_field = cell.locator("input")
+
+        # Wait for input to appear and be editable
+        try:
+            input_field.first.wait_for(state="visible", timeout=3000)
+            if not input_field.first.is_editable():
+                raise Exception("Not editable")
+        except Exception:
+            logging.warning(f"TIMEPICKER: Input not ready on col {col_index}, attempting refocus trick...")
+            all_rows = page.locator(f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row")
+            if all_rows.count() > 1:
+                # Row Refocus Trick
+                curr_idx = row.evaluate("el => el.sectionRowIndex")
+                other_row = all_rows.nth(1 if curr_idx == 0 else 0)
+                other_row.locator("td[aria-colindex='10']").click(timeout=2000)
+                page.wait_for_timeout(200)
+                cell.dblclick(timeout=5000)
+                input_field.first.wait_for(state="visible", timeout=5000)
+
+        if not input_field.first.is_visible() or not input_field.first.is_editable():
+            logging.error(f"TIMEPICKER: Failed to detect editable field in col {col_index}")
+            return False
             
+        logging.info(f"TIMEPICKER: Input field ready for column {col_index}")
+        
+        # Clear and Type
+        input_field.first.click()
+        page.keyboard.press("Control+A")
+        page.keyboard.press("Backspace")
+        page.wait_for_timeout(100)
+        input_field.first.type(new_time_str, delay=50)
         page.wait_for_timeout(300)
         
-        # Now find the k-input-inner within the cell (or its parent)
-        # In Kendo grids, the input might be inside the cell or in a popup. 
-        # Usually it's within the cell during inline editing.
-        input_field = row.locator(SELECTORS["timepicker_input"]).first
-        if col_index == 11: # If it's the second timepicker in the row, we might need the second one
-            input_field = row.locator(SELECTORS["timepicker_input"]).nth(1) if row.locator(SELECTORS["timepicker_input"]).count() > 1 else input_field
+        # Press Tab to commit and move to next cell
+        page.keyboard.press("Tab")
+        page.wait_for_timeout(500)
         
-        # Wait for input to appear
-        try:
-            input_field.wait_for(state="visible", timeout=5000)
-        except Exception:
-            logging.warning(f"TIMEPICKER: Input not visible on col {col_index} after click, retrying...")
-            cell.click(force=True, timeout=5000)
-            input_field.wait_for(state="visible", timeout=5000)
-            
-        logging.info(f"TIMEPICKER: Input field appeared for column {col_index}")
-        
-        # Get the input field element and clear it
-        input_field.click(force=True)
-        page.wait_for_timeout(100)
-        input_field.press("Control+A")
-        page.wait_for_timeout(100)
-        input_field.press("Backspace")
-        page.wait_for_timeout(200)
-        
-        # Type the new time value slowly
-        logging.info(f"TIMEPICKER: Typing value '{new_time_str}' into column {col_index}")
-        input_field.type(new_time_str, delay=30)  # Typing for combobox to register
-        page.wait_for_timeout(200)  # Wait for typing to complete
-        
-        # Press Enter to trigger validation and commit
-        logging.info(f"TIMEPICKER: Pressing Enter to save column {col_index}")
-        input_field.press("Enter")
-        page.wait_for_timeout(400)  # Wait for blur event and save to process
-        
-        # Wait for the grid to stabilize
-        wait_for_loading(page)
-        
-        # Confirm the value was saved by reading the cell text
-        saved_value = cell.inner_text(timeout=2000).strip()
-        logging.info(f"TIMEPICKER: Saved cell text: '{saved_value}'")
-        
-        # Use a more relaxed comparison for read-back verification
-        if not saved_value or saved_value == new_time_str.strip() or new_time_str.strip().lower() in saved_value.lower():
-            logging.info(f"SAVED: Column {col_index} successfully saved with value '{saved_value}'")
+        # Confirm save
+        saved_value = (cell.text_content(timeout=2000) or "").strip()
+        if times_match(saved_value, new_time_str):
             return True
         else:
-            logging.warning(f"VERIFY: Saved value '{saved_value}' does not exactly match '{new_time_str}'. Grid may have reformatted. Considering success.")
-            return True  # Accept because grid might reformat times
+            logging.warning(f"VERIFY: Mismatch on col {col_index}. Expected '{new_time_str}', got '{saved_value}'")
+            return False
             
     except Exception as e:
         logging.error(f"ACTION: Failed to adjust time entry in column {col_index}: {e}")
@@ -653,26 +696,39 @@ def validate_and_process_rows(page: Page, target_date: str):
         scroll_top = scroll_container.evaluate("el => el.scrollTop")
         task_rows = page.locator(f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row").all()
         target_worker = ""
+        target_worker_id = ""
         target_worker_display = ""
         worker_rows_locators = []
         is_block_complete = False
+        
+        # Detect if we are at the bottom of the scroll to handle the last worker block
+        is_at_bottom = scroll_container.evaluate("el => el.scrollTop + el.clientHeight >= el.scrollHeight - 20")
+
         for i, row in enumerate(task_rows):
             row_date = (row.locator(SELECTORS["row_date"]).text_content(timeout=2000) or "").strip()
             if row_date != target_date_full: continue
             name_span = row.locator(SELECTORS["row_worker_name"]).locator("span[title]").first
+            if name_span.count() == 0: continue
+            
             emp_id = (name_span.get_attribute("title", timeout=2000) or "").strip()
             emp_name = (name_span.text_content(timeout=2000) or "").strip()
             worker_id = emp_id or emp_name
             if not worker_id or worker_id in processed_workers: continue
             if not target_worker:
                 target_worker = worker_id
+                target_worker_id = emp_id
+                target_worker_name = emp_name
                 target_worker_display = f"{emp_name} ({emp_id})" if emp_id else emp_name
             if worker_id == target_worker:
                 worker_rows_locators.append(row)
                 if i < len(task_rows) - 1:
-                    next_row_name = task_rows[i+1].locator(SELECTORS["row_worker_name"]).locator("span[title]").first
-                    next_id = (next_row_name.get_attribute("title") or next_row_name.text_content()).strip()
-                    if next_id != target_worker: is_block_complete = True
+                    next_name_span = task_rows[i+1].locator(SELECTORS["row_worker_name"]).locator("span[title]").first
+                    if next_name_span.count() > 0:
+                        next_id = (next_name_span.get_attribute("title") or next_name_span.text_content()).strip()
+                        if next_id != target_worker: is_block_complete = True
+                elif is_at_bottom:
+                    is_block_complete = True
+
         if not target_worker:
             scroll_container.evaluate("el => el.scrollTop += 800")
             page.wait_for_timeout(1000)
@@ -681,34 +737,53 @@ def validate_and_process_rows(page: Page, target_date: str):
                 break
             continue
         if not is_block_complete:
-            worker_rows_locators[-1].scroll_into_view_if_needed()
-            page.wait_for_timeout(500)
+            scroll_container.evaluate("el => el.scrollTop += 300")
+            page.wait_for_timeout(400)
             continue
         # PHASE 5: Looping the previous phases per employee
         worker_fully_processed = False
+        retry_tracking = {} # To detect stuck tasks
+        manual_flag = False
+        
+        # Use a flexible filter on the Employee column text to find rows reliably
+        worker_row_filter = page.locator(f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row").filter(
+            has=page.locator("td[aria-colindex='2'] span").get_by_text(target_worker_name, exact=True)
+        )
+
         while not worker_fully_processed and not AUTOMATION_STOP_FLAG:
             wait_for_loading(page)
             # PHASE 1: Identification of verified task or not per employee
             worker_tasks = []
             fixed_intervals = []
-            rows = page.locator(f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row").all()
-            for row in rows:
-                name_span = row.locator(SELECTORS["row_worker_name"]).locator("span[title]").first
-                row_id = (name_span.get_attribute("title") or name_span.text_content()).strip()
-                if row_id != target_worker: continue
+
+            # Re-fetch worker rows to ensure locators are fresh
+            worker_rows = worker_row_filter.all() 
+            if not worker_rows:
+                logging.warning(f"STALE: Could not find rows for {target_worker_display}. Skipping.")
+                processed_workers.add(target_worker)
+                scroll_container.evaluate("el => el.scrollTop += 400") # Force movement to break loop
+                break
+
+            for row in worker_rows:
                 is_verified = row.locator(SELECTORS["row_checkbox"]).is_checked()
-                t_code_text = row.locator(SELECTORS["row_task_code"]).text_content().strip()
+                t_code_text = (row.locator(SELECTORS["row_task_code"]).text_content() or "").strip()
+                t_name_text = (row.locator(SELECTORS["row_task_name"]).text_content() or "").strip()
                 p_start = parse_kendo_time(row.locator(SELECTORS["row_paid_start"]).text_content() or "")
                 p_end = parse_kendo_time(row.locator(SELECTORS["row_paid_end"]).text_content() or "")
                 s_text = row.locator(SELECTORS["row_sched_range"]).text_content() or ""
-                s_range = s_text.split('-')
+                a_text = row.locator(SELECTORS["row_actual_range"]).text_content() or ""
+                s_range = [x.strip() for x in s_text.split('-') if x.strip()]
+                a_range = [x.strip() for x in a_text.split('-') if x.strip()]
+
                 task_info = {
                     'row': row, 
                     'verified': is_verified, 
                     'code': t_code_text, 
+                    'name': t_name_text,
                     'p_start': p_start, 
                     'p_end': p_end, 
-                    's_range': s_range
+                    's_range': s_range,
+                    'a_range': a_range
                 }
                 worker_tasks.append(task_info)
                 if is_verified:
@@ -717,36 +792,97 @@ def validate_and_process_rows(page: Page, target_date: str):
                     if s_dt and e_dt: fixed_intervals.append((s_dt, e_dt))
             # PHASE 2: Adjustment of Paid time according to current conditionals
             adjustment_made = False
+            manual_flag = False
+
             for task in worker_tasks:
                 if task['verified'] or len(task['s_range']) < 2: continue
-                s_sched_str = parse_kendo_time(task['s_range'][0])
-                e_sched_str = parse_kendo_time(task['s_range'][1])
-                prop_start_dt = parse_time_to_datetime(s_sched_str, target_dt)
-                prop_end_dt = parse_time_to_datetime(e_sched_str, target_dt)
-                if not prop_start_dt or not prop_end_dt: continue
-                if "Extra Work" in task['code'] or "S2S Charter" in task['code']:
-                    prop_end_dt = prop_start_dt + datetime.timedelta(minutes=1)
+                
+                # Conditional 2: Skip Bridge Charter
+                if any(kw in task['code'] for kw in ["Bridge Charter", "BridgeCharter"]) or \
+                   any(kw in task['name'] for kw in ["Bridge Charter", "BridgeCharter"]):
+                    logging.info(f"SKIP: {task['code']} is Bridge Charter. Manual adjustment required.")
+                    continue
+
+                # Setup DateTimes
+                s_sched_dt = parse_time_to_datetime(task['s_range'][0], target_dt)
+                e_sched_dt = parse_time_to_datetime(task['s_range'][1], target_dt)
+                if not s_sched_dt or not e_sched_dt: continue
+                
+                # Determine Proposed Subset
+                if any(word in task['code'] for word in ["Extra Work", "S2S Charter"]):
+                    # Conditional 1: 1-minute span
+                    prop_start_dt, prop_end_dt = s_sched_dt, s_sched_dt + datetime.timedelta(minutes=1)
+                elif any(word in task['code'] for word in ["Spare CDL", "Spare Monitor"]) or \
+                     ("HTS" in task['code'] and any(word in task['code'] for word in ["Units", "Hrs"])):
+                    # Conditionals 3 & 4: Exact Schedule
+                    prop_start_dt, prop_end_dt = s_sched_dt, e_sched_dt
+                else:
+                    # Conditional 5: Comparison logic (Under Schedule)
+                    a_start_dt = parse_time_to_datetime(task['a_range'][0], target_dt) if len(task['a_range']) > 0 else s_sched_dt
+                    a_end_dt = parse_time_to_datetime(task['a_range'][1], target_dt) if len(task['a_range']) > 1 else e_sched_dt
+                    prop_start_dt = max(a_start_dt or s_sched_dt, s_sched_dt)
+                    prop_end_dt = min(a_end_dt or e_sched_dt, e_sched_dt)
+
+                # Resolve Overlaps and apply the 15-minute violation rule
                 final_s, final_e = get_non_overlapping_interval(prop_start_dt, prop_end_dt, fixed_intervals)
+                
+                # Check for 15-minute overlap violation (Rule 1 & 5)
+                time_shifed_mins = (final_s - prop_start_dt).total_seconds() / 60
+                if time_shifed_mins > 15:
+                    logging.warning(f"FLAG: Overlap shift {time_shifed_mins}m > 15m for {task['code']}. Manual review required.")
+                    manual_flag = True
+                    continue
+
                 t_start, t_end = final_s.strftime("%I:%M %p"), final_e.strftime("%I:%M %p")
-                if task['p_start'] != t_start or task['p_end'] != t_end:
+                
+                if not times_match(task['p_start'], t_start) or not times_match(task['p_end'], t_end):
+                    # Detect if we are stuck updating this specific task
+                    task_key = f"{target_worker}_{task['code']}_{t_start}_{t_end}"
+                    retry_tracking[task_key] = retry_tracking.get(task_key, 0) + 1
+                    
+                    if retry_tracking[task_key] > 3:
+                        logging.error(f"STUCK: Task {task['code']} for {target_worker_display} failed to update after 3 tries. Skipping worker.")
+                        worker_fully_processed = True
+                        processed_workers.add(target_worker)
+                        break
+
                     logging.info(f"PHASE 2: Adjustment needed for {task['code']} for {target_worker_display}")
                     # PHASE 3: Save/Update the changes
-                    if adjust_time_entry(page, task['row'], 10, t_start) and adjust_time_entry(page, task['row'], 11, t_end):
-                        save_btn = task['row'].locator(SELECTORS["row_save_btn"])
+                    success_s = adjust_time_entry(page, task['row'], 10, t_start) if not times_match(task['p_start'], t_start) else True
+                    page.wait_for_timeout(300)
+                    success_e = adjust_time_entry(page, task['row'], 11, t_end) if not times_match(task['p_end'], t_end) else True
+                    
+                    if success_s and success_e:
+                        save_btn = task['row'].locator(SELECTORS["row_save_btn"]).first
+                        save_btn.wait_for(state="visible", timeout=5000)
+                        
+                        # Wait for button to become enabled (Kendo delay after input)
+                        for _ in range(10):
+                            if save_btn.is_enabled(): break
+                            page.wait_for_timeout(300)
+                            
+                        if save_btn.is_enabled():
+                            logging.info(f"PHASE 3: Clicking Update for {task['code']}")
                         if save_btn.is_enabled():
                             save_btn.click(force=True)
-                            page.wait_for_timeout(1500)
+                            page.wait_for_timeout(2000)
                             wait_for_loading(page)
                             adjustment_made = True
                             break # Break for-loop to re-map after save
+            
+            if worker_fully_processed:
+                continue
+                
             if adjustment_made: continue # Restart the while-loop to re-map
             # PHASE 4: Mark down adjusted tasks and click Verify button
-            rows = page.locator(f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row").all()
+            if manual_flag: 
+                logging.info(f"PHASE 4: Skipping verification for {target_worker_display} due to flags.")
+                processed_workers.add(target_worker)
+                break
+
+            worker_rows = worker_row_filter.all()
             checked_count = 0
-            for row in rows:
-                name_span = row.locator(SELECTORS["row_worker_name"]).locator("span[title]").first
-                row_id = (name_span.get_attribute("title") or name_span.text_content()).strip()
-                if row_id != target_worker: continue
+            for row in worker_rows:
                 if not row.locator(SELECTORS["row_checkbox"]).is_checked():
                     logging.info(f"PHASE 4: Marking {target_worker_display} task for verification")
                     if verify_task_checkbox(page, row, "N/A", target_worker_display):
@@ -758,7 +894,7 @@ def validate_and_process_rows(page: Page, target_date: str):
                     logging.error(f"PHASE 4: Failed to click Verify button for {target_worker_display}")
             processed_workers.add(target_worker)
             worker_fully_processed = True
-            scroll_container.evaluate("el => el.scrollTop = 0")
+            break # Break current worker loop to refresh master grid handles
 
 def run_playwright_automation(log_text_widget, username, password, start_button, stop_button):
     """Runs the Playwright automation in a separate thread."""
@@ -782,7 +918,7 @@ def run_playwright_automation(log_text_widget, username, password, start_button,
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=False, channel="chrome", args=["--start-maximized"])
-            context = browser.new_context(viewport={"width": 1920, "height": 1080})
+            context = browser.new_context(no_viewport=True)
             page = context.new_page()
 
             try:
@@ -817,7 +953,7 @@ def run_playwright_automation(log_text_widget, username, password, start_button,
         stop_button.configure(state="disabled")
         AUTOMATION_STOP_FLAG = False
         logging.info("UI: Controls re-enabled. Ready for next automation run.")
-def start_automation_thread(log_text_widget, username_entry, password_entry, start_button, stop_button):
+def start_automation_thread(log_text_widget, username_entry, password_entry, save_creds_var, start_button, stop_button):
     """Starts the Playwright automation in a new thread."""
     global AUTOMATION_STOP_FLAG, AUTOMATION_THREAD
     
@@ -827,6 +963,11 @@ def start_automation_thread(log_text_widget, username_entry, password_entry, sta
     if not username or not password:
         messagebox.showwarning("Missing Credentials", "Please enter both username and password.")
         return
+
+    # Encrypt and save credentials locally if requested
+    if save_creds_var.get():
+        encryption_key = load_key()
+        encrypt_credentials(username, password, encryption_key)
 
     # Disable input fields and button during automation
     username_entry.configure(state="disabled")
@@ -864,24 +1005,53 @@ def start_gui_and_automation():
     root.geometry("800x650") # Increased height for Stop button
     root.configure(fg_color=BS_GRAY_100) # Set background color for the root window
 
+    # Load and decrypt existing credentials to pre-fill the GUI
+    encryption_key = load_key()
+    saved_user, saved_pass = decrypt_credentials(encryption_key)
+
+    # Start keep-active background thread for the entire lifetime of the application
+    ka_thread = threading.Thread(target=keep_active, args=(KEEP_ACTIVE_STOP_EVENT,))
+    ka_thread.daemon = True
+    ka_thread.start()
+    logging.info("SYSTEM: Keep-active simulation started for the application session.")
+
+    def on_closing():
+        KEEP_ACTIVE_STOP_EVENT.set() # Stop the simulation thread
+        root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", on_closing)
+
     # --- Credential Input Frame ---
     credential_frame = ctk.CTkFrame(root, fg_color=BS_GRAY_200, corner_radius=10)
     credential_frame.pack(pady=10, padx=10, fill=ctk.X)
 
-    ctk.CTkLabel(credential_frame, text="Username:", text_color=BS_BLACK).grid(row=0, column=0, sticky=ctk.W, pady=5, padx=10)
-    username_entry = ctk.CTkEntry(credential_frame, width=200, fg_color=BS_WHITE, text_color=BS_BLACK) # Removed insertbackground
-    username_entry.grid(row=0, column=1, pady=5, padx=10)
+    # Inner frame to hold and center the credential fields
+    inner_fields_frame = ctk.CTkFrame(credential_frame, fg_color="transparent")
+    inner_fields_frame.pack(pady=10)
 
-    ctk.CTkLabel(credential_frame, text="Password:", text_color=BS_BLACK).grid(row=1, column=0, sticky=ctk.W, pady=5, padx=10)
-    password_entry = ctk.CTkEntry(credential_frame, width=200, show="*", fg_color=BS_WHITE, text_color=BS_BLACK) # Removed insertbackground
+    ctk.CTkLabel(inner_fields_frame, text="Username:", text_color=BS_BLACK).grid(row=0, column=0, sticky=ctk.E, pady=5, padx=5)
+    username_entry = ctk.CTkEntry(inner_fields_frame, width=250, fg_color=BS_WHITE, text_color=BS_BLACK)
+    username_entry.grid(row=0, column=1, pady=5, padx=10)
+    username_entry.insert(0, saved_user)
+
+    ctk.CTkLabel(inner_fields_frame, text="Password:", text_color=BS_BLACK).grid(row=1, column=0, sticky=ctk.E, pady=5, padx=5)
+    password_entry = ctk.CTkEntry(inner_fields_frame, width=250, show="*", fg_color=BS_WHITE, text_color=BS_BLACK)
     password_entry.grid(row=1, column=1, pady=5, padx=10)
+    password_entry.insert(0, saved_pass)
+
+    # Save credentials checkbox centered below fields
+    save_creds_var = ctk.BooleanVar(value=True if saved_user else False)
+    save_creds_checkbox = ctk.CTkCheckBox(credential_frame, text="Save Credentials Encrypted", 
+                                          variable=save_creds_var, text_color=BS_BLACK,
+                                          fg_color=BS_PRIMARY, hover_color=BS_BLUE)
+    save_creds_checkbox.pack(pady=5)
 
     # --- Button Frame ---
-    button_frame = ctk.CTkFrame(credential_frame, fg_color=BS_GRAY_200)
-    button_frame.grid(row=2, columnspan=2, pady=10)
+    button_frame = ctk.CTkFrame(credential_frame, fg_color="transparent")
+    button_frame.pack(pady=15)
 
     start_button = ctk.CTkButton(button_frame, text="Start Automation", 
-                                 command=lambda: start_automation_thread(log_text_widget, username_entry, password_entry, start_button, stop_button),
+                                 command=lambda: start_automation_thread(log_text_widget, username_entry, password_entry, save_creds_var, start_button, stop_button),
                                  fg_color=BS_PRIMARY, text_color=BS_WHITE,
                                  hover_color=BS_BLUE)
     start_button.pack(side=ctk.LEFT, padx=5)
