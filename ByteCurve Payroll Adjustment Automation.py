@@ -159,7 +159,7 @@ SELECTORS = {
     "row_paid_end": "td[aria-colindex='11']",      # Paid End time cell
     "row_paid_reg": "td[aria-colindex='12']",
     "row_checkbox": "input[kendocheckbox][aria-label='verify']",  # Kendo checkbox with verify label
-    "row_save_btn": "button.k-grid-save-command",
+    "row_save_btn": "button.k-grid-save-command, button[title='Update'], button[kendogridsavecommand]",
     "date_filter_btns_container": "[data-testid='date-filter-btns-container']",
     "checkbox_verified": "#checkboxInclude3",
     "checkbox_auto_verified": "#checkboxInclude4",
@@ -312,16 +312,27 @@ def adjust_time_entry(page: Page, row, col_index: int, new_time_str: str) -> boo
         logging.info(f"TIMEPICKER: Input field ready for column {col_index}")
         
         # Clear and Type
-        input_field.first.click()
+        input_field.first.click(force=True)
         page.keyboard.press("Control+A")
         page.keyboard.press("Backspace")
         page.wait_for_timeout(100)
         input_field.first.type(new_time_str, delay=50)
         page.wait_for_timeout(300)
         
-        # Press Tab to commit and move to next cell
-        page.keyboard.press("Tab")
+        # Use Enter to commit the adjustment instead of Tab.
+        # This prevents the grid from losing row focus and triggering 'Unsaved Changes' dialogs.
+        page.keyboard.press("Enter")
         page.wait_for_timeout(500)
+        
+        # Dismiss any Kendo confirmation modal that blocks the grid UI
+        try:
+            dialog_ok = page.locator("button.k-button-solid-primary, button[data-testid='bulk-update-ok-btn']").filter(has_text=re.compile("Ok|Yes|Update", re.I))
+            if dialog_ok.count() > 0 and dialog_ok.first.is_visible():
+                logging.info("DIALOG: Dismissing commit confirmation modal.")
+                dialog_ok.first.click(timeout=2000)
+                page.wait_for_timeout(500)
+        except Exception:
+            pass
         
         # Confirm save
         saved_value = (cell.text_content(timeout=2000) or "").strip()
@@ -795,31 +806,35 @@ def validate_and_process_rows(page: Page, target_date: str):
             manual_flag = False
 
             for task in worker_tasks:
-                if task['verified'] or len(task['s_range']) < 2: continue
+                if task.get('verified') or len(task.get('s_range', [])) < 2: continue
+                
+                # Define task variables to fix NameError and ensure consistency
+                task_code = task.get('code', 'N/A')
+                task_name = task.get('name', 'N/A')
                 
                 # Conditional 2: Skip Bridge Charter
-                if any(kw in task['code'] for kw in ["Bridge Charter", "BridgeCharter"]) or \
-                   any(kw in task['name'] for kw in ["Bridge Charter", "BridgeCharter"]):
-                    logging.info(f"SKIP: {task['code']} is Bridge Charter. Manual adjustment required.")
+                if any(kw in task_code for kw in ["Bridge Charter", "BridgeCharter"]) or \
+                   any(kw in task_name for kw in ["Bridge Charter", "BridgeCharter"]):
+                    logging.info(f"SKIP: {task_code} is Bridge Charter. Manual adjustment required.")
                     continue
 
                 # Setup DateTimes
-                s_sched_dt = parse_time_to_datetime(task['s_range'][0], target_dt)
-                e_sched_dt = parse_time_to_datetime(task['s_range'][1], target_dt)
+                s_sched_dt = parse_time_to_datetime(task.get('s_range', [])[0], target_dt)
+                e_sched_dt = parse_time_to_datetime(task.get('s_range', [])[1], target_dt)
                 if not s_sched_dt or not e_sched_dt: continue
                 
                 # Determine Proposed Subset
-                if any(word in task['code'] for word in ["Extra Work", "S2S Charter"]):
+                if any(word in task_code for word in ["Extra Work", "S2S Charter"]):
                     # Conditional 1: 1-minute span
                     prop_start_dt, prop_end_dt = s_sched_dt, s_sched_dt + datetime.timedelta(minutes=1)
-                elif any(word in task['code'] for word in ["Spare CDL", "Spare Monitor"]) or \
-                     ("HTS" in task['code'] and any(word in task['code'] for word in ["Units", "Hrs"])):
+                elif any(word in task_code for word in ["Spare CDL", "Spare Monitor"]) or \
+                     ("HTS" in task_code and any(word in task_code for word in ["Units", "Hrs"])):
                     # Conditionals 3 & 4: Exact Schedule
                     prop_start_dt, prop_end_dt = s_sched_dt, e_sched_dt
                 else:
                     # Conditional 5: Comparison logic (Under Schedule)
-                    a_start_dt = parse_time_to_datetime(task['a_range'][0], target_dt) if len(task['a_range']) > 0 else s_sched_dt
-                    a_end_dt = parse_time_to_datetime(task['a_range'][1], target_dt) if len(task['a_range']) > 1 else e_sched_dt
+                    a_start_dt = parse_time_to_datetime(task.get('a_range', [])[0], target_dt) if len(task.get('a_range', [])) > 0 else s_sched_dt
+                    a_end_dt = parse_time_to_datetime(task.get('a_range', [])[1], target_dt) if len(task.get('a_range', [])) > 1 else e_sched_dt
                     prop_start_dt = max(a_start_dt or s_sched_dt, s_sched_dt)
                     prop_end_dt = min(a_end_dt or e_sched_dt, e_sched_dt)
 
@@ -829,28 +844,28 @@ def validate_and_process_rows(page: Page, target_date: str):
                 # Check for 15-minute overlap violation (Rule 1 & 5)
                 time_shifed_mins = (final_s - prop_start_dt).total_seconds() / 60
                 if time_shifed_mins > 15:
-                    logging.warning(f"FLAG: Overlap shift {time_shifed_mins}m > 15m for {task['code']}. Manual review required.")
+                    logging.warning(f"FLAG: Overlap shift {time_shifed_mins}m > 15m for {task_code}. Manual review required.")
                     manual_flag = True
                     continue
 
                 t_start, t_end = final_s.strftime("%I:%M %p"), final_e.strftime("%I:%M %p")
                 
-                if not times_match(task['p_start'], t_start) or not times_match(task['p_end'], t_end):
+                if not times_match(task.get('p_start'), t_start) or not times_match(task.get('p_end'), t_end):
                     # Detect if we are stuck updating this specific task
-                    task_key = f"{target_worker}_{task['code']}_{t_start}_{t_end}"
+                    task_key = f"{target_worker}_{task_code}_{t_start}_{t_end}"
                     retry_tracking[task_key] = retry_tracking.get(task_key, 0) + 1
                     
-                    if retry_tracking[task_key] > 3:
-                        logging.error(f"STUCK: Task {task['code']} for {target_worker_display} failed to update after 3 tries. Skipping worker.")
+                    if retry_tracking.get(task_key, 0) > 3:
+                        logging.error(f"STUCK: Task {task_code} for {target_worker_display} failed to update after 3 tries. Skipping worker.")
                         worker_fully_processed = True
                         processed_workers.add(target_worker)
                         break
 
-                    logging.info(f"PHASE 2: Adjustment needed for {task['code']} for {target_worker_display}")
+                    logging.info(f"PHASE 2: Adjustment needed for {task_code} for {target_worker_display}")
                     # PHASE 3: Save/Update the changes
-                    success_s = adjust_time_entry(page, task['row'], 10, t_start) if not times_match(task['p_start'], t_start) else True
+                    success_s = adjust_time_entry(page, task['row'], 10, t_start) if not times_match(task.get('p_start'), t_start) else True
                     page.wait_for_timeout(300)
-                    success_e = adjust_time_entry(page, task['row'], 11, t_end) if not times_match(task['p_end'], t_end) else True
+                    success_e = adjust_time_entry(page, task['row'], 11, t_end) if not times_match(task.get('p_end'), t_end) else True
                     
                     if success_s and success_e:
                         save_btn = task['row'].locator(SELECTORS["row_save_btn"]).first
@@ -862,7 +877,7 @@ def validate_and_process_rows(page: Page, target_date: str):
                             page.wait_for_timeout(300)
                             
                         if save_btn.is_enabled():
-                            logging.info(f"PHASE 3: Clicking Update for {task['code']}")
+                            logging.info(f"PHASE 3: Clicking Update for {task_code}")
                         if save_btn.is_enabled():
                             save_btn.click(force=True)
                             page.wait_for_timeout(2000)
@@ -922,6 +937,9 @@ def run_playwright_automation(log_text_widget, username, password, start_button,
             page = context.new_page()
 
             try:
+                # Auto-accept native browser alerts to prevent the bot from hanging
+                page.on("dialog", lambda dialog: dialog.accept())
+
                 # Ensure credentials are set before starting Playwright
                 if not USERNAME or not PASSWORD:
                     logging.critical("CRITICAL: Credentials are not set. Exiting automation.")
