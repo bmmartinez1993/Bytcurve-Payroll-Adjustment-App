@@ -792,124 +792,103 @@ def validate_and_process_rows(page: Page, target_date: str):
                     'code': t_code_text, 
                     'name': t_name_text,
                     'p_start': p_start, 
-                    'p_end': p_end, 
+                    'p_end': p_end,
                     's_range': s_range,
                     'a_range': a_range
                 }
+                
+                # Calculate proposed times for this task
+                t_prop_start, t_prop_end = None, None
+                if len(s_range) >= 2:
+                    s_sched_dt = parse_time_to_datetime(s_range[0], target_dt)
+                    e_sched_dt = parse_time_to_datetime(s_range[1], target_dt)
+                    if s_sched_dt and e_sched_dt:
+                        if any(kw in t_code_text for kw in ["Extra Work", "S2S Charter"]):
+                            prop_start_dt, prop_end_dt = s_sched_dt, s_sched_dt + datetime.timedelta(minutes=1)
+                        elif any(kw in t_code_text for kw in ["Spare CDL", "Spare Monitor"]) or \
+                             ("HTS" in t_code_text and any(kw in t_code_text for kw in ["Units", "Hrs"])):
+                            prop_start_dt, prop_end_dt = s_sched_dt, e_sched_dt
+                        else:
+                            a_start_dt = parse_time_to_datetime(a_range[0], target_dt) if len(a_range) > 0 else s_sched_dt
+                            a_end_dt = parse_time_to_datetime(a_range[1], target_dt) if len(a_range) > 1 else e_sched_dt
+                            prop_start_dt = max(a_start_dt or s_sched_dt, s_sched_dt)
+                            prop_end_dt = min(a_end_dt or e_sched_dt, e_sched_dt)
+                        
+                        t_prop_start, t_prop_end = prop_start_dt, prop_end_dt
+                
+                task_info["prop_start_dt"] = t_prop_start
+                task_info["prop_end_dt"] = t_prop_end
+                
                 worker_tasks.append(task_info)
+                
                 if is_verified:
-                    s_dt = parse_time_to_datetime(p_start, target_dt)
-                    e_dt = parse_time_to_datetime(p_end, target_dt)
-                    if s_dt and e_dt: fixed_intervals.append((s_dt, e_dt))
-            # PHASE 2: Adjustment of Paid time according to current conditionals
-            adjustment_made = False
-            manual_flag = False
+                    fixed_intervals.append((parse_time_to_datetime(p_start, target_dt), parse_time_to_datetime(p_end, target_dt)))
 
+            # PHASE 2 & 3: Find THE FIRST task that needs adjustment, update it, and RESET grid
+            adjustment_made = False
             for task in worker_tasks:
-                if task.get('verified') or len(task.get('s_range', [])) < 2: continue
+                if task['verified'] or not task['prop_start_dt']: continue
                 
-                # Define task variables to fix NameError and ensure consistency
-                task_code = task.get('code', 'N/A')
-                task_name = task.get('name', 'N/A')
+                task_code = task['code']
+                task_name = task['name']
                 
-                # Conditional 2: Skip Bridge Charter
                 if any(kw in task_code for kw in ["Bridge Charter", "BridgeCharter"]) or \
                    any(kw in task_name for kw in ["Bridge Charter", "BridgeCharter"]):
-                    logging.info(f"SKIP: {task_code} is Bridge Charter. Manual adjustment required.")
                     continue
 
-                # Setup DateTimes
-                s_sched_dt = parse_time_to_datetime(task.get('s_range', [])[0], target_dt)
-                e_sched_dt = parse_time_to_datetime(task.get('s_range', [])[1], target_dt)
-                if not s_sched_dt or not e_sched_dt: continue
+                # Resolve Overlaps against fixed intervals
+                final_s, final_e = get_non_overlapping_interval(task['prop_start_dt'], task['prop_end_dt'], fixed_intervals)
                 
-                # Determine Proposed Subset
-                if any(word in task_code for word in ["Extra Work", "S2S Charter"]):
-                    # Conditional 1: 1-minute span
-                    prop_start_dt, prop_end_dt = s_sched_dt, s_sched_dt + datetime.timedelta(minutes=1)
-                elif any(word in task_code for word in ["Spare CDL", "Spare Monitor"]) or \
-                     ("HTS" in task_code and any(word in task_code for word in ["Units", "Hrs"])):
-                    # Conditionals 3 & 4: Exact Schedule
-                    prop_start_dt, prop_end_dt = s_sched_dt, e_sched_dt
-                else:
-                    # Conditional 5: Comparison logic (Under Schedule)
-                    a_start_dt = parse_time_to_datetime(task.get('a_range', [])[0], target_dt) if len(task.get('a_range', [])) > 0 else s_sched_dt
-                    a_end_dt = parse_time_to_datetime(task.get('a_range', [])[1], target_dt) if len(task.get('a_range', [])) > 1 else e_sched_dt
-                    prop_start_dt = max(a_start_dt or s_sched_dt, s_sched_dt)
-                    prop_end_dt = min(a_end_dt or e_sched_dt, e_sched_dt)
-
-                # Resolve Overlaps and apply the 15-minute violation rule
-                final_s, final_e = get_non_overlapping_interval(prop_start_dt, prop_end_dt, fixed_intervals)
-                
-                # Check for 15-minute overlap violation (Rule 1 & 5)
-                time_shifed_mins = (final_s - prop_start_dt).total_seconds() / 60
+                time_shifed_mins = (final_s - task['prop_start_dt']).total_seconds() / 60
                 if time_shifed_mins > 15:
-                    logging.warning(f"FLAG: Overlap shift {time_shifed_mins}m > 15m for {task_code}. Manual review required.")
-                    manual_flag = True
-                    continue
+                    manual_flag = True; continue
 
                 t_start, t_end = final_s.strftime("%I:%M %p"), final_e.strftime("%I:%M %p")
                 
-                if not times_match(task.get('p_start'), t_start) or not times_match(task.get('p_end'), t_end):
-                    # Detect if we are stuck updating this specific task
+                if not times_match(task['p_start'], t_start) or not times_match(task['p_end'], t_end):
                     task_key = f"{target_worker}_{task_code}_{t_start}_{t_end}"
                     retry_tracking[task_key] = retry_tracking.get(task_key, 0) + 1
-                    
-                    if retry_tracking.get(task_key, 0) > 3:
-                        logging.error(f"STUCK: Task {task_code} for {target_worker_display} failed to update after 3 tries. Skipping worker.")
-                        worker_fully_processed = True
-                        processed_workers.add(target_worker)
-                        break
+                    if retry_tracking[task_key] > 3: 
+                        logging.error(f"STUCK: {task_code} failed 3 times. Skipping worker."); worker_fully_processed = True; break
 
-                    logging.info(f"PHASE 2: Adjustment needed for {task_code} for {target_worker_display}")
-                    # PHASE 3: Save/Update the changes
-                    success_s = adjust_time_entry(page, task['row'], 10, t_start) if not times_match(task.get('p_start'), t_start) else True
-                    page.wait_for_timeout(300)
-                    success_e = adjust_time_entry(page, task['row'], 11, t_end) if not times_match(task.get('p_end'), t_end) else True
+                    logging.info(f"PHASE 2: Adjusting {task_code} for {target_worker_display}")
+                    success_s = adjust_time_entry(page, task['row'], 10, t_start) if not times_match(task['p_start'], t_start) else True
+                    success_e = adjust_time_entry(page, task['row'], 11, t_end) if not times_match(task['p_end'], t_end) else True
                     
                     if success_s and success_e:
                         save_btn = task['row'].locator(SELECTORS["row_save_btn"]).first
                         save_btn.wait_for(state="visible", timeout=5000)
-                        
-                        # Wait for button to become enabled (Kendo delay after input)
-                        for _ in range(10):
+                        for _ in range(10): 
                             if save_btn.is_enabled(): break
                             page.wait_for_timeout(300)
-                            
+                        
                         if save_btn.is_enabled():
-                            logging.info(f"PHASE 3: Clicking Update for {task_code}")
-                        if save_btn.is_enabled():
+                            logging.info(f"PHASE 3: Clicking Update for {task_code}. Grid will reset.")
                             save_btn.click(force=True)
-                            page.wait_for_timeout(2000)
                             wait_for_loading(page)
-                            adjustment_made = True
-                            break # Break for-loop to re-map after save
+                            adjustment_made = True; break 
             
-            if worker_fully_processed:
-                continue
-                
-            if adjustment_made: continue # Restart the while-loop to re-map
-            # PHASE 4: Mark down adjusted tasks and click Verify button
-            if manual_flag: 
-                logging.info(f"PHASE 4: Skipping verification for {target_worker_display} due to flags.")
-                processed_workers.add(target_worker)
-                break
+            if worker_fully_processed or AUTOMATION_STOP_FLAG: continue
+            if adjustment_made: continue # Restart inner while-loop (Phase 1) for the same employee
+
+            # PHASE 4: No more adjustments needed. Mark & Verify.
+            if manual_flag:
+                logging.info(f"PHASE 4: Flags exist for {target_worker_display}. Skipping verification."); processed_workers.add(target_worker); break
 
             worker_rows = worker_row_filter.all()
             checked_count = 0
             for row in worker_rows:
                 if not row.locator(SELECTORS["row_checkbox"]).is_checked():
-                    logging.info(f"PHASE 4: Marking {target_worker_display} task for verification")
-                    if verify_task_checkbox(page, row, "N/A", target_worker_display):
-                        checked_count += 1
+                    if verify_task_checkbox(page, row, "N/A", target_worker_display): checked_count += 1
+            
             if checked_count > 0:
+                logging.info(f"PHASE 4: Clicking Verify for {target_worker_display}. Grid will reset.")
                 if click_verify_button(page, target_worker_display):
-                    logging.info(f"PHASE 4: Bulk verification complete for {target_worker_display}")
-                else:
-                    logging.error(f"PHASE 4: Failed to click Verify button for {target_worker_display}")
+                    logging.info(f"PHASE 4: Verification complete for {target_worker_display}")
+                wait_for_loading(page)
+
             processed_workers.add(target_worker)
             worker_fully_processed = True
-            break # Break current worker loop to refresh master grid handles
 
 def run_playwright_automation(log_text_widget, username, password, start_button, stop_button):
     """Runs the Playwright automation in a separate thread."""
