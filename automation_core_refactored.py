@@ -696,19 +696,27 @@ def ensure_row_visible(page: Page, row: Locator, grid_selector: str,
         True if row was successfully made visible, False otherwise
     """
     try:
-        # Get the row's offset position
-        row_top = row.evaluate("el => el.offsetTop")
-
-        # Scroll the container to position the row
-        scroll_container = page.locator(grid_selector)
-        scroll_container.evaluate(f"el => el.scrollTop = {row_top} - {scroll_offset}")
-
-        # Allow scroll to complete
+        # Primary path: let the browser scroll the element into view natively.
+        # This works whenever the element is already attached to the DOM
+        # (even if outside the visible area) and is faster than offsetTop math.
+        row.scroll_into_view_if_needed(timeout=3000)
         page.wait_for_timeout(200)
+        return True
+    except Exception:
+        pass
 
+    try:
+        # Fallback: compute offsetTop and set scrollTop on the container.
+        # Use a short timeout so we don't block for the 30-second Playwright
+        # default when the row has been virtualized out of the DOM.
+        row_top = row.evaluate("el => el.offsetTop", timeout=2000)
+        page.locator(grid_selector).evaluate(
+            f"el => el.scrollTop = Math.max(0, {row_top} - {scroll_offset})"
+        )
+        page.wait_for_timeout(200)
         return True
     except Exception as e:
-        logging.error(f"SCROLL: Failed to make row visible: {e}")
+        logging.warning(f"SCROLL: Row not accessible (may be virtualized): {e}")
         return False
 
 

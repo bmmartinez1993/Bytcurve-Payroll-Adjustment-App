@@ -403,6 +403,61 @@ def _read_task_row(row) -> dict:
     }
 
 
+def _scroll_worker_into_view(page: Page, scroll_container, worker_name: str) -> bool:
+    """
+    Brings the target worker's rows into the Kendo virtual grid's DOM render window.
+
+    Kendo virtual grids remove off-screen rows from the DOM, making Playwright
+    locator operations time out.  This function uses JavaScript (which never
+    waits for DOM elements) to find any rendered row that belongs to the worker,
+    then scrolls the container so those rows are centred in the viewport.
+
+    If the rows are not currently rendered, the function scrolls through the
+    grid in both directions until it finds them.
+    """
+    grid_sel = SELECTORS["payload_task_grid"]
+
+    # JavaScript that looks through CURRENTLY RENDERED rows for this worker.
+    # Returns the row's offsetTop if found, null otherwise.
+    find_js = """
+        ([sel, name]) => {
+            var content = document.querySelector(sel + ' div.k-grid-content');
+            if (!content) return null;
+            var rows = content.querySelectorAll('tbody tr.k-master-row');
+            for (var row of rows) {
+                var span = row.querySelector('td[aria-colindex="2"] span[title]');
+                if (span && span.textContent.trim() === name) {
+                    return row.offsetTop;
+                }
+            }
+            return null;
+        }
+    """
+
+    def _scroll_to_top_found():
+        top = page.evaluate(find_js, [grid_sel, worker_name])
+        if top is not None:
+            scroll_container.evaluate(f"el => el.scrollTop = Math.max(0, {top} - 80)")
+            page.wait_for_timeout(250)
+            return True
+        return False
+
+    # Check current scroll position first (fastest path).
+    if _scroll_to_top_found():
+        return True
+
+    # Not visible — scan through the grid (down first, then up).
+    for step_px in [300, -300]:
+        for _ in range(25):
+            scroll_container.evaluate(f"el => el.scrollTop += {step_px}")
+            page.wait_for_timeout(150)
+            if _scroll_to_top_found():
+                return True
+
+    logging.warning(f"SCROLL: Could not locate rows for '{worker_name}' in the grid.")
+    return False
+
+
 def _calculate_proposed_times(task: dict, target_dt: dt):
     """Returns (proposed_start_dt, proposed_end_dt) or (None, None) for skipped tasks."""
     s_range = task["s_range"]
@@ -458,7 +513,8 @@ def _click_update_button(page: Page, row, task_code: str) -> bool:
 
 
 def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
-                         worker_id: str, target_dt: dt) -> bool:
+                         worker_id: str, target_dt: dt,
+                         scroll_container=None, worker_name: str = "") -> bool:
     """
     Inner adjustment loop for one worker.
 
@@ -472,6 +528,13 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
     manual_flag = False
 
     while not AUTOMATION_STOP_FLAG:
+        # Bring worker rows into the Kendo virtual grid's render window BEFORE
+        # calling .all() — otherwise virtualized (off-screen) rows are absent
+        # from the DOM and every subsequent locator operation times out (30 s).
+        if scroll_container is not None and worker_name:
+            _scroll_worker_into_view(page, scroll_container, worker_name)
+            page.wait_for_timeout(400)
+
         wait_for_loading(page)
         worker_rows = worker_filter.all()
         if not worker_rows:
@@ -551,8 +614,13 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
     return False  # Stopped
 
 
-def _verify_worker_tasks(page: Page, worker_filter, worker_display: str) -> None:
+def _verify_worker_tasks(page: Page, worker_filter, worker_display: str,
+                         scroll_container=None, worker_name: str = "") -> None:
     """Checks all unchecked task checkboxes then clicks the Verify button."""
+    if scroll_container is not None and worker_name:
+        _scroll_worker_into_view(page, scroll_container, worker_name)
+        page.wait_for_timeout(400)
+
     worker_rows = worker_filter.all()
     checked_count = sum(
         1 for row in worker_rows
@@ -600,10 +668,16 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
 
         logging.info(f"WORKER: Processing {worker_display}")
 
-        adjustments_ok = _adjust_worker_tasks(page, worker_filter, worker_display, worker_id, target_dt)
+        adjustments_ok = _adjust_worker_tasks(
+            page, worker_filter, worker_display, worker_id, target_dt,
+            scroll_container=scroll_container, worker_name=worker_name,
+        )
 
         if adjustments_ok:
-            _verify_worker_tasks(page, worker_filter, worker_display)
+            _verify_worker_tasks(
+                page, worker_filter, worker_display,
+                scroll_container=scroll_container, worker_name=worker_name,
+            )
             logging.info(f"WORKER: Done with {worker_display}")
         else:
             logging.warning(f"WORKER: Skipping verification for {worker_display} (manual review needed)")
