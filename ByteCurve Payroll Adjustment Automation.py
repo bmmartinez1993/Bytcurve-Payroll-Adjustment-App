@@ -4,6 +4,7 @@ import datetime
 from datetime import datetime as dt
 import os
 import random
+import re
 import time
 import pyautogui
 import logging
@@ -85,8 +86,8 @@ SELECTORS = {
     "checkbox_pending_review": "#checkboxInclude5",
     "btn_verify":              "button.k-button.k-primary",
     "btn_dialog_ok":           "button[data-testid='bulk-update-ok-btn']",
-    "weekly_view_btn":         "weekly-view-btn",
-    "detailed_view_btn":       "detailed-view-btn",
+    "weekly_view_btn":         "weekly-view-btn",      # present on the daily view (toggles to weekly)
+    "auto_verify_btn":         "auto-verify-btn",      # present on the daily view (bulk auto-verify)
     "filter_submit_btn":       "filter-submit-btn",
 }
 
@@ -242,16 +243,25 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
         page.wait_for_selector("div[role='dialog'][aria-modal='true']", state="visible", timeout=15000)
         page.wait_for_timeout(500)
 
+        # Primary: the test-id the dialog ships with. If that is absent, fall back to
+        # the generic Kendo confirm-dialog primary button (proven in diagnose_dialog.py),
+        # scoped to the open dialog and matched on its action text.
         ok_btn = page.locator(SELECTORS["btn_dialog_ok"])
-        ok_btn.wait_for(state="visible", timeout=10000)
-        ok_btn.scroll_into_view_if_needed()
-        page.wait_for_timeout(500)
-
         if ok_btn.count() == 0:
+            ok_btn = page.locator(
+                "div[role='dialog'] button.k-button-solid-primary, "
+                "div[role='dialog'] button.k-primary"
+            ).filter(has_text=re.compile(r"ok|yes|update", re.I))
+
+        try:
+            ok_btn.first.wait_for(state="visible", timeout=10000)
+        except Exception:
             logging.error(f"VERIFY_BTN: Dialog OK not found for {worker_name}")
             return False
 
-        ok_btn.click(force=True, timeout=5000, delay=100)
+        ok_btn.first.scroll_into_view_if_needed()
+        page.wait_for_timeout(500)
+        ok_btn.first.click(force=True, timeout=5000, delay=100)
         page.wait_for_timeout(3000)
         wait_for_loading(page)
         page.wait_for_timeout(1500)
@@ -268,11 +278,19 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
 # ===========================================================================
 
 def _setup_view_and_filters(page: Page, target_date_short: str) -> None:
-    """Switches to detailed view, selects the date, checks filters, and sorts."""
-    detailed_btn = page.get_by_test_id(SELECTORS["detailed_view_btn"])
+    """Confirms the daily grid is loaded, selects the date, checks filters, and sorts."""
     wait_for_loading(page)
-    if detailed_btn.is_visible():
-        detailed_btn.click()
+
+    # "Verify Hours" lands directly on the daily/detailed view, so no view toggle is
+    # needed — the editable paid-time grid (payload-task-grid) is present on landing.
+    # We simply confirm it has rendered before relying on its rows/columns.
+    grid = page.locator(SELECTORS["payload_task_grid"])
+    try:
+        grid.first.wait_for(state="visible", timeout=15000)
+    except Exception:
+        logging.error("VIEW: Daily payroll grid not found — aborting filter setup.")
+        return
+
     wait_for_loading(page)
 
     date_btn = (
