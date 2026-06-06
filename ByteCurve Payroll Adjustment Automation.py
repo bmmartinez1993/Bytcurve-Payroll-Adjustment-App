@@ -37,14 +37,33 @@ from automation_core_refactored import (
 )
 
 # --- LOGGING CONFIGURATION ---
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler("automation_activity.log", encoding='utf-8'),
-        logging.StreamHandler()
-    ]
+
+class _LiveFileHandler(logging.FileHandler):
+    """FileHandler that flushes to disk after every record for live log tailing."""
+    def emit(self, record):
+        super().emit(record)
+        self.flush()
+
+_log_formatter = logging.Formatter(
+    fmt='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
 )
+
+_file_handler = _LiveFileHandler(
+    "automation_activity.log",
+    mode='w',           # overwrite each run — keeps the file to the current session only
+    encoding='utf-8',
+)
+_file_handler.setFormatter(_log_formatter)
+
+_stream_handler = logging.StreamHandler()
+_stream_handler.setFormatter(_log_formatter)
+
+_root_logger = logging.getLogger()
+_root_logger.setLevel(logging.INFO)
+_root_logger.handlers.clear()          # remove any handlers set by imported modules
+_root_logger.addHandler(_file_handler)
+_root_logger.addHandler(_stream_handler)
 
 # --- ByteCurve Color Palette ---
 BS_BLUE    = "#0d6efd"
@@ -79,13 +98,15 @@ SELECTORS = {
     "row_paid_start":          "td[aria-colindex='10']",
     "row_paid_end":            "td[aria-colindex='11']",
     "row_checkbox":            "input[kendocheckbox][aria-label='verify']",
-    "row_save_btn":            "button.k-grid-save-command, button[title='Update'], button[kendogridsavecommand]",
     "date_filter_btns_container": "[data-testid='date-filter-btns-container']",
     "checkbox_verified":       "#checkboxInclude3",
     "checkbox_auto_verified":  "#checkboxInclude4",
     "checkbox_pending_review": "#checkboxInclude5",
     "btn_verify":              "button.k-button.k-primary",
     "btn_dialog_ok":           "button[data-testid='bulk-update-ok-btn']",
+    "btn_confirm_changes_yes": "button[data-testid='confirm-changes-yes-btn']",
+    "btn_confirm_changes_no":  "button[data-testid='confirm-changes-no-btn']",
+    "btn_conflict_ok":         "button[data-testid='verification-conflict-ok-btn']",
     "weekly_view_btn":         "weekly-view-btn",      # present on the daily view (toggles to weekly)
     "auto_verify_btn":         "auto-verify-btn",      # present on the daily view (bulk auto-verify)
     "filter_submit_btn":       "filter-submit-btn",
@@ -265,6 +286,31 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
         page.wait_for_timeout(3000)
         wait_for_loading(page)
         page.wait_for_timeout(1500)
+
+        # After the grid reloads, the platform may show an "Employee Conflict"
+        # dialog if a verified task overlaps with another worker's already-verified
+        # schedule.  This dialog does NOT have data-testid='confirm-changes-dialog'
+        # so _handle_confirm_changes_dialog would miss it without this check.
+        conflict_btn = page.locator(SELECTORS["btn_conflict_ok"])
+        if conflict_btn.count() > 0 and conflict_btn.first.is_visible():
+            logging.info(
+                f"VERIFY_BTN: 'Employee Conflict' dialog detected after verification "
+                f"for {worker_name}. Clicking Ok."
+            )
+            try:
+                conflict_btn.first.scroll_into_view_if_needed()
+                conflict_btn.first.click(force=True)
+                page.wait_for_selector(
+                    "div[role='dialog'][aria-modal='true'].k-dialog",
+                    state="hidden", timeout=6000
+                )
+                page.wait_for_timeout(800)
+                wait_for_loading(page)
+            except Exception as ce:
+                logging.warning(
+                    f"VERIFY_BTN: Could not dismiss conflict dialog for {worker_name}: {ce}"
+                )
+
         logging.info(f"VERIFY_BTN: Verification complete for {worker_name}")
         return True
 
@@ -423,54 +469,94 @@ def _read_task_row(row) -> dict:
 
 def _scroll_worker_into_view(page: Page, scroll_container, worker_name: str) -> bool:
     """
-    Brings the target worker's rows into the Kendo virtual grid's DOM render window.
+    Brings the target worker's rows into the Kendo virtual grid's DOM render window
+    and waits until they are confirmed present before returning.
 
-    Kendo virtual grids remove off-screen rows from the DOM, making Playwright
-    locator operations time out.  This function uses JavaScript (which never
-    waits for DOM elements) to find any rendered row that belongs to the worker,
-    then scrolls the container so those rows are centred in the viewport.
+    Kendo virtual grids remove off-screen rows from the DOM, so Playwright
+    locator operations on those rows time out.  This function:
 
-    If the rows are not currently rendered, the function scrolls through the
-    grid in both directions until it finds them.
+    1. Calls scrollIntoView() on any matching row already in the render window
+       (correct for CSS-transform virtual scroll — offsetTop must NOT be used).
+    2. After scrolling, polls with wait_for_function until the row is confirmed
+       in the DOM (up to 3 s), so the caller never reads a stale empty list.
+    3. If the row is not currently rendered, scans the grid in 400 px increments
+       (down first, then up) until it finds and confirms the row.
     """
     grid_sel = SELECTORS["payload_task_grid"]
 
-    # JavaScript that looks through CURRENTLY RENDERED rows for this worker.
-    # Returns the row's offsetTop if found, null otherwise.
-    find_js = """
+    # JS: find the row, call scrollIntoView so the container scrolls to it.
+    scroll_js = """
         ([sel, name]) => {
             var content = document.querySelector(sel + ' div.k-grid-content');
-            if (!content) return null;
+            if (!content) return false;
             var rows = content.querySelectorAll('tbody tr.k-master-row');
             for (var row of rows) {
                 var span = row.querySelector('td[aria-colindex="2"] span[title]');
                 if (span && span.textContent.trim() === name) {
-                    return row.offsetTop;
+                    row.scrollIntoView({ block: 'center', inline: 'nearest' });
+                    return true;
                 }
             }
-            return null;
+            return false;
         }
     """
 
-    def _scroll_to_top_found():
-        top = page.evaluate(find_js, [grid_sel, worker_name])
-        if top is not None:
-            scroll_container.evaluate(f"el => el.scrollTop = Math.max(0, {top} - 80)")
-            page.wait_for_timeout(250)
-            return True
-        return False
+    # JS: check whether the row is currently rendered — used for polling.
+    check_js = """
+        ([sel, name]) => {
+            var content = document.querySelector(sel + ' div.k-grid-content');
+            if (!content) return false;
+            var rows = content.querySelectorAll('tbody tr.k-master-row');
+            for (var row of rows) {
+                var span = row.querySelector('td[aria-colindex="2"] span[title]');
+                if (span && span.textContent.trim() === name) return true;
+            }
+            return false;
+        }
+    """
 
-    # Check current scroll position first (fastest path).
-    if _scroll_to_top_found():
+    def _scroll_and_confirm():
+        """scrollIntoView the row, then poll until Kendo re-renders it."""
+        if not page.evaluate(scroll_js, [grid_sel, worker_name]):
+            return False
+        # Kendo virtual grid re-renders rows after every scroll.  Poll until
+        # the row is stable in the DOM rather than relying on a fixed timeout.
+        try:
+            page.wait_for_function(check_js, arg=[grid_sel, worker_name], timeout=3000)
+            return True
+        except Exception:
+            return False
+
+    # Fast path: row already in current render window (most iterations after a
+    # simple grid reload land here and return immediately).
+    if _scroll_and_confirm():
         return True
 
-    # Not visible — scan through the grid (down first, then up).
-    for step_px in [300, -300]:
-        for _ in range(25):
-            scroll_container.evaluate(f"el => el.scrollTop += {step_px}")
-            page.wait_for_timeout(150)
-            if _scroll_to_top_found():
-                return True
+    # Full-grid scan.
+    #
+    # After a dialog-triggered save, Kendo leaves the grid scrolled to the
+    # "next-employee" row that was double-clicked to trigger the dialog.  That
+    # employee may be further down the grid than the worker we are still
+    # processing, so a bidirectional scan that starts from the current position
+    # only goes *forward* (deeper) and then back to the same starting point —
+    # it never reaches rows that are *above* the starting position.
+    #
+    # Fix: reset scrollTop to 0 first so the scan always covers the entire
+    # grid from the very top, regardless of where Kendo left the scroll.
+    scroll_container.evaluate("el => { el.scrollTop = 0; }")
+    page.wait_for_timeout(400)   # let Kendo re-render the initial rows at top
+
+    if _scroll_and_confirm():
+        return True
+
+    # Scan downward: 55 steps × 400 px = 22,000 px — enough for very large
+    # employee rosters. At 200 ms per step the worst-case cost is ~11 s; in
+    # practice the row is found in the first 20–30 steps.
+    for _ in range(55):
+        scroll_container.evaluate("el => el.scrollTop += 400")
+        page.wait_for_timeout(200)
+        if _scroll_and_confirm():
+            return True
 
     logging.warning(f"SCROLL: Could not locate rows for '{worker_name}' in the grid.")
     return False
@@ -506,27 +592,236 @@ def _calculate_proposed_times(task: dict, target_dt: dt):
     return prop_start, prop_end
 
 
-def _click_update_button(page: Page, row, task_code: str) -> bool:
-    """Clicks the row's Update/Save button and waits for the grid to reload."""
-    try:
-        save_btn = row.locator(SELECTORS["row_save_btn"]).first
-        save_btn.wait_for(state="visible", timeout=5000)
+def _handle_confirm_changes_dialog(page: Page, task_code: str,
+                                    timeout: int = 8000) -> bool:
+    """Dismisses any Kendo modal dialog that is currently blocking the page.
 
-        for _ in range(MAX_RETRY_ATTEMPTS * 10):
-            if save_btn.is_enabled():
-                break
-            page.wait_for_timeout(100)
+    Handles two distinct dialog types that can appear during automation:
 
-        if not save_btn.is_enabled():
-            logging.warning(f"SAVE: Update button never enabled for {task_code}")
+    1. 'Unsaved changes' dialog (data-testid='confirm-changes-dialog')
+       Appears when navigating away from an inline-edited row.
+       Action: click Yes (btn_confirm_changes_yes) to commit the edit.
+
+    2. 'Employee Conflict' dialog (no wrapper data-testid)
+       Appears after verification when the platform detects that a worker is
+       already verified for an overlapping task (another client's schedule).
+       Action: click Ok (btn_conflict_ok) to acknowledge and continue.
+
+    The function detects WHICH dialog is showing by checking which action
+    button is visible, then clicks the correct one.
+
+    ``timeout`` controls how long to wait for ANY dialog to appear.
+    Pass a short value (e.g. 1 500 ms) for pre-emptive cleanup checks.
+
+    Returns True if a dialog was found and dismissed, False otherwise.
+    """
+    wrapper_sel  = "[data-testid='confirm-changes-dialog']"
+    any_dlg_sel  = "div[role='dialog'][aria-modal='true'].k-dialog"
+
+    # Fast-path: wait for any Kendo modal to become visible.
+    detected = False
+    for sel in (wrapper_sel, any_dlg_sel):
+        try:
+            page.wait_for_selector(sel, state="visible", timeout=timeout)
+            detected = True
+            break
+        except Exception:
+            pass
+
+    if not detected:
+        return False
+
+    # Determine dialog type by checking which button is present.
+    conflict_btn   = page.locator(SELECTORS["btn_conflict_ok"]).first
+    yes_btn        = page.locator(SELECTORS["btn_confirm_changes_yes"]).first
+
+    if conflict_btn.is_visible():
+        # ── Employee Conflict dialog ──────────────────────────────────────────
+        logging.info(
+            f"DIALOG: 'Employee Conflict' dialog detected for {task_code}. "
+            "Clicking Ok to acknowledge."
+        )
+        try:
+            conflict_btn.scroll_into_view_if_needed()
+            conflict_btn.click(force=True)
+            page.wait_for_selector(any_dlg_sel, state="hidden", timeout=8000)
+            return True
+        except Exception as e:
+            logging.warning(
+                f"DIALOG: Could not dismiss conflict dialog for {task_code}: {e}"
+            )
             return False
 
-        logging.info(f"SAVE: Clicking Update for {task_code}. Grid will reload.")
-        save_btn.click(force=True)
-        wait_for_loading(page)
+    # ── Unsaved changes dialog ────────────────────────────────────────────────
+    logging.info(
+        f"DIALOG: 'Unsaved changes' dialog detected for {task_code}. Clicking Yes."
+    )
+    try:
+        yes_btn.wait_for(state="visible", timeout=5000)
+        yes_btn.scroll_into_view_if_needed()
+        yes_btn.click(force=True)
+        page.wait_for_selector(wrapper_sel, state="hidden", timeout=8000)
         return True
     except Exception as e:
-        logging.error(f"SAVE: Update click failed for {task_code}: {e}")
+        logging.warning(f"DIALOG: Could not dismiss dialog for {task_code}: {e}")
+        return False
+
+
+
+def _save_via_navigation_dialog(page: Page, task_code: str,
+                                 current_task_idx: int, tasks: list) -> bool:
+    """
+    Saves an in-edit row by triggering Kendo's "Unsaved changes" dialog.
+
+    Strategy (in priority order)
+    ─────────────────────────────
+    PRIMARY — Double-click the next employee's paid-start cell.
+      The dialog reliably fires when Kendo detects an edit attempt on a row that
+      belongs to a different employee block.  Double-click is the real edit
+      gesture, matching exactly what a user would do.
+
+    FALLBACK — Double-click within-block adjacent row (paid-start → paid-end).
+      Used only when the next-employee row is not reachable from the DOM.
+
+    Pre-step: dispatch 'input'+'change' on every input inside the current edit
+    row so Angular's FormControl marks the values as dirty before navigation.
+    Without this, Kendo sees the row as unchanged and skips the dialog.
+    """
+    try:
+        # ── Pre-step: mark row dirty in Angular ───────────────────────────────
+        page.evaluate("""() => {
+            var row = document.querySelector('tr.k-grid-edit-row');
+            if (!row) return;
+            row.querySelectorAll('input').forEach(function(inp) {
+                inp.dispatchEvent(new Event('input',  { bubbles: true }));
+                inp.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        }""")
+        page.wait_for_timeout(600)
+
+        def _dblclick_coords_and_check(cx: float, cy: float, label: str) -> bool:
+            """Double-click at (cx, cy) and return True if the dialog appears."""
+            logging.info(
+                f"SAVE_VIA_DIALOG [{task_code}]: dblclick {label} "
+                f"at ({cx:.0f}, {cy:.0f})."
+            )
+            page.mouse.dblclick(cx, cy)
+            page.wait_for_timeout(2000)
+            if _handle_confirm_changes_dialog(page, task_code, timeout=5000):
+                return True
+            return False
+
+        # ── PRIMARY: double-click next employee's paid-start cell ─────────────
+        logging.info(
+            f"SAVE_VIA_DIALOG [{task_code}]: PRIMARY — locating next-employee row."
+        )
+        try:
+            last_handle = tasks[-1]["row"].element_handle(timeout=2000)
+            if last_handle:
+                # Walk DOM forward from the last row of the current employee block
+                # to find the first k-master-row belonging to a different employee.
+                # Try paid-start (col 10), then paid-end (col 11), then first td.
+                coords_list = page.evaluate("""(lastRow) => {
+                    var results = [];
+                    var el = lastRow.nextElementSibling;
+                    while (el) {
+                        if (el.classList.contains('k-master-row')) {
+                            var selectors = [
+                                'td[aria-colindex="10"]',
+                                'td[aria-colindex="11"]',
+                                'td'
+                            ];
+                            for (var i = 0; i < selectors.length; i++) {
+                                var cell = el.querySelector(selectors[i]);
+                                if (cell) {
+                                    cell.scrollIntoView({
+                                        block: 'nearest', inline: 'nearest'
+                                    });
+                                    var r = cell.getBoundingClientRect();
+                                    if (r.width > 0 && r.height > 0) {
+                                        results.push({
+                                            x: r.left + r.width  / 2,
+                                            y: r.top  + r.height / 2,
+                                            col: selectors[i]
+                                        });
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        el = el.nextElementSibling;
+                    }
+                    return results;
+                }""", last_handle)
+
+                if coords_list:
+                    page.wait_for_timeout(400)   # let scroll settle
+                    c = coords_list[0]
+                    cx, cy = c["x"], c["y"]
+                    col_label = f"next-employee {c['col']}"
+                    if _dblclick_coords_and_check(cx, cy, col_label):
+                        wait_for_loading(page)
+                        return True
+                    # Second attempt: single-click first, then double-click
+                    logging.info(
+                        f"SAVE_VIA_DIALOG [{task_code}]: dblclick did not trigger dialog — "
+                        "retrying with single-click then dblclick."
+                    )
+                    page.mouse.click(cx, cy)
+                    page.wait_for_timeout(600)
+                    if _dblclick_coords_and_check(cx, cy, col_label + " (retry)"):
+                        wait_for_loading(page)
+                        return True
+                else:
+                    logging.info(
+                        f"SAVE_VIA_DIALOG [{task_code}]: no next-employee row found in DOM."
+                    )
+        except Exception as ex:
+            logging.warning(
+                f"SAVE_VIA_DIALOG [{task_code}]: next-employee PRIMARY failed — {ex}"
+            )
+
+        # ── FALLBACK: double-click within-block adjacent row ──────────────────
+        if current_task_idx + 1 < len(tasks):
+            nav_row = tasks[current_task_idx + 1]["row"]
+        elif current_task_idx > 0:
+            nav_row = tasks[current_task_idx - 1]["row"]
+        else:
+            nav_row = None
+
+        if nav_row is not None:
+            logging.info(
+                f"SAVE_VIA_DIALOG [{task_code}]: FALLBACK — dblclick within-block "
+                "adjacent row."
+            )
+            for label, sel in (
+                ("paid-start", SELECTORS["row_paid_start"]),
+                ("paid-end",   SELECTORS["row_paid_end"]),
+            ):
+                try:
+                    cell = nav_row.locator(sel)
+                    cell.scroll_into_view_if_needed()
+                    box = cell.bounding_box()
+                    if box:
+                        cx = box["x"] + box["width"]  / 2
+                        cy = box["y"] + box["height"] / 2
+                        if _dblclick_coords_and_check(cx, cy, f"within-block {label}"):
+                            wait_for_loading(page)
+                            return True
+                except Exception as ex:
+                    logging.warning(
+                        f"SAVE_VIA_DIALOG [{task_code}]: fallback {label} — {ex}"
+                    )
+
+        logging.warning(
+            f"SAVE_VIA_DIALOG: Save dialog did not appear for {task_code} "
+            "after all strategies (next-employee dblclick + within-block fallback)."
+        )
+        return False
+
+    except Exception as e:
+        logging.error(f"SAVE_VIA_DIALOG: Failed for {task_code}: {e}")
         return False
 
 
@@ -534,16 +829,25 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                          worker_id: str, target_dt: dt,
                          scroll_container=None, worker_name: str = "") -> bool:
     """
-    Inner adjustment loop for one worker.
+    Adjusts all unadjusted paid-time tasks for one worker, then signals
+    readiness for verification.
 
-    Reads all tasks fresh on each iteration (the grid reloads after every
-    Update click). Adjusts exactly one task per pass, then restarts.
+    Per-task flow (matches the required automation steps):
+      1. Adjust the paid-start and paid-end cells.
+      2. Click the adjacent row to trigger Kendo's "Unsaved changes" dialog,
+         then click Yes to commit the save.
+      3. The grid reloads after each save, so rows are re-read fresh and the
+         next unadjusted task is located for the next iteration.
+    Verification (checkbox marking + Verify button) is handled by the caller
+    ONLY after this function returns True — i.e., after ALL tasks for this
+    worker have been adjusted.
 
-    Returns True when there are no more adjustments to make, False if the
-    worker must be skipped due to repeated failures.
+    Returns True when no more adjustments are needed, False when the worker
+    must be skipped (repeated failures or manual-review flag).
     """
     retry_tracking: dict[str, int] = {}
     manual_flag = False
+    _stale_budget = 3  # retries before giving up when rows aren't in DOM yet
 
     while not AUTOMATION_STOP_FLAG:
         # Bring worker rows into the Kendo virtual grid's render window BEFORE
@@ -556,8 +860,18 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
         wait_for_loading(page)
         worker_rows = worker_filter.all()
         if not worker_rows:
-            logging.warning(f"STALE: Rows gone for {worker_display}. Skipping.")
+            if _stale_budget > 0:
+                _stale_budget -= 1
+                logging.info(
+                    f"STALE: Rows not in DOM yet for {worker_display} — "
+                    f"retrying ({_stale_budget} retries left)."
+                )
+                page.wait_for_timeout(1200)
+                continue
+            logging.warning(f"STALE: Rows gone for {worker_display} after all retries. Skipping.")
             return False
+
+        _stale_budget = 3  # reset on successful read so later iterations get fresh budget
 
         # Build task list and collect fixed (verified) intervals
         tasks = [_read_task_row(r) for r in worker_rows]
@@ -569,8 +883,9 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
         ]
 
         adjustment_made = False
+        needs_retry     = False   # set when a save attempt fails so we loop again
 
-        for task in tasks:
+        for task_idx, task in enumerate(tasks):
             if task["verified"]:
                 continue
             if determine_task_policy(task["code"], task["name"]) is None:
@@ -580,8 +895,30 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
             if not prop_s:
                 continue
 
+            # Guard: raw interval invalid (start >= end).  Kendo silently
+            # rejects reversed times so the row never becomes dirty and the
+            # "Unsaved changes" dialog never fires — all retries are wasted.
+            if prop_s >= prop_e:
+                logging.warning(
+                    f"SKIP: {task['code']} for {worker_display} has invalid interval "
+                    f"({datetime_to_time_str(prop_s)} ≥ {datetime_to_time_str(prop_e)}) "
+                    f"— manual review needed."
+                )
+                manual_flag = True
+                continue
+
             # Resolve overlaps against already-fixed intervals
             final_s, final_e = get_non_overlapping_interval(prop_s, prop_e, fixed_intervals)
+
+            # Guard: overlap resolution can also produce a reversed interval.
+            if final_s >= final_e:
+                logging.warning(
+                    f"SKIP: {task['code']} for {worker_display} interval invalid after "
+                    f"overlap resolution ({datetime_to_time_str(final_s)} ≥ "
+                    f"{datetime_to_time_str(final_e)}) — manual review needed."
+                )
+                manual_flag = True
+                continue
 
             shift_mins = (final_s - prop_s).total_seconds() / 60
             if shift_mins > MAX_TIME_SHIFT_MINUTES:
@@ -604,7 +941,14 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                 logging.error(f"STUCK: {task['code']} failed {MAX_RETRY_ATTEMPTS} times. Skipping worker.")
                 return False
 
-            logging.info(f"ADJUST: {task['code']} for {worker_display} → {t_start} – {t_end}")
+            logging.info(
+                f"STEP1: Adjusting paid cells — {task['code']} for {worker_display} "
+                f"→ {t_start} – {t_end}"
+            )
+
+            # Dismiss any lingering dialog BEFORE touching cells so its overlay
+            # does not intercept the dblclick on the paid-start/end cells.
+            _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
 
             ok_s = adjust_time_entry(page, task["row"], COL_PAID_START, t_start) \
                    if not times_match(task["p_start"], t_start) else True
@@ -612,22 +956,92 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                    if not times_match(task["p_end"],   t_end)   else True
 
             if ok_s and ok_e:
-                if _click_update_button(page, task["row"], task["code"]):
+                logging.info(
+                    f"STEP2: Paid cells adjusted — clicking adjacent row to trigger "
+                    f"save dialog for {task['code']}."
+                )
+                if _save_via_navigation_dialog(page, task["code"], task_idx, tasks):
+                    logging.info(
+                        f"STEP3: {task['code']} saved. Grid reloaded — "
+                        f"locating next unadjusted task for {worker_display}."
+                    )
                     retry_tracking.pop(task_key, None)
                     adjustment_made = True
-                    break  # Grid reset — restart loop
+                else:
+                    # Dialog was not triggered — cell click did not register through
+                    # Kendo's JS pipeline. Break so the outer loop re-reads the grid
+                    # and retries; do NOT fall through to verification.
+                    logging.warning(
+                        f"SAVE_FAIL: Save dialog not triggered for {task['code']} "
+                        f"({worker_display}). Retrying on next pass."
+                    )
+                    _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
+                    needs_retry = True
+                break  # Always break — grid state changed; re-read rows regardless
             else:
-                logging.warning(f"ADJUST_FAIL: {task['code']} for {worker_display}")
+                logging.warning(
+                    f"ADJUST_FAIL: Could not edit paid cells for {task['code']} "
+                    f"({worker_display}). Checking if edit row is still open."
+                )
+                # Kendo TimePicker stores its value via a custom ControlValueAccessor,
+                # so Playwright's fill() sets the displayed value correctly while
+                # input.value (read by adjust_time_entry's VERIFY) returns ''.
+                # If the edit row is still open in the DOM the fields ARE set —
+                # navigate to the next employee to trigger the save dialog so
+                # Kendo commits the values that are visually shown.
+                edit_row_open = False
+                try:
+                    edit_row_open = page.locator("tr.k-grid-edit-row").is_visible(
+                        timeout=1500
+                    )
+                except Exception:
+                    pass
 
-        if adjustment_made:
-            continue  # Restart to pick up refreshed grid
+                if edit_row_open:
+                    logging.info(
+                        f"ADJUST_VERIFY_FAIL [{task['code']}]: Edit row is open — "
+                        "fields may be set. Navigating to next employee to trigger "
+                        "save dialog."
+                    )
+                    if _save_via_navigation_dialog(page, task["code"], task_idx, tasks):
+                        logging.info(
+                            f"STEP3: {task['code']} saved via navigation dialog "
+                            f"despite VERIFY failure. Locating next unadjusted task "
+                            f"for {worker_display}."
+                        )
+                        retry_tracking.pop(task_key, None)
+                        adjustment_made = True
+                    else:
+                        logging.warning(
+                            f"SAVE_FAIL: Save dialog not triggered for {task['code']} "
+                            f"({worker_display}) after VERIFY failure. Retrying."
+                        )
+                        _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
+                        needs_retry = True
+                else:
+                    # Edit row is not open — cell could not be opened at all
+                    # (e.g. a dialog overlay blocked the dblclick). Dismiss any
+                    # lingering dialog and retry on the next pass.
+                    _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
+                    needs_retry = True
+                break  # Always break — grid state may have changed; re-read rows
 
-        # No more adjustments needed (or all remaining tasks are manual-flagged)
+        if adjustment_made or needs_retry:
+            continue  # Restart outer while — re-read rows, find next task
+
+        # Inner for loop completed without any task needing adjustment AND
+        # without any retry signal — all tasks already match their target times
+        # (or were skipped due to policy/overlap).
         if manual_flag:
             logging.info(f"MANUAL_FLAG: Skipping verification for {worker_display}")
             return False
 
-        return True  # All clear — ready for verification
+        # STEP4: All adjustments done — caller will mark checkboxes and verify.
+        logging.info(
+            f"STEP4: All paid-time adjustments complete for {worker_display}. "
+            "Proceeding to verification."
+        )
+        return True
 
     return False  # Stopped
 
@@ -699,6 +1113,8 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
             logging.info(f"WORKER: Done with {worker_display}")
         else:
             logging.warning(f"WORKER: Skipping verification for {worker_display} (manual review needed)")
+
+        logging.info(f"STEP5: Moving to next employee after completing {worker_display}.")
 
         processed_workers.add(worker_id)
 
