@@ -99,6 +99,12 @@ SELECTORS = {
     "row_paid_end":            "td[aria-colindex='11']",
     "row_checkbox":            "input[kendocheckbox][aria-label='verify']",
     "date_filter_btns_container": "[data-testid='date-filter-btns-container']",
+    "date_calendar_btn":          "kendo-datepicker button.k-input-button",
+    "date_calendar":              "kendo-calendar",
+    "date_cal_nav_prev":          "kendo-calendar button.k-calendar-nav-prev",
+    "date_cal_nav_next":          "kendo-calendar button.k-calendar-nav-next",
+    "date_cal_title":             "kendo-calendar button.k-calendar-nav-fast",
+    "date_input":                 "input.k-input-inner[role='combobox']",
     "checkbox_verified":       "#checkboxInclude3",
     "checkbox_auto_verified":  "#checkboxInclude4",
     "checkbox_pending_review": "#checkboxInclude5",
@@ -107,9 +113,12 @@ SELECTORS = {
     "btn_confirm_changes_yes": "button[data-testid='confirm-changes-yes-btn']",
     "btn_confirm_changes_no":  "button[data-testid='confirm-changes-no-btn']",
     "btn_conflict_ok":         "button[data-testid='verification-conflict-ok-btn']",
+    "btn_dialog_close":        "button.k-dialog-close, button[aria-label='Close']",
     "weekly_view_btn":         "weekly-view-btn",      # present on the daily view (toggles to weekly)
     "auto_verify_btn":         "auto-verify-btn",      # present on the daily view (bulk auto-verify)
     "filter_submit_btn":       "filter-submit-btn",
+    "emp_filter":              "[data-testid='emp-input']",
+    "emp_filter_popup_items":  "kendo-popup li.k-list-item",
 }
 
 # --- GLOBAL STATE ---
@@ -311,6 +320,10 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
                     f"VERIFY_BTN: Could not dismiss conflict dialog for {worker_name}: {ce}"
                 )
 
+        # Dismiss any remaining dialog (e.g. 'Task Save Detail') that may have
+        # appeared as server feedback. Its overlay would block the next worker.
+        _handle_confirm_changes_dialog(page, worker_name, timeout=2000)
+
         logging.info(f"VERIFY_BTN: Verification complete for {worker_name}")
         return True
 
@@ -323,7 +336,64 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
 # validate_and_process_rows — split into focused helpers
 # ===========================================================================
 
-def _setup_view_and_filters(page: Page, target_date_short: str) -> None:
+def _select_date_via_calendar(page: Page, target_dt: dt) -> bool:
+    """
+    Selects the business date by typing directly into the Kendo DatePicker
+    input field in MM/DD/YYYY format and pressing Enter.
+
+    Strategy:
+      1. Click the input to focus it (may open the calendar popup).
+      2. Press Escape to close any popup that opened, keeping input focus.
+      3. Press Ctrl+A on the input to select the existing value.
+      4. Type the date character-by-character (so Kendo fires input/change
+         events on each keystroke) in MM/DD/YYYY format.
+      5. Press Enter — Kendo commits the date and reloads the grid.
+
+    Returns True on success, False on any error.
+    """
+    date_str = target_dt.strftime("%m/%d/%Y")   # "06/07/2026"
+
+    def _dismiss_popup():
+        try:
+            page.keyboard.press("Escape")
+            page.wait_for_timeout(200)
+        except Exception:
+            pass
+
+    try:
+        inp = page.locator(SELECTORS["date_input"]).first
+        inp.wait_for(state="visible", timeout=5000)
+
+        # Focus the input — clicking it may open the calendar popup.
+        inp.click()
+        page.wait_for_timeout(300)
+
+        # Close any popup that just opened; the input remains focused.
+        _dismiss_popup()
+
+        # Select the entire existing value so the typed date replaces it.
+        inp.press("Control+a")
+        page.wait_for_timeout(100)
+
+        # Type MM/DD/YYYY with a small per-keystroke delay so Kendo's
+        # masked-input handler processes each character individually.
+        inp.type(date_str, delay=50)
+        page.wait_for_timeout(200)
+
+        # Commit: Enter applies the date and triggers the grid reload.
+        inp.press("Enter")
+        page.wait_for_timeout(500)
+
+        logging.info(f"DATE: Business date {date_str} entered via input field.")
+        return True
+
+    except Exception as e:
+        logging.error(f"DATE: Failed to enter business date '{date_str}': {e}")
+        _dismiss_popup()
+        return False
+
+
+def _setup_view_and_filters(page: Page, target_dt: dt) -> None:
     """Confirms the daily grid is loaded, selects the date, checks filters, and sorts."""
     wait_for_loading(page)
 
@@ -339,6 +409,8 @@ def _setup_view_and_filters(page: Page, target_date_short: str) -> None:
 
     wait_for_loading(page)
 
+    target_date_short = target_dt.strftime("%m/%d")   # e.g. "06/07"
+
     date_btn = (
         page.locator(SELECTORS["date_filter_btns_container"])
         .get_by_role("link", name=target_date_short, exact=True)
@@ -346,6 +418,16 @@ def _setup_view_and_filters(page: Page, target_date_short: str) -> None:
     if date_btn.is_visible():
         date_btn.click()
         logging.info(f"Selected date: {target_date_short}")
+    else:
+        logging.info(
+            f"DATE: {target_date_short} not in quick-access strip — "
+            "opening calendar widget."
+        )
+        if not _select_date_via_calendar(page, target_dt):
+            logging.error(
+                f"DATE: Could not select {target_date_short} via calendar widget. "
+                "Proceeding with whatever date is currently active."
+            )
 
     wait_for_loading(page)
     page.locator(SELECTORS["checkbox_verified"]).check()
@@ -374,6 +456,10 @@ def _setup_view_and_filters(page: Page, target_date_short: str) -> None:
 def _find_worker_block(page: Page, scroll_container, target_date_full: str,
                        processed_workers: set):
     """
+    Retained as a fallback / diagnostic tool.
+    The main loop now uses _get_all_employees_from_dropdown + _filter_grid_by_employee
+    instead, which eliminates virtual-scroll stale-DOM issues entirely.
+
     Scans the visible rows to locate the first complete, unprocessed worker block.
 
     Returns a 4-tuple (worker_id, worker_name, display_name, row_locators) when a
@@ -534,32 +620,221 @@ def _scroll_worker_into_view(page: Page, scroll_container, worker_name: str) -> 
 
     # Full-grid scan.
     #
-    # After a dialog-triggered save, Kendo leaves the grid scrolled to the
-    # "next-employee" row that was double-clicked to trigger the dialog.  That
-    # employee may be further down the grid than the worker we are still
-    # processing, so a bidirectional scan that starts from the current position
-    # only goes *forward* (deeper) and then back to the same starting point —
-    # it never reaches rows that are *above* the starting position.
-    #
-    # Fix: reset scrollTop to 0 first so the scan always covers the entire
-    # grid from the very top, regardless of where Kendo left the scroll.
+    # Scroll to the bottom first: (a) evicts any lingering Kendo edit row that
+    # would bounce scrollTop=0 writes back, and (b) immediately surfaces
+    # late-alphabet (Y/Z) employees who live near the end of the list.
+    scroll_container.evaluate("el => { el.scrollTop = el.scrollHeight; }")
+    page.wait_for_timeout(300)
+    if _scroll_and_confirm():   # fast-path for employees near the end of the list
+        return True
+
     scroll_container.evaluate("el => { el.scrollTop = 0; }")
     page.wait_for_timeout(400)   # let Kendo re-render the initial rows at top
 
     if _scroll_and_confirm():
         return True
 
-    # Scan downward: 55 steps × 400 px = 22,000 px — enough for very large
-    # employee rosters. At 200 ms per step the worst-case cost is ~11 s; in
-    # practice the row is found in the first 20–30 steps.
-    for _ in range(55):
-        scroll_container.evaluate("el => el.scrollTop += 400")
-        page.wait_for_timeout(200)
+    # Strategy A: scroll one viewport-height at a time and stop as soon as
+    # scrollTop stops advancing (bottom reached).  clientHeight-relative steps
+    # cover the full grid regardless of zoom/row height; early exit avoids
+    # wasting time after the last row is already past.
+    for _ in range(40):
+        reached_bottom = scroll_container.evaluate(
+            "el => { const prev = el.scrollTop; el.scrollTop += el.clientHeight; "
+            "return el.scrollTop === prev; }"
+        )
+        page.wait_for_timeout(150)
         if _scroll_and_confirm():
             return True
+        if reached_bottom:
+            break  # already at the bottom — no more rows to uncover
 
     logging.warning(f"SCROLL: Could not locate rows for '{worker_name}' in the grid.")
     return False
+
+
+# ---------------------------------------------------------------------------
+# Employee-filter helpers
+# ---------------------------------------------------------------------------
+
+def _open_employee_dropdown(page: Page) -> bool:
+    """
+    Opens the emp-input Kendo DropDownList popup and waits until the full employee
+    list (more than just the 'Select employee' placeholder) is loaded.
+    Returns True when ready, False if all strategies fail.
+
+    Design rule: never re-click when the popup is already open — Kendo toggles the
+    popup on each click, so a second click would close it instead of keeping it open.
+    Each strategy first checks popup presence before deciding whether to click.
+    """
+    popup_host = page.locator("kendo-popup")
+    comp       = page.locator(SELECTORS["emp_filter"])
+
+    def _popup_is_open() -> bool:
+        return popup_host.count() > 0
+
+    def _popup_items_loaded() -> bool:
+        """True once the employee list rows (>1 items) are present in the popup.
+        A count of exactly 1 means only the 'Select employee' placeholder loaded."""
+        try:
+            page.wait_for_function(
+                "() => document.querySelectorAll('kendo-popup li.k-list-item').length > 1",
+                timeout=5000,
+            )
+            return True
+        except Exception:
+            return False
+
+    # Strategy 1: click the inner toggle button Kendo renders (.k-input-button in v8+,
+    # .k-select in older versions).  The host kendo-dropdownlist element itself has no
+    # click handler in Angular — clicking it silently does nothing.
+    if not _popup_is_open():
+        inner = comp.locator(".k-input-button, .k-select")
+        if inner.count() > 0:
+            inner.first.click()
+        else:
+            comp.click()
+        page.wait_for_timeout(600)
+
+    if _popup_is_open():
+        if _popup_items_loaded():
+            return True
+        # Popup opened but items never loaded — emit DOM snapshot for debugging.
+        try:
+            dom_snapshot = page.evaluate(
+                "() => { const p = document.querySelector('kendo-popup'); "
+                "return p ? p.innerHTML.substring(0, 800) : 'no kendo-popup'; }"
+            )
+            logging.warning(f"EMP_FILTER: Popup open but employee list empty. DOM: {dom_snapshot}")
+        except Exception:
+            pass
+        return False
+
+    # Strategy 2: popup did not open — try a JavaScript click which bypasses Angular
+    # zone wrapping that can swallow synthetic Playwright events.
+    page.evaluate(
+        """() => {
+            const btn = document.querySelector(
+                "[data-testid='emp-input'] .k-input-button, "
+                + "[data-testid='emp-input'] .k-select, "
+                + "[data-testid='emp-input'] .k-picker"
+            ) || document.querySelector("[data-testid='emp-input']");
+            if (btn) btn.click();
+        }"""
+    )
+    page.wait_for_timeout(800)
+    if _popup_is_open() and _popup_items_loaded():
+        return True
+
+    # Strategy 3: force-click as last resort (only if still not open).
+    if not _popup_is_open():
+        try:
+            comp.click(force=True)
+            page.wait_for_timeout(800)
+        except Exception:
+            pass
+    if _popup_is_open() and _popup_items_loaded():
+        return True
+
+    page.keyboard.press("Escape")
+    return False
+
+
+def _read_dropdown_names_via_js(page: Page) -> list[str]:
+    """
+    Reads all visible kendo-popup list item texts using JavaScript textContent.
+    This is robust against any internal span structure Kendo may use — it captures
+    the text regardless of whether it lives in span.k-list-item-text or elsewhere.
+    """
+    try:
+        raw: list = page.evaluate(
+            "() => Array.from(document.querySelectorAll('kendo-popup li.k-list-item'))"
+            ".map(li => (li.textContent || '').trim())"
+        )
+        return raw if isinstance(raw, list) else []
+    except Exception as e:
+        logging.warning(f"EMP_FILTER: JS read of popup names failed: {e}")
+        return []
+
+
+def _get_all_employees_from_dropdown(page: Page) -> list:
+    """
+    Opens the emp-input dropdown and returns all employee display names in order.
+    Closes the popup without selecting anything so the current filter is unchanged.
+    """
+    if not _open_employee_dropdown(page):
+        logging.warning("EMP_FILTER: Dropdown popup did not open — no employee list returned.")
+        return []
+
+    raw_names = _read_dropdown_names_via_js(page)
+    if raw_names:
+        logging.info(f"EMP_FILTER: Raw popup sample (first 3): {raw_names[:3]}")
+
+    # Exclude the Kendo defaultItem placeholder and blanks.
+    names = [n for n in raw_names if n and n.lower() != "select employee"]
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(300)
+    logging.info(f"EMP_FILTER: {len(names)} employees found in dropdown.")
+    return names
+
+
+def _filter_grid_by_employee(page: Page, employee_name: str) -> bool:
+    """
+    Selects employee_name in the emp-input dropdown so the grid shows only
+    that employee's rows.  Eliminates virtual-scroll stale-DOM issues because
+    all rows for the selected employee are always in the DOM render buffer.
+    Returns True when the item was found and clicked.
+    """
+    if not _open_employee_dropdown(page):
+        logging.warning(f"EMP_FILTER: Could not open dropdown to filter by '{employee_name}'.")
+        return False
+    try:
+        # JS click: exact text match, robust against any internal span structure.
+        clicked: bool = page.evaluate(
+            """(name) => {
+                const items = document.querySelectorAll('kendo-popup li.k-list-item');
+                for (const li of items) {
+                    if ((li.textContent || '').trim() === name) { li.click(); return true; }
+                }
+                return false;
+            }""",
+            employee_name,
+        )
+        if not clicked:
+            # Fallback: Playwright locator with partial-text match.
+            item = (
+                page.locator(SELECTORS["emp_filter_popup_items"])
+                .filter(has_text=employee_name)
+                .first
+            )
+            item.wait_for(state="visible", timeout=3000)
+            item.click()
+        wait_for_loading(page)
+        return True
+    except Exception as e:
+        page.keyboard.press("Escape")
+        logging.warning(f"EMP_FILTER: Could not select '{employee_name}': {e}")
+        return False
+
+
+def _clear_employee_filter(page: Page) -> None:
+    """
+    Resets the emp-input dropdown to 'Select employee' so the grid shows all rows.
+    Uses JS to click the first popup item (the Kendo defaultItem placeholder).
+    """
+    if not _open_employee_dropdown(page):
+        logging.warning("EMP_FILTER: Could not open dropdown to clear filter.")
+        return
+    try:
+        # The Kendo defaultItem ("Select employee") is always the first list item.
+        page.evaluate(
+            "() => { const first = document.querySelector('kendo-popup li.k-list-item');"
+            " if (first) first.click(); }"
+        )
+        wait_for_loading(page)
+    except Exception as e:
+        page.keyboard.press("Escape")
+        logging.warning(f"EMP_FILTER: Could not clear filter: {e}")
 
 
 def _calculate_proposed_times(task: dict, target_dt: dt):
@@ -581,10 +856,12 @@ def _calculate_proposed_times(task: dict, target_dt: dt):
     if policy.is_one_minute_only:
         return s_start_dt, s_start_dt + datetime.timedelta(minutes=1)
 
-    if policy.require_schedule_match:
+    # Spare CDL/Monitor and HTS units/hours always use exact schedule times.
+    # These task types are not driven by clock-in/out; schedule is authoritative.
+    if policy.use_schedule_time:
         return s_start_dt, s_end_dt
 
-    # Regular task: clamp actual times to the schedule window
+    # Regular task: schedule defines the window; actual clock-in/out adjusts within it.
     a_start = parse_time_to_datetime(a_range[0], target_dt) if len(a_range) > 0 else s_start_dt
     a_end   = parse_time_to_datetime(a_range[1], target_dt) if len(a_range) > 1 else s_end_dt
     prop_start = max(a_start or s_start_dt, s_start_dt)
@@ -596,22 +873,13 @@ def _handle_confirm_changes_dialog(page: Page, task_code: str,
                                     timeout: int = 8000) -> bool:
     """Dismisses any Kendo modal dialog that is currently blocking the page.
 
-    Handles two distinct dialog types that can appear during automation:
+    Handles three distinct dialog types:
 
-    1. 'Unsaved changes' dialog (data-testid='confirm-changes-dialog')
-       Appears when navigating away from an inline-edited row.
-       Action: click Yes (btn_confirm_changes_yes) to commit the edit.
-
-    2. 'Employee Conflict' dialog (no wrapper data-testid)
-       Appears after verification when the platform detects that a worker is
-       already verified for an overlapping task (another client's schedule).
-       Action: click Ok (btn_conflict_ok) to acknowledge and continue.
-
-    The function detects WHICH dialog is showing by checking which action
-    button is visible, then clicks the correct one.
-
-    ``timeout`` controls how long to wait for ANY dialog to appear.
-    Pass a short value (e.g. 1 500 ms) for pre-emptive cleanup checks.
+    1. 'Unsaved changes' dialog — click Yes to commit the edit.
+    2. 'Employee Conflict' dialog — click Ok to acknowledge.
+    3. Any other Kendo dialog (e.g. 'Task Save Detail') — click the × close
+       button. These dialogs have no known action button but their k-overlay
+       blocks all subsequent grid interactions if not dismissed.
 
     Returns True if a dialog was found and dismissed, False otherwise.
     """
@@ -632,8 +900,8 @@ def _handle_confirm_changes_dialog(page: Page, task_code: str,
         return False
 
     # Determine dialog type by checking which button is present.
-    conflict_btn   = page.locator(SELECTORS["btn_conflict_ok"]).first
-    yes_btn        = page.locator(SELECTORS["btn_confirm_changes_yes"]).first
+    conflict_btn = page.locator(SELECTORS["btn_conflict_ok"]).first
+    yes_btn      = page.locator(SELECTORS["btn_confirm_changes_yes"]).first
 
     if conflict_btn.is_visible():
         # ── Employee Conflict dialog ──────────────────────────────────────────
@@ -652,24 +920,59 @@ def _handle_confirm_changes_dialog(page: Page, task_code: str,
             )
             return False
 
-    # ── Unsaved changes dialog ────────────────────────────────────────────────
-    logging.info(
-        f"DIALOG: 'Unsaved changes' dialog detected for {task_code}. Clicking Yes."
-    )
+    if yes_btn.is_visible():
+        # ── Unsaved changes dialog ────────────────────────────────────────────
+        logging.info(
+            f"DIALOG: 'Unsaved changes' dialog detected for {task_code}. Clicking Yes."
+        )
+        try:
+            yes_btn.scroll_into_view_if_needed()
+            yes_btn.click(force=True)
+            page.wait_for_selector(wrapper_sel, state="hidden", timeout=8000)
+            return True
+        except Exception as e:
+            logging.warning(f"DIALOG: Could not dismiss 'Unsaved changes' dialog for {task_code}: {e}")
+            return False
+
+    # ── Unknown / Task Save Detail dialog — click the × close button ─────────
+    # These dialogs appear as server-side feedback after saves. They have no
+    # action buttons we care about; their k-overlay blocks grid interactions.
     try:
-        yes_btn.wait_for(state="visible", timeout=5000)
-        yes_btn.scroll_into_view_if_needed()
-        yes_btn.click(force=True)
-        page.wait_for_selector(wrapper_sel, state="hidden", timeout=8000)
+        # Try to read the dialog title for logging
+        title_el = page.locator(".k-dialog-title, .k-window-title").first
+        title_text = title_el.text_content(timeout=1000).strip() if title_el.count() > 0 else "unknown"
+    except Exception:
+        title_text = "unknown"
+
+    logging.info(
+        f"DIALOG: Unknown dialog ('{title_text}') detected for {task_code}. "
+        "Clicking close (×) button to dismiss."
+    )
+    close_btn = page.locator(SELECTORS["btn_dialog_close"]).first
+    try:
+        close_btn.wait_for(state="visible", timeout=3000)
+        close_btn.click(force=True)
+        page.wait_for_selector(any_dlg_sel, state="hidden", timeout=8000)
+        logging.info(f"DIALOG: '{title_text}' dialog dismissed for {task_code}.")
         return True
     except Exception as e:
-        logging.warning(f"DIALOG: Could not dismiss dialog for {task_code}: {e}")
-        return False
+        logging.warning(
+            f"DIALOG: Could not dismiss '{title_text}' dialog for {task_code}: {e}"
+        )
+        # Last resort: press Escape to close any modal
+        try:
+            page.keyboard.press("Escape")
+            page.wait_for_timeout(500)
+            logging.info(f"DIALOG: Sent Escape to dismiss '{title_text}' dialog for {task_code}.")
+            return True
+        except Exception:
+            return False
 
 
 
 def _save_via_navigation_dialog(page: Page, task_code: str,
-                                 current_task_idx: int, tasks: list) -> bool:
+                                 current_task_idx: int, tasks: list,
+                                 emp_filter_name: str = "") -> bool:
     """
     Saves an in-edit row by triggering Kendo's "Unsaved changes" dialog.
 
@@ -814,6 +1117,47 @@ def _save_via_navigation_dialog(page: Page, task_code: str,
                         f"SAVE_VIA_DIALOG [{task_code}]: fallback {label} — {ex}"
                     )
 
+        # FILTER BYPASS — when the grid is filtered to one employee there is no
+        # next-employee row visible and single-task blocks have no adjacent row
+        # either.  Temporarily clear the employee filter so any other employee's
+        # row becomes accessible, trigger the dialog from there, then re-apply
+        # the filter so the caller's rows are back in the DOM.
+        if emp_filter_name:
+            logging.info(
+                f"SAVE_VIA_DIALOG [{task_code}]: FILTER BYPASS — "
+                "clearing employee filter to expose a next-employee row."
+            )
+            _clear_employee_filter(page)
+            page.wait_for_timeout(500)
+            try:
+                coord = page.evaluate("""() => {
+                    var editRow = document.querySelector('tr.k-grid-edit-row');
+                    var rows = document.querySelectorAll(
+                        '[data-testid="payload-task-grid"] tbody tr.k-master-row'
+                    );
+                    for (var i = 0; i < rows.length; i++) {
+                        if (rows[i] === editRow) continue;
+                        var cell = rows[i].querySelector('td[aria-colindex="10"]')
+                                || rows[i].querySelector('td');
+                        if (!cell) continue;
+                        cell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                        var r = cell.getBoundingClientRect();
+                        if (r.width > 0 && r.height > 0)
+                            return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+                    }
+                    return null;
+                }""")
+                if coord:
+                    if _dblclick_coords_and_check(
+                        coord["x"], coord["y"], "filter-bypass any-other-row"
+                    ):
+                        wait_for_loading(page)
+                        _filter_grid_by_employee(page, emp_filter_name)
+                        return True
+            except Exception as ex:
+                logging.warning(f"SAVE_VIA_DIALOG [{task_code}]: filter bypass — {ex}")
+            _filter_grid_by_employee(page, emp_filter_name)  # re-apply regardless
+
         logging.warning(
             f"SAVE_VIA_DIALOG: Save dialog did not appear for {task_code} "
             "after all strategies (next-employee dblclick + within-block fallback)."
@@ -827,7 +1171,8 @@ def _save_via_navigation_dialog(page: Page, task_code: str,
 
 def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                          worker_id: str, target_dt: dt,
-                         scroll_container=None, worker_name: str = "") -> bool:
+                         scroll_container=None, worker_name: str = "",
+                         emp_filter_name: str = "") -> bool:
     """
     Adjusts all unadjusted paid-time tasks for one worker, then signals
     readiness for verification.
@@ -847,7 +1192,8 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
     """
     retry_tracking: dict[str, int] = {}
     manual_flag = False
-    _stale_budget = 3  # retries before giving up when rows aren't in DOM yet
+    _stale_budget = 3   # retries before giving up when rows aren't in DOM yet
+    _saved_task_count = 0  # tasks successfully committed this call
 
     while not AUTOMATION_STOP_FLAG:
         # Bring worker rows into the Kendo virtual grid's render window BEFORE
@@ -866,9 +1212,21 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                     f"STALE: Rows not in DOM yet for {worker_display} — "
                     f"retrying ({_stale_budget} retries left)."
                 )
-                page.wait_for_timeout(1200)
+                if emp_filter_name:
+                    _filter_grid_by_employee(page, emp_filter_name)
+                else:
+                    wait_for_loading(page)
                 continue
             logging.warning(f"STALE: Rows gone for {worker_display} after all retries. Skipping.")
+            if _saved_task_count > 0:
+                # Tasks were saved but rows disappeared (grid filter reset after save).
+                # Proceed to verification rather than skipping — the rows may reappear
+                # after the filter is re-applied in _verify_worker_tasks.
+                logging.info(
+                    f"STALE: {_saved_task_count} task(s) saved for {worker_display} "
+                    "— rows filtered out post-save. Proceeding to verification."
+                )
+                return True
             return False
 
         _stale_budget = 3  # reset on successful read so later iterations get fresh budget
@@ -960,13 +1318,19 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                     f"STEP2: Paid cells adjusted — clicking adjacent row to trigger "
                     f"save dialog for {task['code']}."
                 )
-                if _save_via_navigation_dialog(page, task["code"], task_idx, tasks):
+                if _save_via_navigation_dialog(
+                    page, task["code"], task_idx, tasks,
+                    emp_filter_name=emp_filter_name
+                ):
                     logging.info(
                         f"STEP3: {task['code']} saved. Grid reloaded — "
                         f"locating next unadjusted task for {worker_display}."
                     )
                     retry_tracking.pop(task_key, None)
                     adjustment_made = True
+                    _saved_task_count += 1
+                    if emp_filter_name:
+                        _filter_grid_by_employee(page, emp_filter_name)
                 else:
                     # Dialog was not triggered — cell click did not register through
                     # Kendo's JS pipeline. Break so the outer loop re-reads the grid
@@ -1003,7 +1367,10 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                         "fields may be set. Navigating to next employee to trigger "
                         "save dialog."
                     )
-                    if _save_via_navigation_dialog(page, task["code"], task_idx, tasks):
+                    if _save_via_navigation_dialog(
+                        page, task["code"], task_idx, tasks,
+                        emp_filter_name=emp_filter_name
+                    ):
                         logging.info(
                             f"STEP3: {task['code']} saved via navigation dialog "
                             f"despite VERIFY failure. Locating next unadjusted task "
@@ -1011,6 +1378,9 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                         )
                         retry_tracking.pop(task_key, None)
                         adjustment_made = True
+                        _saved_task_count += 1
+                        if emp_filter_name:
+                            _filter_grid_by_employee(page, emp_filter_name)
                     else:
                         logging.warning(
                             f"SAVE_FAIL: Save dialog not triggered for {task['code']} "
@@ -1046,19 +1416,86 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
     return False  # Stopped
 
 
+def _reapply_grid_filters(page: Page) -> None:
+    """Re-checks all three filter checkboxes and re-submits the grid query.
+
+    Called when worker rows disappear after a save (the grid filter can reset
+    to 'Pending Review' only after a reload, hiding tasks that transitioned to
+    Verified or Auto-Verified state).  Re-applying restores the full view so
+    the verification step can find the rows.
+    """
+    try:
+        page.locator(SELECTORS["checkbox_verified"]).check()
+        page.locator(SELECTORS["checkbox_auto_verified"]).check()
+        page.locator(SELECTORS["checkbox_pending_review"]).check()
+        page.get_by_test_id(SELECTORS["filter_submit_btn"]).click()
+        page.wait_for_load_state("networkidle")
+        wait_for_loading(page)
+        page.wait_for_timeout(1500)
+        logging.info("FILTER: Re-applied all filter options (Verified / Auto-Verified / Pending Review).")
+    except Exception as e:
+        logging.warning(f"FILTER: Could not re-apply filters: {e}")
+
+
 def _verify_worker_tasks(page: Page, worker_filter, worker_display: str,
-                         scroll_container=None, worker_name: str = "") -> None:
-    """Checks all unchecked task checkboxes then clicks the Verify button."""
-    if scroll_container is not None and worker_name:
-        _scroll_worker_into_view(page, scroll_container, worker_name)
+                         scroll_container=None, worker_name: str = "",
+                         emp_filter_name: str = "") -> None:
+    """Checks all unchecked task checkboxes then clicks the Verify button.
+
+    Processes checkboxes one at a time: after each successful check the rows
+    are re-fetched from scratch.  This avoids stale-locator timeouts that occur
+    when Kendo virtual scroll destroys and recreates DOM elements between the
+    initial worker_filter.all() snapshot and the is_checked() call on later rows.
+    """
+    if emp_filter_name:
+        # Grid is already filtered to this employee — all rows are in the DOM.
+        _filter_grid_by_employee(page, emp_filter_name)
+    elif scroll_container is not None and worker_name:
+        found = _scroll_worker_into_view(page, scroll_container, worker_name)
+        if not found:
+            # Rows may have disappeared because the grid filter reset after the last
+            # save (task transitioned out of Pending Review).  Re-apply all filters
+            # so verified/auto-verified rows become visible again, then retry scroll.
+            logging.info(
+                f"VERIFY: Rows not visible for {worker_display} — re-applying grid filters."
+            )
+            _reapply_grid_filters(page)
+            _scroll_worker_into_view(page, scroll_container, worker_name)
         page.wait_for_timeout(400)
 
-    worker_rows = worker_filter.all()
-    checked_count = sum(
-        1 for row in worker_rows
-        if not row.locator(SELECTORS["row_checkbox"]).is_checked()
-        and verify_task_checkbox(page, row, "N/A", worker_display)
-    )
+    checked_count = 0
+
+    for _ in range(30):   # safety ceiling — no worker has 30 tasks
+        # Re-fetch rows on every iteration so locators are fresh.
+        if emp_filter_name:
+            pass  # filter keeps rows in DOM — no scroll needed
+        elif scroll_container is not None and worker_name:
+            _scroll_worker_into_view(page, scroll_container, worker_name)
+            page.wait_for_timeout(200)
+
+        worker_rows = worker_filter.all()
+        found_unchecked = False
+
+        for row in worker_rows:
+            try:
+                row.scroll_into_view_if_needed(timeout=3000)
+                page.wait_for_timeout(150)
+                already_checked = row.locator(SELECTORS["row_checkbox"]).is_checked(timeout=5000)
+            except Exception as e:
+                logging.warning(
+                    f"VERIFY: Could not read checkbox state for {worker_display} row "
+                    f"— skipping row. ({e})"
+                )
+                continue
+
+            if not already_checked:
+                if verify_task_checkbox(page, row, "N/A", worker_display):
+                    checked_count += 1
+                found_unchecked = True
+                break   # re-fetch rows before processing the next unchecked row
+
+        if not found_unchecked:
+            break   # all rows checked (or none left)
 
     if checked_count > 0:
         logging.info(f"VERIFY: {checked_count} task(s) checked for {worker_display}. Clicking Verify.")
@@ -1071,28 +1508,53 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
     """
     Main orchestration loop.
 
-    For each employee in the grid (scrolling through virtualized rows):
-      1. Adjusts paid-time cells until all tasks match policy.
-      2. Verifies (checks checkboxes + clicks Verify) once adjustments are done.
+    Iterates through every employee listed in the emp-input dropdown (alphabetical
+    order).  For each employee the grid is filtered to show only their rows before
+    any adjustment or verification work begins.  This keeps every row permanently
+    in the DOM render buffer — completely eliminating virtual-scroll stale-DOM
+    issues — and replaces the previous scroll-based worker discovery.
     """
     logging.info(f"Processing date: {target_date}")
-    target_dt         = dt.strptime(target_date, "%Y-%m-%d")
-    target_date_short = target_dt.strftime("%m/%d")
-    target_date_full  = target_dt.strftime("%m/%d/%Y")
-    scroll_container  = page.locator(f"{SELECTORS['payload_task_grid']} div.k-grid-content")
+    target_dt        = dt.strptime(target_date, "%Y-%m-%d")
+    target_date_full = target_dt.strftime("%m/%d/%Y")
 
-    _setup_view_and_filters(page, target_date_short)
+    _setup_view_and_filters(page, target_dt)
+
+    employee_names = _get_all_employees_from_dropdown(page)
+    if not employee_names:
+        logging.warning("EMP_FILTER: No employees found in dropdown — nothing to process.")
+        return
 
     processed_workers: set[str] = set()
+    grid_rows_sel = f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row"
 
-    while not AUTOMATION_STOP_FLAG:
-        block = _find_worker_block(page, scroll_container, target_date_full, processed_workers)
-        if block is None:
+    for emp_filter_name in employee_names:
+        if AUTOMATION_STOP_FLAG:
             break
 
-        worker_id, worker_name, worker_display, _ = block
+        if not _filter_grid_by_employee(page, emp_filter_name):
+            continue
 
-        # Build a live filter so row locators stay fresh across grid reloads
+        # Identify the canonical worker_id / worker_name from the filtered grid rows.
+        task_rows     = page.locator(grid_rows_sel).all()
+        worker_id     = worker_name = worker_display = ""
+        for row in task_rows:
+            row_date = (row.locator(SELECTORS["row_date"]).text_content(timeout=2000) or "").strip()
+            if row_date != target_date_full:
+                continue
+            name_span = row.locator(SELECTORS["row_worker_name"]).locator("span[title]").first
+            if name_span.count() == 0:
+                continue
+            emp_id       = (name_span.get_attribute("title", timeout=2000) or "").strip()
+            worker_name  = (name_span.text_content(timeout=2000) or "").strip()
+            worker_id    = emp_id or worker_name
+            worker_display = f"{worker_name} ({emp_id})" if emp_id else worker_name
+            break
+
+        if not worker_id or worker_id in processed_workers:
+            continue
+
+        # Build a live locator filtered to this worker's rows.
         worker_filter = (
             page.locator(f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row")
             .filter(has=page.locator("td[aria-colindex='2'] span").get_by_text(worker_name, exact=True))
@@ -1102,20 +1564,21 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
 
         adjustments_ok = _adjust_worker_tasks(
             page, worker_filter, worker_display, worker_id, target_dt,
-            scroll_container=scroll_container, worker_name=worker_name,
+            emp_filter_name=emp_filter_name,
         )
 
         if adjustments_ok:
             _verify_worker_tasks(
                 page, worker_filter, worker_display,
-                scroll_container=scroll_container, worker_name=worker_name,
+                emp_filter_name=emp_filter_name,
             )
             logging.info(f"WORKER: Done with {worker_display}")
         else:
-            logging.warning(f"WORKER: Skipping verification for {worker_display} (manual review needed)")
+            logging.warning(
+                f"WORKER: Skipping verification for {worker_display} (manual review needed)"
+            )
 
         logging.info(f"STEP5: Moving to next employee after completing {worker_display}.")
-
         processed_workers.add(worker_id)
 
 
@@ -1129,10 +1592,16 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
     USERNAME = username
     PASSWORD = password
 
+    # Remove only the plain console StreamHandler and any previous TkinterLogHandler.
+    # Must NOT use isinstance(h, StreamHandler) because FileHandler is a subclass of
+    # StreamHandler — that check would silently remove _file_handler and kill file logging.
     for handler in logging.root.handlers[:]:
-        if isinstance(handler, (logging.StreamHandler, TkinterLogHandler)):
+        if type(handler) is logging.StreamHandler or isinstance(handler, TkinterLogHandler):
             logging.root.removeHandler(handler)
-    logging.root.addHandler(TkinterLogHandler(log_text_widget))
+
+    tkinter_handler = TkinterLogHandler(log_text_widget)
+    tkinter_handler.setFormatter(_log_formatter)   # timestamps in the UI match the file
+    logging.root.addHandler(tkinter_handler)
 
     logging.info("=" * 60)
     logging.info(f"AUTOMATION RUN STARTED: {dt.now().strftime('%Y-%m-%d %H:%M:%S')}")
