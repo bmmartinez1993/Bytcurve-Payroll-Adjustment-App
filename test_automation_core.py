@@ -8,7 +8,7 @@ Tests cover time parsing, interval calculations, task classification, and data m
 import unittest
 import datetime
 from datetime import datetime as dt
-from typing import Optional, Tuple
+from typing import Optional
 
 # Import the refactored core functions
 import sys
@@ -586,7 +586,7 @@ class TestCalculateProposedTimeRange(unittest.TestCase):
             start_dt=dt(2026, 6, 4, 5, 30),
             end_dt=dt(2026, 6, 4, 7, 30),
             start_str='05:30 AM',
-            end_str='07:30 PM'
+            end_str='07:30 AM'
         )
 
         result = calculate_proposed_time_range('Regular', 'Task', schedule, actual, self.ref_date)
@@ -609,7 +609,7 @@ class TestCalculateProposedTimeRange(unittest.TestCase):
             start_dt=dt(2026, 6, 4, 5, 0),
             end_dt=dt(2026, 6, 4, 8, 0),
             start_str='05:00 AM',
-            end_str='08:00 PM'
+            end_str='08:00 AM'
         )
 
         result = calculate_proposed_time_range('Regular', 'Task', schedule, actual, self.ref_date)
@@ -688,37 +688,5 @@ class TestEdgeCases(unittest.TestCase):
         self.assertEqual(result, (expected_start, expected_end))
 
 
-def run_tests():
-    """Run all tests and return results."""
-    # Create a test suite
-    loader = unittest.TestLoader()
-    suite = unittest.TestSuite()
-
-    # Add all test classes
-    suite.addTests(loader.loadTestsFromTestCase(TestTimeParsingAndFormatting))
-    suite.addTests(loader.loadTestsFromTestCase(TestTimeIntervalAndOverlap))
-    suite.addTests(loader.loadTestsFromTestCase(TestDataModels))
-    suite.addTests(loader.loadTestsFromTestCase(TestTaskClassification))
-    suite.addTests(loader.loadTestsFromTestCase(TestCalculateProposedTimeRange))
-    suite.addTests(loader.loadTestsFromTestCase(TestEdgeCases))
-
-    # Run the tests
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-
-    # Print summary
-    print("\n" + "=" * 70)
-    print("TEST SUMMARY")
-    print("=" * 70)
-    print(f"Tests run: {result.testsRun}")
-    print(f"Successes: {result.testsRun - len(result.failures) - len(result.errors)}")
-    print(f"Failures: {len(result.failures)}")
-    print(f"Errors: {len(result.errors)}")
-    print(f"Skipped: {len(result.skipped)}")
-    print("=" * 70)
-
-    return result
-
-
 if __name__ == '__main__':
-    run_tests()
+    unittest.main(verbosity=2)
