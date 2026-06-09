@@ -105,6 +105,7 @@ SELECTORS = {
     "date_cal_nav_next":          "kendo-calendar button.k-calendar-nav-next",
     "date_cal_title":             "kendo-calendar button.k-calendar-nav-fast",
     "date_input":                 "input.k-input-inner[role='combobox']",
+    "checkbox_incomplete":     "#checkboxInclude2",
     "checkbox_verified":       "#checkboxInclude3",
     "checkbox_auto_verified":  "#checkboxInclude4",
     "checkbox_pending_review": "#checkboxInclude5",
@@ -430,6 +431,7 @@ def _setup_view_and_filters(page: Page, target_dt: dt) -> None:
             )
 
     wait_for_loading(page)
+    page.locator(SELECTORS["checkbox_incomplete"]).check()
     page.locator(SELECTORS["checkbox_verified"]).check()
     page.locator(SELECTORS["checkbox_auto_verified"]).check()
     page.locator(SELECTORS["checkbox_pending_review"]).check()
@@ -848,7 +850,6 @@ def _calculate_proposed_times(task: dict, target_dt: dt):
     if not s_start_dt or not s_end_dt:
         return None, None
 
-    a_range = task["a_range"]
     policy  = determine_task_policy(task["code"], task["name"])
     if policy is None:
         return None, None
@@ -856,17 +857,8 @@ def _calculate_proposed_times(task: dict, target_dt: dt):
     if policy.is_one_minute_only:
         return s_start_dt, s_start_dt + datetime.timedelta(minutes=1)
 
-    # Spare CDL/Monitor and HTS units/hours always use exact schedule times.
-    # These task types are not driven by clock-in/out; schedule is authoritative.
-    if policy.use_schedule_time:
-        return s_start_dt, s_end_dt
-
-    # Regular task: schedule defines the window; actual clock-in/out adjusts within it.
-    a_start = parse_time_to_datetime(a_range[0], target_dt) if len(a_range) > 0 else s_start_dt
-    a_end   = parse_time_to_datetime(a_range[1], target_dt) if len(a_range) > 1 else s_end_dt
-    prop_start = max(a_start or s_start_dt, s_start_dt)
-    prop_end   = min(a_end   or s_end_dt,   s_end_dt)
-    return prop_start, prop_end
+    # Schedule times are always authoritative — use them directly for all task types.
+    return s_start_dt, s_end_dt
 
 
 def _handle_confirm_changes_dialog(page: Page, task_code: str,
@@ -1169,6 +1161,73 @@ def _save_via_navigation_dialog(page: Page, task_code: str,
         return False
 
 
+def _click_update_button(page: Page, task_code: str) -> bool:
+    """
+    Clicks the Update (save) button that Kendo renders in the command cell
+    (column 17) whenever a row is in edit mode.
+
+    Returns True if the button was found, clicked, and the edit row closed
+    (confirming the save was committed).  Returns False with a WARNING log
+    explaining why it could not complete so the caller can fall back.
+    """
+    try:
+        edit_row = page.locator("tr.k-grid-edit-row")
+
+        try:
+            edit_row.wait_for(state="visible", timeout=2000)
+        except Exception as e:
+            logging.warning(
+                f"UPDATE_BTN [{task_code}]: No active edit row found — "
+                f"cannot locate Update button ({e})."
+            )
+            return False
+
+        update_btn = edit_row.locator(
+            "button.k-grid-save-command, "
+            "button[title='Update'], "
+            "button[kendogridsavecommand]"
+        ).first
+
+        try:
+            update_btn.wait_for(state="visible", timeout=2000)
+        except Exception as e:
+            logging.warning(
+                f"UPDATE_BTN [{task_code}]: Update button not visible in edit row — "
+                f"({e})."
+            )
+            return False
+
+        if not update_btn.is_enabled():
+            logging.warning(
+                f"UPDATE_BTN [{task_code}]: Update button is disabled — "
+                "values may not have been accepted by Kendo yet."
+            )
+            return False
+
+        logging.info(f"UPDATE_BTN [{task_code}]: Clicking Update button.")
+        update_btn.click(force=True)
+        page.wait_for_timeout(800)
+        wait_for_loading(page)
+
+        # Confirm the save landed: the edit row should disappear.
+        try:
+            page.wait_for_selector("tr.k-grid-edit-row", state="hidden", timeout=4000)
+            logging.info(
+                f"UPDATE_BTN [{task_code}]: Save confirmed — edit row closed after Update click."
+            )
+            return True
+        except Exception:
+            logging.warning(
+                f"UPDATE_BTN [{task_code}]: Edit row still visible after Update click — "
+                "save may not have completed."
+            )
+            return False
+
+    except Exception as e:
+        logging.warning(f"UPDATE_BTN [{task_code}]: Unexpected error — {e}.")
+        return False
+
+
 def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                          worker_id: str, target_dt: dt,
                          scroll_container=None, worker_name: str = "",
@@ -1315,13 +1374,21 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
 
             if ok_s and ok_e:
                 logging.info(
-                    f"STEP2: Paid cells adjusted — clicking adjacent row to trigger "
-                    f"save dialog for {task['code']}."
+                    f"STEP2: Paid cells adjusted — attempting Update button save "
+                    f"for {task['code']}."
                 )
-                if _save_via_navigation_dialog(
-                    page, task["code"], task_idx, tasks,
-                    emp_filter_name=emp_filter_name
-                ):
+                saved = _click_update_button(page, task["code"])
+                if not saved:
+                    logging.info(
+                        f"STEP2_FALLBACK [{task['code']}]: Update button did not save — "
+                        "falling back to navigation dialog."
+                    )
+                    saved = _save_via_navigation_dialog(
+                        page, task["code"], task_idx, tasks,
+                        emp_filter_name=emp_filter_name
+                    )
+
+                if saved:
                     logging.info(
                         f"STEP3: {task['code']} saved. Grid reloaded — "
                         f"locating next unadjusted task for {worker_display}."
@@ -1329,15 +1396,11 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                     retry_tracking.pop(task_key, None)
                     adjustment_made = True
                     _saved_task_count += 1
-                    if emp_filter_name:
-                        _filter_grid_by_employee(page, emp_filter_name)
                 else:
-                    # Dialog was not triggered — cell click did not register through
-                    # Kendo's JS pipeline. Break so the outer loop re-reads the grid
-                    # and retries; do NOT fall through to verification.
+                    # Neither strategy succeeded — retry on next outer loop pass.
                     logging.warning(
-                        f"SAVE_FAIL: Save dialog not triggered for {task['code']} "
-                        f"({worker_display}). Retrying on next pass."
+                        f"SAVE_FAIL: Both Update button and navigation dialog failed "
+                        f"for {task['code']} ({worker_display}). Retrying on next pass."
                     )
                     _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
                     needs_retry = True
@@ -1364,27 +1427,31 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                 if edit_row_open:
                     logging.info(
                         f"ADJUST_VERIFY_FAIL [{task['code']}]: Edit row is open — "
-                        "fields may be set. Navigating to next employee to trigger "
-                        "save dialog."
+                        "fields may be set. Attempting Update button save."
                     )
-                    if _save_via_navigation_dialog(
-                        page, task["code"], task_idx, tasks,
-                        emp_filter_name=emp_filter_name
-                    ):
+                    saved = _click_update_button(page, task["code"])
+                    if not saved:
                         logging.info(
-                            f"STEP3: {task['code']} saved via navigation dialog "
-                            f"despite VERIFY failure. Locating next unadjusted task "
-                            f"for {worker_display}."
+                            f"ADJUST_VERIFY_FAIL_FALLBACK [{task['code']}]: Update button "
+                            "did not save — falling back to navigation dialog."
+                        )
+                        saved = _save_via_navigation_dialog(
+                            page, task["code"], task_idx, tasks,
+                            emp_filter_name=emp_filter_name
+                        )
+
+                    if saved:
+                        logging.info(
+                            f"STEP3: {task['code']} saved despite VERIFY failure. "
+                            f"Locating next unadjusted task for {worker_display}."
                         )
                         retry_tracking.pop(task_key, None)
                         adjustment_made = True
                         _saved_task_count += 1
-                        if emp_filter_name:
-                            _filter_grid_by_employee(page, emp_filter_name)
                     else:
                         logging.warning(
-                            f"SAVE_FAIL: Save dialog not triggered for {task['code']} "
-                            f"({worker_display}) after VERIFY failure. Retrying."
+                            f"SAVE_FAIL: Both Update button and navigation dialog failed "
+                            f"for {task['code']} ({worker_display}) after VERIFY failure. Retrying."
                         )
                         _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
                         needs_retry = True
@@ -1425,6 +1492,7 @@ def _reapply_grid_filters(page: Page) -> None:
     the verification step can find the rows.
     """
     try:
+        page.locator(SELECTORS["checkbox_incomplete"]).check()
         page.locator(SELECTORS["checkbox_verified"]).check()
         page.locator(SELECTORS["checkbox_auto_verified"]).check()
         page.locator(SELECTORS["checkbox_pending_review"]).check()
@@ -1432,7 +1500,7 @@ def _reapply_grid_filters(page: Page) -> None:
         page.wait_for_load_state("networkidle")
         wait_for_loading(page)
         page.wait_for_timeout(1500)
-        logging.info("FILTER: Re-applied all filter options (Verified / Auto-Verified / Pending Review).")
+        logging.info("FILTER: Re-applied all filter options (Incomplete / Verified / Auto-Verified / Pending Review).")
     except Exception as e:
         logging.warning(f"FILTER: Could not re-apply filters: {e}")
 
