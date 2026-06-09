@@ -165,8 +165,17 @@ class TaskPolicy(Enum):
 
     @property
     def require_schedule_match(self) -> bool:
-        """Whether schedule time must match paid time exactly."""
+        """Whether schedule time must match paid time exactly (Spare tasks)."""
         return self in (TaskPolicy.SPARE_CDL, TaskPolicy.SPARE_MONITOR)
+
+    @property
+    def use_schedule_time(self) -> bool:
+        """Whether paid time must equal schedule time exactly.
+        Covers Spare tasks and HTS units/hours tasks — neither uses clock-in/out."""
+        return self in (
+            TaskPolicy.SPARE_CDL, TaskPolicy.SPARE_MONITOR,
+            TaskPolicy.HTS_UNITS, TaskPolicy.HTS_HOURS,
+        )
 
     @property
     def is_one_minute_only(self) -> bool:
