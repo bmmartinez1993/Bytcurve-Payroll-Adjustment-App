@@ -23,6 +23,7 @@ from automation_core_refactored import (
     parse_time_range_str,
     # Interval utilities
     get_non_overlapping_interval,
+    intervals_overlap,
     # Task classification
     determine_task_policy,
     # UI interaction
@@ -1299,13 +1300,56 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
             if t["verified"]
         ]
 
+        # PRE-SCAN: scan the whole employee block — every task, every class,
+        # verified and unverified — to build the complete schedule picture
+        # before any unverified task is adjusted.
+        #
+        # An "anchor" is any scheduled slot that an unverified task must not
+        # violate when its paid time is placed:
+        #   • Verified tasks (all classes)      → anchor (slot already committed)
+        #   • Unverified non-Spare tasks        → anchor (schedule is authoritative)
+        #   • Unverified Spare CDL/Monitor      → NOT an anchor; these are the
+        #                                         tasks being adjusted to fit around
+        #                                         everything else
+        #   • Bridge Charter (policy = None)    → excluded (skipped by adj. loop)
+        #
+        # Adjustments are only ever applied to unverified tasks, following the
+        # existing task-policy and schedule-conflict conditionals already in place.
+        anchor_schedule_intervals: list = []
+        spare_unverified_count = 0
+        for _t in tasks:
+            _tp = determine_task_policy(_t["code"], _t["name"])
+            if _tp is None:
+                continue  # Bridge Charter — excluded
+            if _tp.require_schedule_match and not _t["verified"]:
+                # Unverified Spare CDL/Monitor — being adjusted, not an anchor
+                spare_unverified_count += 1
+                continue
+            # Everything else (verified any class, unverified non-Spare):
+            # schedule time is a fixed anchor for the whole employee block
+            _sr = _t["s_range"]
+            if len(_sr) >= 2:
+                _ss = parse_time_to_datetime(_sr[0], target_dt)
+                _se = parse_time_to_datetime(_sr[1], target_dt)
+                if _ss and _se and _ss < _se:
+                    anchor_schedule_intervals.append((_ss, _se))
+
+        if spare_unverified_count and anchor_schedule_intervals:
+            logging.info(
+                f"PRE_SCAN: {worker_display} — full employee block scanned: "
+                f"{spare_unverified_count} unverified Spare CDL/Monitor task(s) "
+                f"resolved against {len(anchor_schedule_intervals)} anchor schedule "
+                f"interval(s) (all classes, verified + unverified)."
+            )
+
         adjustment_made = False
         needs_retry     = False   # set when a save attempt fails so we loop again
 
         for task_idx, task in enumerate(tasks):
             if task["verified"]:
                 continue
-            if determine_task_policy(task["code"], task["name"]) is None:
+            task_policy = determine_task_policy(task["code"], task["name"])
+            if task_policy is None:
                 continue  # Bridge Charter or similar — skip
 
             prop_s, prop_e = _calculate_proposed_times(task, target_dt)
@@ -1324,10 +1368,43 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                 manual_flag = True
                 continue
 
-            # Resolve overlaps against already-fixed intervals
-            final_s, final_e = get_non_overlapping_interval(prop_s, prop_e, fixed_intervals)
+            # Resolve overlaps. Spare CDL/Monitor tasks must also avoid the
+            # schedule times of every other task for this employee (anchor
+            # intervals), not just already-verified paid times.
+            if task_policy.require_schedule_match and anchor_schedule_intervals:
+                blocking_intervals = fixed_intervals + anchor_schedule_intervals
+                if any(
+                    intervals_overlap(prop_s, prop_e, bs, be)
+                    for bs, be in anchor_schedule_intervals
+                ):
+                    logging.info(
+                        f"SPARE_CONFLICT: {task['code']} for {worker_display} — "
+                        f"schedule time {datetime_to_time_str(prop_s)}–{datetime_to_time_str(prop_e)} "
+                        f"conflicts with anchor task(s). Resolving against all "
+                        f"{len(blocking_intervals)} blocking interval(s)."
+                    )
+                final_s, final_e = get_non_overlapping_interval(prop_s, prop_e, blocking_intervals)
+            else:
+                final_s, final_e = get_non_overlapping_interval(prop_s, prop_e, fixed_intervals)
 
-            # Guard: overlap resolution can also produce a reversed interval.
+            # Spare CDL/Monitor: the paid time duration must always equal the
+            # full Schedule Hrs amount (prop_e − prop_s). get_non_overlapping_interval
+            # already preserves this duration when shifting, so no truncation is
+            # applied. If the conflict shift pushes the resolved start entirely
+            # past the schedule end the displacement is too large to be automatic
+            # — flag for manual review.
+            if task_policy.require_schedule_match and final_s >= prop_e:
+                logging.warning(
+                    f"SKIP: {task['code']} for {worker_display} — "
+                    f"conflict shift places start ({datetime_to_time_str(final_s)}) "
+                    f"past Schedule Hrs end ({datetime_to_time_str(prop_e)}) "
+                    f"— manual review needed."
+                )
+                manual_flag = True
+                continue
+
+            # Guard: overlap resolution (or the schedule-end cap above) can
+            # produce a reversed interval.
             if final_s >= final_e:
                 logging.warning(
                     f"SKIP: {task['code']} for {worker_display} interval invalid after "
@@ -1339,11 +1416,21 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
 
             shift_mins = (final_s - prop_s).total_seconds() / 60
             if shift_mins > MAX_TIME_SHIFT_MINUTES:
-                logging.warning(
-                    f"SKIP: {task['code']} shifted {shift_mins:.0f} min — manual review needed."
-                )
-                manual_flag = True
-                continue
+                # Spare CDL/Monitor: the duration is fixed to the Schedule Hrs amount,
+                # so large conflict-driven shifts are expected — skip the threshold guard.
+                if task_policy.require_schedule_match:
+                    logging.info(
+                        f"SPARE_SHIFT: {task['code']} for {worker_display} — "
+                        f"shifted {shift_mins:.0f} min (Schedule Hrs duration preserved: "
+                        f"{datetime_to_time_str(final_s)}–{datetime_to_time_str(final_e)}) "
+                        f"— proceeding."
+                    )
+                else:
+                    logging.warning(
+                        f"SKIP: {task['code']} shifted {shift_mins:.0f} min — manual review needed."
+                    )
+                    manual_flag = True
+                    continue
 
             t_start = datetime_to_time_str(final_s)
             t_end   = datetime_to_time_str(final_e)
