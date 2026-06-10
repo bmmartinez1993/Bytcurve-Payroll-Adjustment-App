@@ -1,0 +1,9 @@
+# Force LF line endings for files that run inside Linux containers.
+# Without this, Windows git checkouts produce CRLF which breaks bash scripts.
+docker-entrypoint.sh    text eol=lf
+Dockerfile              text eol=lf
+.dockerignore           text eol=lf
+docker-compose.yml      text eol=lf
+
+# Default: let git auto-detect everything else
+*                       text=auto
