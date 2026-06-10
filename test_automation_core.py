@@ -46,6 +46,7 @@ from automation_core_refactored import (
     MAX_TIME_SHIFT_MINUTES,
     ONE_MINUTE_TASK_KEYWORDS,
     SCHEDULE_MATCH_TASK_KEYWORDS,
+    HTS_TASK_KEYWORDS,
     SKIP_TASK_KEYWORDS
 )
 
@@ -479,6 +480,12 @@ class TestTaskClassification(unittest.TestCase):
         result = determine_task_policy('HTS', 'Hours')
         self.assertEqual(result, TaskPolicy.HTS_HOURS)
 
+    def test_determine_task_policy_hts_hrs(self):
+        """Test HTS Hrs abbreviation (from HTS_TASK_KEYWORDS) maps to HTS_HOURS."""
+        self.assertIn('Hrs', HTS_TASK_KEYWORDS)
+        result = determine_task_policy('HTS', 'Hrs')
+        self.assertEqual(result, TaskPolicy.HTS_HOURS)
+
     def test_determine_task_policy_regular(self):
         """Test regular task classification (default)."""
         result = determine_task_policy('Regular', 'Regular Task')
@@ -508,6 +515,16 @@ class TestTaskClassification(unittest.TestCase):
         self.assertTrue(TaskPolicy.SPARE_CDL.require_schedule_match)
         self.assertTrue(TaskPolicy.SPARE_MONITOR.require_schedule_match)
         self.assertFalse(TaskPolicy.REGULAR.require_schedule_match)
+
+    def test_task_policy_use_schedule_time(self):
+        """Test TaskPolicy use_schedule_time property covers Spare and HTS types."""
+        self.assertTrue(TaskPolicy.SPARE_CDL.use_schedule_time)
+        self.assertTrue(TaskPolicy.SPARE_MONITOR.use_schedule_time)
+        self.assertTrue(TaskPolicy.HTS_UNITS.use_schedule_time)
+        self.assertTrue(TaskPolicy.HTS_HOURS.use_schedule_time)
+        self.assertFalse(TaskPolicy.REGULAR.use_schedule_time)
+        self.assertFalse(TaskPolicy.EXTRA_WORK.use_schedule_time)
+        self.assertFalse(TaskPolicy.S2S_CHARTER.use_schedule_time)
 
     def test_task_policy_is_one_minute_only(self):
         """Test TaskPolicy is_one_minute_only property."""
@@ -573,6 +590,40 @@ class TestCalculateProposedTimeRange(unittest.TestCase):
         start, end = result
         self.assertEqual(start, dt(2026, 6, 4, 6, 0))
         self.assertEqual(end, dt(2026, 6, 4, 8, 0))  # Exact schedule time
+
+    def test_hts_units_exact_schedule(self):
+        """Test HTS Units task uses exact schedule time (same branch as Spare tasks)."""
+        schedule = TimeRange(
+            start_dt=dt(2026, 6, 4, 6, 0),
+            end_dt=dt(2026, 6, 4, 8, 0),
+            start_str='06:00 AM',
+            end_str='08:00 AM'
+        )
+        actual = TimeRange(start_str='', end_str='')
+
+        result = calculate_proposed_time_range('HTS', 'Units', schedule, actual, self.ref_date)
+
+        self.assertIsNotNone(result)
+        start, end = result
+        self.assertEqual(start, dt(2026, 6, 4, 6, 0))
+        self.assertEqual(end, dt(2026, 6, 4, 8, 0))
+
+    def test_hts_hours_exact_schedule(self):
+        """Test HTS Hours task uses exact schedule time (same branch as Spare tasks)."""
+        schedule = TimeRange(
+            start_dt=dt(2026, 6, 4, 6, 0),
+            end_dt=dt(2026, 6, 4, 8, 0),
+            start_str='06:00 AM',
+            end_str='08:00 AM'
+        )
+        actual = TimeRange(start_str='', end_str='')
+
+        result = calculate_proposed_time_range('HTS', 'Hours', schedule, actual, self.ref_date)
+
+        self.assertIsNotNone(result)
+        start, end = result
+        self.assertEqual(start, dt(2026, 6, 4, 6, 0))
+        self.assertEqual(end, dt(2026, 6, 4, 8, 0))
 
     def test_regular_task_actual_time(self):
         """Test regular task uses actual time bounded by schedule."""
