@@ -4,6 +4,13 @@ __pycache__/
 venv/
 .pytest_cache/
 
+# Encrypted credentials (never commit these)
+credentials.enc
+secret.key
+
+# Runtime logs
+automation_activity.log
+
 # Playwright artifacts
 test-results/
 playwright-report/
