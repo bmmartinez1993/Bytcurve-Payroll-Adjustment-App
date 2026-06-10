@@ -1384,6 +1384,42 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                         f"{len(blocking_intervals)} blocking interval(s)."
                     )
                 final_s, final_e = get_non_overlapping_interval(prop_s, prop_e, blocking_intervals)
+
+            elif task_policy.is_one_minute_only:
+                # Extra Work / S2S Charter: also block against other unverified
+                # 1-minute tasks so multiple same-start-time entries stagger
+                # correctly. Use each peer's current paid time if already set
+                # (from a previous outer-loop save), otherwise use its schedule time.
+                other_one_min: list = []
+                for _oi, _ot in enumerate(tasks):
+                    if _oi == task_idx or _ot["verified"]:
+                        continue
+                    _op = determine_task_policy(_ot["code"], _ot["name"])
+                    if _op is None or not _op.is_one_minute_only:
+                        continue
+                    _ops = parse_time_to_datetime(_ot["p_start"], target_dt)
+                    _ope = parse_time_to_datetime(_ot["p_end"],   target_dt)
+                    if _ops and _ope and _ops < _ope:
+                        other_one_min.append((_ops, _ope))
+                    else:
+                        _osr = _ot["s_range"]
+                        if len(_osr) >= 2:
+                            _oss = parse_time_to_datetime(_osr[0], target_dt)
+                            _ose = parse_time_to_datetime(_osr[1], target_dt)
+                            if _oss and _ose and _oss < _ose:
+                                other_one_min.append((_oss, _ose))
+                blocking_intervals = fixed_intervals + other_one_min
+                if other_one_min and any(
+                    intervals_overlap(prop_s, prop_e, bs, be)
+                    for bs, be in other_one_min
+                ):
+                    logging.info(
+                        f"ONE_MIN_CONFLICT: {task['code']} for {worker_display} — "
+                        f"1-min slot {datetime_to_time_str(prop_s)} conflicts with other "
+                        f"1-min task(s). Resolving to nearest available slot."
+                    )
+                final_s, final_e = get_non_overlapping_interval(prop_s, prop_e, blocking_intervals)
+
             else:
                 final_s, final_e = get_non_overlapping_interval(prop_s, prop_e, fixed_intervals)
 
@@ -1416,14 +1452,20 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
 
             shift_mins = (final_s - prop_s).total_seconds() / 60
             if shift_mins > MAX_TIME_SHIFT_MINUTES:
-                # Spare CDL/Monitor: the duration is fixed to the Schedule Hrs amount,
-                # so large conflict-driven shifts are expected — skip the threshold guard.
+                # Spare CDL/Monitor: duration is fixed to Schedule Hrs — large shifts expected.
+                # Extra Work/S2S Charter: 1-min slot must always be placed — skip the guard.
                 if task_policy.require_schedule_match:
                     logging.info(
                         f"SPARE_SHIFT: {task['code']} for {worker_display} — "
                         f"shifted {shift_mins:.0f} min (Schedule Hrs duration preserved: "
                         f"{datetime_to_time_str(final_s)}–{datetime_to_time_str(final_e)}) "
                         f"— proceeding."
+                    )
+                elif task_policy.is_one_minute_only:
+                    logging.info(
+                        f"ONE_MIN_SHIFT: {task['code']} for {worker_display} — "
+                        f"shifted {shift_mins:.0f} min to {datetime_to_time_str(final_s)}–"
+                        f"{datetime_to_time_str(final_e)} (1-min slot preserved) — proceeding."
                     )
                 else:
                     logging.warning(
@@ -1603,8 +1645,7 @@ def _verify_worker_tasks(page: Page, worker_filter, worker_display: str,
     initial worker_filter.all() snapshot and the is_checked() call on later rows.
     """
     if emp_filter_name:
-        # Grid is already filtered to this employee — all rows are in the DOM.
-        _filter_grid_by_employee(page, emp_filter_name)
+        pass  # Grid is already filtered from the adjustment step — no re-open needed.
     elif scroll_container is not None and worker_name:
         found = _scroll_worker_into_view(page, scroll_container, worker_name)
         if not found:
