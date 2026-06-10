@@ -842,8 +842,8 @@ def enter_time_in_input(page: Page, input_field: Locator, time_value: str) -> bo
         page.wait_for_timeout(100)
 
         # Type the new time value with a slight delay for each character
-        input_field.type(time_value, delay=50)
-        page.wait_for_timeout(300)
+        input_field.type(time_value, delay=40)
+        page.wait_for_timeout(200)
 
         return True
     except Exception as e:
@@ -953,7 +953,7 @@ def adjust_time_entry(
     scroll_container_selector = f"[data-testid='payload-task-grid'] {grid_selector}"
 
     try:
-        page.wait_for_timeout(200)
+        page.wait_for_timeout(100)
 
         # Step 1: Ensure the row is visible in the virtualized grid
         if not ensure_row_visible(page, row, scroll_container_selector):
@@ -979,14 +979,14 @@ def adjust_time_entry(
         commit_time_change(page)
 
         # Step 6: Verify the value was saved correctly.
-        # Wait for the timepicker input to exit edit mode (detach from the DOM)
-        # before reading the cell's display text; otherwise text_content() returns ""
-        # because <input> values are not part of DOM text content.
+        # The Kendo timepicker input rarely detaches from the DOM before the grid
+        # re-renders — keep the timeout short so we don't waste time waiting for
+        # an event that almost never fires before text_content() is readable.
         try:
-            cell.locator("input").wait_for(state="detached", timeout=3000)
+            cell.locator("input").wait_for(state="detached", timeout=500)
         except Exception:
-            pass  # Input may have already detached or cell structure differs
-        page.wait_for_timeout(200)
+            pass  # Expected: input stays attached; fall through to text_content check
+        page.wait_for_timeout(150)
 
         saved_value = (cell.text_content(timeout=2000) or "").strip()
         if times_match(saved_value, new_time_str):

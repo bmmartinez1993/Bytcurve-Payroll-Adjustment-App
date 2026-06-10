@@ -1207,7 +1207,7 @@ def _click_update_button(page: Page, task_code: str) -> bool:
 
         logging.info(f"UPDATE_BTN [{task_code}]: Clicking Update button.")
         update_btn.click(force=True)
-        page.wait_for_timeout(800)
+        page.wait_for_timeout(500)
         wait_for_loading(page)
 
         # Confirm the save landed: the edit row should disappear.
