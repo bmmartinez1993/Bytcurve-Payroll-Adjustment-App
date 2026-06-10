@@ -1,0 +1,28 @@
+# Version control
+.git/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Secrets — never bake credentials into the image; mount at runtime instead
+.env
+credentials.enc
+secret.key
+
+# Runtime-generated files
+*.log
+automation_activity.log
+
+# Playwright test artifacts
+test-results/
+playwright-report/
+blob-report/
+videos/
+screenshots/
