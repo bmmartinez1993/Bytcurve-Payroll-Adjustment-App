@@ -1,6 +1,13 @@
 # ByteCurve Payroll Adjustment Automation
 
-Playwright-based automation tool that logs into the ByteCurve 360 portal, validates employee timesheet entries against task-specific policies, adjusts paid time ranges where needed, and bulk-verifies completed records. Runs via a CustomTkinter GUI with live logging and encrypted credential storage.
+Playwright-based automation tool that logs into the ByteCurve 360 portal, validates employee timesheet entries against task-specific policies, adjusts paid time ranges where needed, and bulk-verifies completed records.
+
+Supports two run modes:
+
+| Mode | Entry point | When to use |
+|---|---|---|
+| **GUI** | `ByteCurve Payroll Adjustment Automation.py` | Local development, manual runs |
+| **CLI / headless** | `cli.py` | Docker, cloud schedulers, CI |
 
 ---
 
@@ -8,14 +15,21 @@ Playwright-based automation tool that logs into the ByteCurve 360 portal, valida
 
 ```
 Bytcurve-Payroll-Adjustment-App/
-├── ByteCurve Payroll Adjustment Automation.py  # Main script: GUI + orchestration
-├── automation_core_refactored.py               # Core library: data models, time utils, grid interactions
+├── ByteCurve Payroll Adjustment Automation.py  # GUI app: orchestration + CustomTkinter UI
+├── automation_core_refactored.py               # Core library: time utils, overlap resolution, grid interactions
+├── cli.py                                      # Headless CLI runner (Docker / server)
 ├── test_automation_core.py                     # Unit tests for the core library (88 tests)
 ├── ByteCurve Inspector.py                      # Playwright Inspector launcher for selector debugging
 ├── diagnose_dialog.py                          # Dialog diagnostics utility
 ├── requirements.txt                            # Python dependencies
 ├── .env.example                                # Environment variable template
+├── Dockerfile                                  # Container image definition
+├── docker-compose.yml                          # Compose service definition
+├── docker-entrypoint.sh                        # Container startup (starts Xvfb, then exec app)
+├── .dockerignore                               # Files excluded from the build context
 ├── .gitignore
+├── logs/                                       # Runtime log output (gitignored)
+│   └── automation_activity.log
 └── credentials.enc / secret.key               # Encrypted credential files (gitignored)
 ```
 
@@ -24,77 +38,123 @@ Bytcurve-Payroll-Adjustment-App/
 ## Architecture
 
 ```
-GUI (CustomTkinter)
-    └── Automation thread
-            ├── login()
-            ├── navigate_to_payroll()
-            └── validate_and_process_rows()  ← main loop
-                    ├── _get_all_employees_from_dropdown()
-                    └── for each employee:
-                            ├── _filter_grid_by_employee()
-                            ├── process_worker_adjustments()   ← automation_core_refactored
-                            │       ├── extract_task_data_from_row()
-                            │       ├── determine_task_adjustment_needs()
-                            │       ├── calculate_proposed_time_range()
-                            │       └── adjust_task_time_range()
-                            ├── save_task_changes()
-                            └── verify_all_worker_tasks()
+┌─ GUI mode ──────────────────────┐    ┌─ CLI mode ─────────────────────┐
+│ CustomTkinter window            │    │ cli.py                         │
+│   └── Automation thread         │    │   └── (same automation fns)    │
+└─────────────────────────────────┘    └────────────────────────────────┘
+               │                                      │
+               └──────────────┬───────────────────────┘
+                              ▼
+                        login()
+                        navigate_to_payroll()
+                        validate_and_process_rows()  ← main loop
+                              ├── _get_all_employees_from_dropdown()
+                              └── for each employee:
+                                      ├── _filter_grid_by_employee()
+                                      ├── _adjust_worker_tasks()
+                                      │       ├── _read_task_row()
+                                      │       ├── _calculate_proposed_times()
+                                      │       ├── adjust_time_entry()       ← automation_core_refactored
+                                      │       └── _click_update_button() / _save_via_navigation_dialog()
+                                      └── _verify_worker_tasks()
 ```
 
-The main script handles browser orchestration, GUI, and credential management. `automation_core_refactored.py` contains all pure-logic functions (time math, overlap resolution, task classification) and is independently unit-testable without a browser.
+`automation_core_refactored.py` contains all pure-logic functions (time math, overlap resolution, task classification) and is independently unit-testable without a browser. `cli.py` loads the main module via `importlib` so the GUI is never instantiated — all automation functions are shared without duplication.
 
 ---
 
 ## Prerequisites
 
+### Local (GUI or CLI)
+
 - Python 3.8+
+- Google Chrome installed (the app runs `channel="chrome"` to ensure consistent rendering of cookie banners and portal UI)
 - A ByteCurve 360 portal account
+
+### Docker
+
+- Docker Desktop (or any Docker Engine + Compose v2)
+- No Python or Chrome required on the host
 
 ---
 
 ## Installation
+
+### Local
 
 ```bash
 # 1. Clone or download the repository
 # 2. Install Python dependencies
 pip install -r requirements.txt
 
-# 3. Install the Chromium browser for Playwright
-playwright install chromium
+# 3. Install Chrome for Testing (used by Playwright's channel="chrome")
+playwright install chrome
 ```
+
+### Docker
+
+```bash
+# Build the image (installs Chrome for Testing inside the container)
+docker compose build
+
+# Or build and run in one step
+docker compose up --build
+```
+
+The image is based on `mcr.microsoft.com/playwright/python:v1.58.0-jammy`, which provides Chromium and all browser system dependencies. The Dockerfile adds Chrome for Testing via `playwright install chrome` so `channel="chrome"` resolves correctly inside the container.
 
 ---
 
 ## Credential Setup
 
-Credentials can be provided two ways. The app prefers encrypted storage over environment variables when both exist.
+### GUI mode
 
-**Option A — Encrypted file (recommended for repeated use)**
+On first launch, enter your credentials and check **Save Credentials Encrypted**. The app encrypts them with Fernet and writes `credentials.enc` + `secret.key` to the project directory. Both files are gitignored.
 
-On first launch, enter your credentials in the GUI and check "Save Credentials". The app encrypts them with Fernet and writes `credentials.enc` + `secret.key` to the project directory. These files are gitignored.
+### CLI / Docker mode
 
-**Option B — Environment variable**
+Credentials are resolved in priority order:
 
-Copy `.env.example` to `.env` and fill in your credentials:
+**Option A — Encrypted files (recommended)**
+
+Place `credentials.enc` and `secret.key` next to `docker-compose.yml`. The compose file mounts them as read-only volumes:
+
+```bash
+docker compose up
+```
+
+**Option B — Environment variables**
+
+Copy `.env.example` to `.env` and fill in plain-text credentials:
 
 ```text
 BYTECURVE_USER=your_username
 BYTECURVE_PASS=your_password
 ```
 
-> `.env` is gitignored and never committed.
+Then run:
+
+```bash
+docker compose up
+```
+
+`docker-compose.yml` passes `BYTECURVE_USER` / `BYTECURVE_PASS` from the host environment (or `.env` file) into the container. When set, these take priority over the encrypted files.
+
+> `.env` is gitignored. Never commit it.
 
 ---
 
 ## Usage
 
-### Run the main automation
+### GUI (local)
 
 ```bash
 python "ByteCurve Payroll Adjustment Automation.py"
 ```
 
-A GUI window opens. Enter credentials (or load saved ones), then click **Start**. The automation will:
+A window opens. Enter credentials (or load saved ones), then click **Start**. Click **Stop** for a graceful shutdown after the current employee finishes.
+
+The automation will:
 
 1. Log into ByteCurve 360 and navigate to **Verify Hours**.
 2. Set the view to the previous business day.
@@ -104,7 +164,39 @@ A GUI window opens. Enter credentials (or load saved ones), then click **Start**
 6. Enter adjusted times into the grid and save.
 7. Check all verification checkboxes and click **Verify**.
 
-Click **Stop** at any time for a graceful shutdown after the current employee finishes.
+### CLI (local headless or Docker)
+
+```bash
+# Run against the previous business day (default)
+python cli.py
+
+# Run against a specific date
+python cli.py --date 2026-06-10
+```
+
+In Docker:
+
+```bash
+# Default run (previous business day)
+docker compose up
+
+# Override the target date
+docker compose run --rm bytecurve-app python cli.py --date 2026-06-10
+```
+
+The CLI exits with code `0` on success and `1` on any error, making it compatible with cron jobs, task schedulers, and CI pipelines. `SIGTERM` (`docker stop`) and `SIGINT` (Ctrl+C) both trigger a graceful stop after the current operation.
+
+### Logs
+
+Both modes write to `logs/automation_activity.log` in the project directory (overwritten each run). In Docker, the `logs/` directory is mounted as a host volume so logs persist across container restarts.
+
+To tail logs from a running container:
+
+```bash
+docker compose logs -f
+# or directly from the host volume
+tail -f logs/automation_activity.log
+```
 
 ### Debug selectors with the Inspector
 
@@ -112,7 +204,7 @@ Click **Stop** at any time for a graceful shutdown after the current employee fi
 python "ByteCurve Inspector.py"
 ```
 
-Opens Playwright Inspector with the portal pre-loaded and logged in, letting you interactively identify CSS selectors.
+Opens Playwright Inspector with the portal pre-loaded and logged in.
 
 ### Diagnose dialog issues
 
@@ -167,4 +259,4 @@ Key constants in `automation_core_refactored.py`:
 | `COL_PAID_START` | 10 | Kendo grid column index for paid start |
 | `COL_PAID_END` | 11 | Kendo grid column index for paid end |
 
-The portal URL and all CSS/Kendo selectors are defined in the `BYTECURVE_URL` and `SELECTORS` dict at the top of the main automation script.
+The portal URL and all CSS/Kendo selectors are defined in `BYTECURVE_URL` and the `SELECTORS` dict at the top of the main automation script.
