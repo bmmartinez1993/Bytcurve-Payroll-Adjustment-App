@@ -1408,15 +1408,27 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                             _ose = parse_time_to_datetime(_osr[1], target_dt)
                             if _oss and _ose and _oss < _ose:
                                 other_one_min.append((_oss, _ose))
-                blocking_intervals = fixed_intervals + other_one_min
-                if other_one_min and any(
+                # Include anchor_schedule_intervals so the 1-minute entry never
+                # lands on a scheduled slot that ByteCurve would flag as a conflict.
+                blocking_intervals = fixed_intervals + other_one_min + anchor_schedule_intervals
+                _peer_conflict   = other_one_min and any(
                     intervals_overlap(prop_s, prop_e, bs, be)
                     for bs, be in other_one_min
-                ):
+                )
+                _anchor_conflict = anchor_schedule_intervals and any(
+                    intervals_overlap(prop_s, prop_e, bs, be)
+                    for bs, be in anchor_schedule_intervals
+                )
+                if _peer_conflict or _anchor_conflict:
+                    _sources = []
+                    if _peer_conflict:
+                        _sources.append("1-min peer(s)")
+                    if _anchor_conflict:
+                        _sources.append("anchor schedule task(s)")
                     logging.info(
                         f"ONE_MIN_CONFLICT: {task['code']} for {worker_display} — "
-                        f"1-min slot {datetime_to_time_str(prop_s)} conflicts with other "
-                        f"1-min task(s). Resolving to nearest available slot."
+                        f"1-min slot {datetime_to_time_str(prop_s)} conflicts with "
+                        f"{' and '.join(_sources)}. Resolving to nearest available slot."
                     )
                 final_s, final_e = get_non_overlapping_interval(prop_s, prop_e, blocking_intervals)
 
@@ -1522,6 +1534,9 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                         f"STEP3: {task['code']} saved. Grid reloaded — "
                         f"locating next unadjusted task for {worker_display}."
                     )
+                    # Dismiss any schedule-conflict dialog ByteCurve fires back
+                    # immediately after an individual save before the next iteration.
+                    _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
                     retry_tracking.pop(task_key, None)
                     adjustment_made = True
                     _saved_task_count += 1
@@ -1574,6 +1589,9 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                             f"STEP3: {task['code']} saved despite VERIFY failure. "
                             f"Locating next unadjusted task for {worker_display}."
                         )
+                        # Dismiss any schedule-conflict dialog ByteCurve fires back
+                        # immediately after an individual save before the next iteration.
+                        _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
                         retry_tracking.pop(task_key, None)
                         adjustment_made = True
                         _saved_task_count += 1
