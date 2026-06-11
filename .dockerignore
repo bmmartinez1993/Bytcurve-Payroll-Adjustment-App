@@ -17,8 +17,8 @@ credentials.enc
 secret.key
 
 # Runtime-generated files
+logs/
 *.log
-automation_activity.log
 
 # Playwright test artifacts
 test-results/

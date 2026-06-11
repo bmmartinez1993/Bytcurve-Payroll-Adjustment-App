@@ -50,8 +50,9 @@ _log_formatter = logging.Formatter(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
+os.makedirs("logs", exist_ok=True)
 _file_handler = _LiveFileHandler(
-    "automation_activity.log",
+    os.path.join("logs", "automation_activity.log"),
     mode='w',           # overwrite each run — keeps the file to the current session only
     encoding='utf-8',
 )
@@ -1823,7 +1824,7 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
 
     try:
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=False, channel="chrome", args=["--start-maximized"])
+            browser = pw.chromium.launch(headless=False, channel="chrome", args=["--start-maximized", "--no-sandbox"])
             context = browser.new_context(no_viewport=True)
             page    = context.new_page()
             try:
