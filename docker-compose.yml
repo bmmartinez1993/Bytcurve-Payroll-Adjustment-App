@@ -3,13 +3,18 @@ services:
     build: .
     volumes:
       # Credentials are never baked into the image.
-      # Place credentials.enc and secret.key next to this file before running.
+      # Option A (recommended): mount pre-encrypted files.
       - ./credentials.enc:/app/credentials.enc:ro
       - ./secret.key:/app/secret.key:ro
       # Persist session logs on the host so they survive container restarts.
       - ./logs:/app/logs
     environment:
       - DISPLAY=:99
+      # Option B: pass credentials as plain-text env vars instead of mounting
+      # files.  When set, these take priority over credentials.enc.
+      # Populate them in a .env file next to this compose file (never commit it).
+      - BYTECURVE_USER=${BYTECURVE_USER:-}
+      - BYTECURVE_PASS=${BYTECURVE_PASS:-}
     # Automatically restart the container if it exits unexpectedly in a
     # cloud environment (e.g. ECS, GCE, Azure Container Instances).
     restart: unless-stopped
