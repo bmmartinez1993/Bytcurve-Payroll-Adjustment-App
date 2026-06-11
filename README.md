@@ -218,13 +218,25 @@ Runs targeted checks against confirmation/save dialogs to verify button presence
 
 ## Running Tests
 
+### Unit tests (no browser required)
+
 ```bash
 python -m pytest test_automation_core.py -v
 # or
 python test_automation_core.py
 ```
 
-88 unit tests cover time parsing, interval/overlap logic, data models, task classification, and proposed-time calculation — all without requiring a browser.
+88 unit tests cover time parsing, interval/overlap logic, data models, task classification, and proposed-time calculation.
+
+### Container smoke tests (Docker required)
+
+Verifies the container environment before a live run: Xvfb is running, Chrome for Testing launches, the log directory is writable, `cli.py --help` exits cleanly, the main module loads via importlib, and both credential paths (env vars + encrypted files) resolve correctly.
+
+```bash
+docker compose -f docker-compose.test.yml run --rm smoke-test
+```
+
+No real credentials are needed — the smoke tests use throwaway Fernet keys generated in `/tmp`. Run this after every `docker compose build` or before deploying a new image to Cloud Run.
 
 ---
 

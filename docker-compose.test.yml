@@ -1,0 +1,25 @@
+# Smoke-test compose file — runs test_container_smoke.py inside the image.
+#
+# Usage:
+#   docker compose -f docker-compose.test.yml run --rm smoke-test
+#
+# No real credentials are needed. BYTECURVE_USER / BYTECURVE_PASS are set to
+# placeholder values so the module-load fixture does not exit early.
+# The credential-file tests generate their own throwaway Fernet keys in /tmp.
+services:
+  smoke-test:
+    build: .
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
+    command:
+      - python
+      - -m
+      - pytest
+      - test_container_smoke.py
+      - -v
+      - --tb=short
+    environment:
+      - DISPLAY=:99
+      - BYTECURVE_USER=smoke_test_user
+      - BYTECURVE_PASS=smoke_test_pass
+    volumes:
+      - ./logs:/app/logs
