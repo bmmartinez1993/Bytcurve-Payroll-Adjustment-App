@@ -30,10 +30,19 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install Chrome for Testing so channel="chrome" resolves to Playwright's own
+# Chrome binary rather than a system Chrome that isn't present in this image.
+# This preserves the headed Chrome behaviour (cookie banner visibility, etc.)
+# that bundled Chromium does not reproduce.
+RUN python -m playwright install chrome
+
 # Copy application source.
 # credentials.enc and secret.key are excluded via .dockerignore and must be
 # mounted as read-only volumes at runtime (see docker-compose.yml).
 COPY . .
+
+# Ensure the logs directory exists so the volume mount and log file path both work.
+RUN mkdir -p /app/logs
 
 # Strip Windows line-endings in case the file was committed with CRLF, then
 # make the script executable.
