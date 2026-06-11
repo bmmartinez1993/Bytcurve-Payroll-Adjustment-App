@@ -55,4 +55,6 @@ RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh \
 ENV DISPLAY=:99
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["python", "ByteCurve Payroll Adjustment Automation.py"]
+# cli.py is the headless entry point used in Docker / cloud.
+# To run the GUI instead (e.g. with VNC): override CMD at runtime.
+CMD ["python", "cli.py"]
