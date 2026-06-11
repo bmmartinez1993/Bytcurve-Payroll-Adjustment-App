@@ -1695,10 +1695,23 @@ def _verify_worker_tasks(page: Page, worker_filter, worker_display: str,
             try:
                 row.scroll_into_view_if_needed(timeout=3000)
                 page.wait_for_timeout(150)
+
+                # Skip tasks that are excluded from verification (e.g. Bridge Charter).
+                # determine_task_policy returns None for these — same guard used in
+                # the adjustment loop so the two paths stay consistent.
+                _task_code = (row.locator(SELECTORS["row_task_code"]).text_content(timeout=2000) or "").strip()
+                _task_name = (row.locator(SELECTORS["row_task_name"]).text_content(timeout=2000) or "").strip()
+                if determine_task_policy(_task_code, _task_name) is None:
+                    logging.info(
+                        f"VERIFY: Skipping '{_task_code} {_task_name}' for "
+                        f"{worker_display} — excluded from verification."
+                    )
+                    continue
+
                 already_checked = row.locator(SELECTORS["row_checkbox"]).is_checked(timeout=5000)
             except Exception as e:
                 logging.warning(
-                    f"VERIFY: Could not read checkbox state for {worker_display} row "
+                    f"VERIFY: Could not read row data for {worker_display} "
                     f"— skipping row. ({e})"
                 )
                 continue
