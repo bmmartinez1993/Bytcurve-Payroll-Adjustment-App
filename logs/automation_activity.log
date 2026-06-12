@@ -1,1 +1,1661 @@
-2026-06-12 12:45:56 [INFO] SYSTEM: Keep-active thread started.
+2026-06-12 15:08:14 [INFO] SYSTEM: Keep-active thread started.
+2026-06-12 15:44:27 [INFO] ============================================================
+2026-06-12 15:44:27 [INFO] AUTOMATION RUN STARTED: 2026-06-12 15:44:27
+2026-06-12 15:44:27 [INFO] ============================================================
+2026-06-12 15:44:31 [INFO] Navigating to https://app.bytecurve360.com/portal/core/#/login...
+2026-06-12 15:44:37 [INFO] Cookie consent accepted.
+2026-06-12 15:44:37 [INFO] Logged in successfully.
+2026-06-12 15:44:37 [INFO] Navigating to Timesheets...
+2026-06-12 15:44:44 [INFO] Processing date: 2026-06-11
+2026-06-12 15:44:45 [INFO] Selected date: 06/11
+2026-06-12 15:44:51 [INFO] Sorted by Employee column.
+2026-06-12 15:44:54 [INFO] EMP_FILTER: Raw popup sample (first 3): ['Abigail Nelson', 'Adrian Flores', 'Aichat Amadou']
+2026-06-12 15:44:54 [INFO] EMP_FILTER: 381 employees found in dropdown.
+2026-06-12 15:44:56 [INFO] WORKER: Processing Abigail Nelson (637557 (CT Bridgeport))
+2026-06-12 15:44:56 [INFO] STEP4: All paid-time adjustments complete for Abigail Nelson (637557 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:44:56 [INFO] VERIFY: No new checkboxes needed for Abigail Nelson (637557 (CT Bridgeport)).
+2026-06-12 15:44:56 [INFO] WORKER: Done with Abigail Nelson (637557 (CT Bridgeport))
+2026-06-12 15:44:56 [INFO] STEP5: Moving to next employee after completing Abigail Nelson (637557 (CT Bridgeport)).
+2026-06-12 15:44:58 [INFO] WORKER: Processing Adrian Flores (306829 (CT Bridgeport))
+2026-06-12 15:44:58 [INFO] STEP4: All paid-time adjustments complete for Adrian Flores (306829 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:44:59 [INFO] VERIFY: No new checkboxes needed for Adrian Flores (306829 (CT Bridgeport)).
+2026-06-12 15:44:59 [INFO] WORKER: Done with Adrian Flores (306829 (CT Bridgeport))
+2026-06-12 15:44:59 [INFO] STEP5: Moving to next employee after completing Adrian Flores (306829 (CT Bridgeport)).
+2026-06-12 15:45:00 [INFO] WORKER: Processing Aichat Amadou (306790 (CT Bridgeport))
+2026-06-12 15:45:01 [INFO] STEP4: All paid-time adjustments complete for Aichat Amadou (306790 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:01 [INFO] VERIFY: No new checkboxes needed for Aichat Amadou (306790 (CT Bridgeport)).
+2026-06-12 15:45:01 [INFO] WORKER: Done with Aichat Amadou (306790 (CT Bridgeport))
+2026-06-12 15:45:01 [INFO] STEP5: Moving to next employee after completing Aichat Amadou (306790 (CT Bridgeport)).
+2026-06-12 15:45:02 [INFO] WORKER: Processing Aida Alcover (608941 (CT Bridgeport))
+2026-06-12 15:45:03 [INFO] STEP4: All paid-time adjustments complete for Aida Alcover (608941 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:03 [INFO] VERIFY: No new checkboxes needed for Aida Alcover (608941 (CT Bridgeport)).
+2026-06-12 15:45:03 [INFO] WORKER: Done with Aida Alcover (608941 (CT Bridgeport))
+2026-06-12 15:45:03 [INFO] STEP5: Moving to next employee after completing Aida Alcover (608941 (CT Bridgeport)).
+2026-06-12 15:45:04 [INFO] WORKER: Processing Aisha Smith Sierra (304270 (CT Bridgeport))
+2026-06-12 15:45:05 [INFO] STEP4: All paid-time adjustments complete for Aisha Smith Sierra (304270 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:06 [INFO] VERIFY: No new checkboxes needed for Aisha Smith Sierra (304270 (CT Bridgeport)).
+2026-06-12 15:45:06 [INFO] WORKER: Done with Aisha Smith Sierra (304270 (CT Bridgeport))
+2026-06-12 15:45:06 [INFO] STEP5: Moving to next employee after completing Aisha Smith Sierra (304270 (CT Bridgeport)).
+2026-06-12 15:45:07 [INFO] WORKER: Processing Alberto Piedra (612190 (CT Bridgeport))
+2026-06-12 15:45:08 [INFO] STEP4: All paid-time adjustments complete for Alberto Piedra (612190 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:08 [INFO] VERIFY: No new checkboxes needed for Alberto Piedra (612190 (CT Bridgeport)).
+2026-06-12 15:45:08 [INFO] WORKER: Done with Alberto Piedra (612190 (CT Bridgeport))
+2026-06-12 15:45:08 [INFO] STEP5: Moving to next employee after completing Alberto Piedra (612190 (CT Bridgeport)).
+2026-06-12 15:45:09 [INFO] WORKER: Processing Alexandre Pierre (304878 (CT Bridgeport))
+2026-06-12 15:45:10 [INFO] STEP4: All paid-time adjustments complete for Alexandre Pierre (304878 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:10 [INFO] VERIFY: No new checkboxes needed for Alexandre Pierre (304878 (CT Bridgeport)).
+2026-06-12 15:45:10 [INFO] WORKER: Done with Alexandre Pierre (304878 (CT Bridgeport))
+2026-06-12 15:45:10 [INFO] STEP5: Moving to next employee after completing Alexandre Pierre (304878 (CT Bridgeport)).
+2026-06-12 15:45:11 [INFO] WORKER: Processing Alexis Charles (304223 (CT Bridgeport))
+2026-06-12 15:45:12 [INFO] STEP4: All paid-time adjustments complete for Alexis Charles (304223 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:12 [INFO] VERIFY: No new checkboxes needed for Alexis Charles (304223 (CT Bridgeport)).
+2026-06-12 15:45:12 [INFO] WORKER: Done with Alexis Charles (304223 (CT Bridgeport))
+2026-06-12 15:45:12 [INFO] STEP5: Moving to next employee after completing Alexis Charles (304223 (CT Bridgeport)).
+2026-06-12 15:45:15 [INFO] WORKER: Processing Alfredo Serrano (612752 (CT Bridgeport))
+2026-06-12 15:45:15 [INFO] STEP4: All paid-time adjustments complete for Alfredo Serrano (612752 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:15 [INFO] VERIFY: No new checkboxes needed for Alfredo Serrano (612752 (CT Bridgeport)).
+2026-06-12 15:45:15 [INFO] WORKER: Done with Alfredo Serrano (612752 (CT Bridgeport))
+2026-06-12 15:45:15 [INFO] STEP5: Moving to next employee after completing Alfredo Serrano (612752 (CT Bridgeport)).
+2026-06-12 15:45:17 [INFO] WORKER: Processing Alice Medina (304291 (CT Bridgeport))
+2026-06-12 15:45:17 [INFO] STEP4: All paid-time adjustments complete for Alice Medina (304291 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:18 [INFO] VERIFY: No new checkboxes needed for Alice Medina (304291 (CT Bridgeport)).
+2026-06-12 15:45:18 [INFO] WORKER: Done with Alice Medina (304291 (CT Bridgeport))
+2026-06-12 15:45:18 [INFO] STEP5: Moving to next employee after completing Alice Medina (304291 (CT Bridgeport)).
+2026-06-12 15:45:20 [INFO] WORKER: Processing Alix M Sanon (616836 (CT Bridgeport))
+2026-06-12 15:45:20 [INFO] STEP4: All paid-time adjustments complete for Alix M Sanon (616836 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:20 [INFO] VERIFY: No new checkboxes needed for Alix M Sanon (616836 (CT Bridgeport)).
+2026-06-12 15:45:20 [INFO] WORKER: Done with Alix M Sanon (616836 (CT Bridgeport))
+2026-06-12 15:45:20 [INFO] STEP5: Moving to next employee after completing Alix M Sanon (616836 (CT Bridgeport)).
+2026-06-12 15:45:22 [INFO] WORKER: Processing Allen Mann (621352 (CT Bridgeport))
+2026-06-12 15:45:22 [INFO] STEP4: All paid-time adjustments complete for Allen Mann (621352 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:23 [INFO] VERIFY: No new checkboxes needed for Allen Mann (621352 (CT Bridgeport)).
+2026-06-12 15:45:23 [INFO] WORKER: Done with Allen Mann (621352 (CT Bridgeport))
+2026-06-12 15:45:23 [INFO] STEP5: Moving to next employee after completing Allen Mann (621352 (CT Bridgeport)).
+2026-06-12 15:45:24 [INFO] WORKER: Processing Altagracia Martinez Escolastico (306448 (CT Bridgeport))
+2026-06-12 15:45:24 [INFO] STEP4: All paid-time adjustments complete for Altagracia Martinez Escolastico (306448 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:25 [INFO] VERIFY: No new checkboxes needed for Altagracia Martinez Escolastico (306448 (CT Bridgeport)).
+2026-06-12 15:45:25 [INFO] WORKER: Done with Altagracia Martinez Escolastico (306448 (CT Bridgeport))
+2026-06-12 15:45:25 [INFO] STEP5: Moving to next employee after completing Altagracia Martinez Escolastico (306448 (CT Bridgeport)).
+2026-06-12 15:45:26 [INFO] WORKER: Processing Ana Garcia Orellana (612660 (CT Bridgeport))
+2026-06-12 15:45:27 [INFO] STEP4: All paid-time adjustments complete for Ana Garcia Orellana (612660 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:28 [INFO] VERIFY: No new checkboxes needed for Ana Garcia Orellana (612660 (CT Bridgeport)).
+2026-06-12 15:45:28 [INFO] WORKER: Done with Ana Garcia Orellana (612660 (CT Bridgeport))
+2026-06-12 15:45:28 [INFO] STEP5: Moving to next employee after completing Ana Garcia Orellana (612660 (CT Bridgeport)).
+2026-06-12 15:45:29 [INFO] WORKER: Processing Ana Delgado (305283 (CT Bridgeport))
+2026-06-12 15:45:29 [INFO] STEP4: All paid-time adjustments complete for Ana Delgado (305283 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:30 [INFO] VERIFY: No new checkboxes needed for Ana Delgado (305283 (CT Bridgeport)).
+2026-06-12 15:45:30 [INFO] WORKER: Done with Ana Delgado (305283 (CT Bridgeport))
+2026-06-12 15:45:30 [INFO] STEP5: Moving to next employee after completing Ana Delgado (305283 (CT Bridgeport)).
+2026-06-12 15:45:34 [INFO] WORKER: Processing Andre Richards (617437 (CT Bridgeport))
+2026-06-12 15:45:34 [INFO] STEP4: All paid-time adjustments complete for Andre Richards (617437 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:35 [INFO] VERIFY: No new checkboxes needed for Andre Richards (617437 (CT Bridgeport)).
+2026-06-12 15:45:35 [INFO] WORKER: Done with Andre Richards (617437 (CT Bridgeport))
+2026-06-12 15:45:35 [INFO] STEP5: Moving to next employee after completing Andre Richards (617437 (CT Bridgeport)).
+2026-06-12 15:45:36 [INFO] WORKER: Processing Andrew Bellamy Jr (304306 (CT Bridgeport))
+2026-06-12 15:45:37 [INFO] STEP4: All paid-time adjustments complete for Andrew Bellamy Jr (304306 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:37 [INFO] VERIFY: No new checkboxes needed for Andrew Bellamy Jr (304306 (CT Bridgeport)).
+2026-06-12 15:45:37 [INFO] WORKER: Done with Andrew Bellamy Jr (304306 (CT Bridgeport))
+2026-06-12 15:45:37 [INFO] STEP5: Moving to next employee after completing Andrew Bellamy Jr (304306 (CT Bridgeport)).
+2026-06-12 15:45:38 [INFO] WORKER: Processing Angel Torres (304187 (CT Bridgeport))
+2026-06-12 15:45:39 [INFO] STEP4: All paid-time adjustments complete for Angel Torres (304187 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:39 [INFO] VERIFY: No new checkboxes needed for Angel Torres (304187 (CT Bridgeport)).
+2026-06-12 15:45:39 [INFO] WORKER: Done with Angel Torres (304187 (CT Bridgeport))
+2026-06-12 15:45:39 [INFO] STEP5: Moving to next employee after completing Angel Torres (304187 (CT Bridgeport)).
+2026-06-12 15:45:42 [INFO] WORKER: Processing Angelina Van Norden (304204 (CT Bridgeport))
+2026-06-12 15:45:42 [INFO] STEP4: All paid-time adjustments complete for Angelina Van Norden (304204 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:42 [INFO] VERIFY: No new checkboxes needed for Angelina Van Norden (304204 (CT Bridgeport)).
+2026-06-12 15:45:42 [INFO] WORKER: Done with Angelina Van Norden (304204 (CT Bridgeport))
+2026-06-12 15:45:42 [INFO] STEP5: Moving to next employee after completing Angelina Van Norden (304204 (CT Bridgeport)).
+2026-06-12 15:45:45 [INFO] WORKER: Processing Anthony Newton (307102 (CT Bridgeport))
+2026-06-12 15:45:46 [INFO] STEP4: All paid-time adjustments complete for Anthony Newton (307102 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:46 [INFO] VERIFY: No new checkboxes needed for Anthony Newton (307102 (CT Bridgeport)).
+2026-06-12 15:45:46 [INFO] WORKER: Done with Anthony Newton (307102 (CT Bridgeport))
+2026-06-12 15:45:46 [INFO] STEP5: Moving to next employee after completing Anthony Newton (307102 (CT Bridgeport)).
+2026-06-12 15:45:48 [INFO] WORKER: Processing Antonio Vargas Iii (304518 (CT Bridgeport))
+2026-06-12 15:45:48 [INFO] STEP4: All paid-time adjustments complete for Antonio Vargas Iii (304518 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:48 [INFO] VERIFY: No new checkboxes needed for Antonio Vargas Iii (304518 (CT Bridgeport)).
+2026-06-12 15:45:48 [INFO] WORKER: Done with Antonio Vargas Iii (304518 (CT Bridgeport))
+2026-06-12 15:45:48 [INFO] STEP5: Moving to next employee after completing Antonio Vargas Iii (304518 (CT Bridgeport)).
+2026-06-12 15:45:50 [INFO] WORKER: Processing ashley torres (618062 (CT Bridgeport))
+2026-06-12 15:45:50 [INFO] STEP4: All paid-time adjustments complete for ashley torres (618062 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:51 [INFO] VERIFY: Skipping 'Bridge Charter 117078-1' for ashley torres (618062 (CT Bridgeport)) — excluded from verification.
+2026-06-12 15:45:51 [INFO] VERIFY: No new checkboxes needed for ashley torres (618062 (CT Bridgeport)).
+2026-06-12 15:45:51 [INFO] WORKER: Done with ashley torres (618062 (CT Bridgeport))
+2026-06-12 15:45:51 [INFO] STEP5: Moving to next employee after completing ashley torres (618062 (CT Bridgeport)).
+2026-06-12 15:45:52 [INFO] WORKER: Processing Ashley Glover (622289 (CT Bridgeport))
+2026-06-12 15:45:53 [INFO] STEP4: All paid-time adjustments complete for Ashley Glover (622289 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:54 [INFO] VERIFY: No new checkboxes needed for Ashley Glover (622289 (CT Bridgeport)).
+2026-06-12 15:45:54 [INFO] WORKER: Done with Ashley Glover (622289 (CT Bridgeport))
+2026-06-12 15:45:54 [INFO] STEP5: Moving to next employee after completing Ashley Glover (622289 (CT Bridgeport)).
+2026-06-12 15:45:55 [INFO] WORKER: Processing Ashley Santiago (625380 (CT Bridgeport))
+2026-06-12 15:45:56 [INFO] STEP4: All paid-time adjustments complete for Ashley Santiago (625380 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:45:56 [INFO] VERIFY: No new checkboxes needed for Ashley Santiago (625380 (CT Bridgeport)).
+2026-06-12 15:45:56 [INFO] WORKER: Done with Ashley Santiago (625380 (CT Bridgeport))
+2026-06-12 15:45:56 [INFO] STEP5: Moving to next employee after completing Ashley Santiago (625380 (CT Bridgeport)).
+2026-06-12 15:45:59 [INFO] WORKER: Processing Bernadette Klicin (000015 (CT Bridgeport))
+2026-06-12 15:45:59 [INFO] STEP4: All paid-time adjustments complete for Bernadette Klicin (000015 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:00 [INFO] VERIFY: No new checkboxes needed for Bernadette Klicin (000015 (CT Bridgeport)).
+2026-06-12 15:46:00 [INFO] WORKER: Done with Bernadette Klicin (000015 (CT Bridgeport))
+2026-06-12 15:46:00 [INFO] STEP5: Moving to next employee after completing Bernadette Klicin (000015 (CT Bridgeport)).
+2026-06-12 15:46:02 [INFO] WORKER: Processing Bertha L Hill (307363 (CT Bridgeport))
+2026-06-12 15:46:03 [INFO] STEP4: All paid-time adjustments complete for Bertha L Hill (307363 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:04 [INFO] VERIFY: No new checkboxes needed for Bertha L Hill (307363 (CT Bridgeport)).
+2026-06-12 15:46:04 [INFO] WORKER: Done with Bertha L Hill (307363 (CT Bridgeport))
+2026-06-12 15:46:04 [INFO] STEP5: Moving to next employee after completing Bertha L Hill (307363 (CT Bridgeport)).
+2026-06-12 15:46:05 [INFO] WORKER: Processing Bessie Jones (304178 (CT Bridgeport))
+2026-06-12 15:46:06 [INFO] STEP4: All paid-time adjustments complete for Bessie Jones (304178 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:06 [INFO] VERIFY: No new checkboxes needed for Bessie Jones (304178 (CT Bridgeport)).
+2026-06-12 15:46:06 [INFO] WORKER: Done with Bessie Jones (304178 (CT Bridgeport))
+2026-06-12 15:46:06 [INFO] STEP5: Moving to next employee after completing Bessie Jones (304178 (CT Bridgeport)).
+2026-06-12 15:46:07 [INFO] WORKER: Processing Betty Martinez (304788 (CT Bridgeport))
+2026-06-12 15:46:08 [INFO] STEP4: All paid-time adjustments complete for Betty Martinez (304788 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:08 [INFO] VERIFY: No new checkboxes needed for Betty Martinez (304788 (CT Bridgeport)).
+2026-06-12 15:46:08 [INFO] WORKER: Done with Betty Martinez (304788 (CT Bridgeport))
+2026-06-12 15:46:08 [INFO] STEP5: Moving to next employee after completing Betty Martinez (304788 (CT Bridgeport)).
+2026-06-12 15:46:10 [INFO] WORKER: Processing Brenda Roman (611819 (CT Bridgeport))
+2026-06-12 15:46:10 [INFO] STEP4: All paid-time adjustments complete for Brenda Roman (611819 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:11 [INFO] VERIFY: No new checkboxes needed for Brenda Roman (611819 (CT Bridgeport)).
+2026-06-12 15:46:11 [INFO] WORKER: Done with Brenda Roman (611819 (CT Bridgeport))
+2026-06-12 15:46:11 [INFO] STEP5: Moving to next employee after completing Brenda Roman (611819 (CT Bridgeport)).
+2026-06-12 15:46:14 [INFO] WORKER: Processing Bridget Cheatham (304215 (CT Bridgeport))
+2026-06-12 15:46:14 [INFO] STEP4: All paid-time adjustments complete for Bridget Cheatham (304215 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:14 [INFO] VERIFY: No new checkboxes needed for Bridget Cheatham (304215 (CT Bridgeport)).
+2026-06-12 15:46:14 [INFO] WORKER: Done with Bridget Cheatham (304215 (CT Bridgeport))
+2026-06-12 15:46:14 [INFO] STEP5: Moving to next employee after completing Bridget Cheatham (304215 (CT Bridgeport)).
+2026-06-12 15:46:18 [INFO] WORKER: Processing Carlton Howell (304176 (CT Bridgeport))
+2026-06-12 15:46:19 [INFO] STEP4: All paid-time adjustments complete for Carlton Howell (304176 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:19 [INFO] VERIFY: No new checkboxes needed for Carlton Howell (304176 (CT Bridgeport)).
+2026-06-12 15:46:19 [INFO] WORKER: Done with Carlton Howell (304176 (CT Bridgeport))
+2026-06-12 15:46:19 [INFO] STEP5: Moving to next employee after completing Carlton Howell (304176 (CT Bridgeport)).
+2026-06-12 15:46:22 [INFO] WORKER: Processing Carmen Hernandez (304255 (CT Bridgeport))
+2026-06-12 15:46:22 [INFO] STEP4: All paid-time adjustments complete for Carmen Hernandez (304255 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:23 [INFO] VERIFY: No new checkboxes needed for Carmen Hernandez (304255 (CT Bridgeport)).
+2026-06-12 15:46:23 [INFO] WORKER: Done with Carmen Hernandez (304255 (CT Bridgeport))
+2026-06-12 15:46:23 [INFO] STEP5: Moving to next employee after completing Carmen Hernandez (304255 (CT Bridgeport)).
+2026-06-12 15:46:24 [INFO] WORKER: Processing Carmen Perez (304239 (CT Bridgeport))
+2026-06-12 15:46:24 [INFO] STEP4: All paid-time adjustments complete for Carmen Perez (304239 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:25 [INFO] VERIFY: No new checkboxes needed for Carmen Perez (304239 (CT Bridgeport)).
+2026-06-12 15:46:25 [INFO] WORKER: Done with Carmen Perez (304239 (CT Bridgeport))
+2026-06-12 15:46:25 [INFO] STEP5: Moving to next employee after completing Carmen Perez (304239 (CT Bridgeport)).
+2026-06-12 15:46:26 [INFO] WORKER: Processing Carmen Figueroa (304220 (CT Bridgeport))
+2026-06-12 15:46:27 [INFO] STEP4: All paid-time adjustments complete for Carmen Figueroa (304220 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:27 [INFO] VERIFY: No new checkboxes needed for Carmen Figueroa (304220 (CT Bridgeport)).
+2026-06-12 15:46:27 [INFO] WORKER: Done with Carmen Figueroa (304220 (CT Bridgeport))
+2026-06-12 15:46:27 [INFO] STEP5: Moving to next employee after completing Carmen Figueroa (304220 (CT Bridgeport)).
+2026-06-12 15:46:28 [INFO] WORKER: Processing Carmen Sotamba Fajardo (622103 (CT Bridgeport))
+2026-06-12 15:46:29 [INFO] STEP4: All paid-time adjustments complete for Carmen Sotamba Fajardo (622103 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:29 [INFO] VERIFY: No new checkboxes needed for Carmen Sotamba Fajardo (622103 (CT Bridgeport)).
+2026-06-12 15:46:29 [INFO] WORKER: Done with Carmen Sotamba Fajardo (622103 (CT Bridgeport))
+2026-06-12 15:46:29 [INFO] STEP5: Moving to next employee after completing Carmen Sotamba Fajardo (622103 (CT Bridgeport)).
+2026-06-12 15:46:32 [INFO] WORKER: Processing Carmen (City Driver) Perez (000017 (CT Bridgeport))
+2026-06-12 15:46:32 [INFO] STEP4: All paid-time adjustments complete for Carmen (City Driver) Perez (000017 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:33 [INFO] VERIFY: No new checkboxes needed for Carmen (City Driver) Perez (000017 (CT Bridgeport)).
+2026-06-12 15:46:33 [INFO] WORKER: Done with Carmen (City Driver) Perez (000017 (CT Bridgeport))
+2026-06-12 15:46:33 [INFO] STEP5: Moving to next employee after completing Carmen (City Driver) Perez (000017 (CT Bridgeport)).
+2026-06-12 15:46:34 [INFO] WORKER: Processing Carolin Volquez Rosario (306703 (CT Bridgeport))
+2026-06-12 15:46:35 [INFO] STEP4: All paid-time adjustments complete for Carolin Volquez Rosario (306703 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:35 [INFO] VERIFY: Skipping 'Bridge Charter 117078-2' for Carolin Volquez Rosario (306703 (CT Bridgeport)) — excluded from verification.
+2026-06-12 15:46:35 [INFO] VERIFY: No new checkboxes needed for Carolin Volquez Rosario (306703 (CT Bridgeport)).
+2026-06-12 15:46:35 [INFO] WORKER: Done with Carolin Volquez Rosario (306703 (CT Bridgeport))
+2026-06-12 15:46:35 [INFO] STEP5: Moving to next employee after completing Carolin Volquez Rosario (306703 (CT Bridgeport)).
+2026-06-12 15:46:36 [INFO] WORKER: Processing Cassandra Diaz (305277 (CT Bridgeport))
+2026-06-12 15:46:37 [INFO] STEP4: All paid-time adjustments complete for Cassandra Diaz (305277 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:37 [INFO] VERIFY: No new checkboxes needed for Cassandra Diaz (305277 (CT Bridgeport)).
+2026-06-12 15:46:37 [INFO] WORKER: Done with Cassandra Diaz (305277 (CT Bridgeport))
+2026-06-12 15:46:37 [INFO] STEP5: Moving to next employee after completing Cassandra Diaz (305277 (CT Bridgeport)).
+2026-06-12 15:46:39 [INFO] WORKER: Processing Celeste Tompkins (622064 (CT Bridgeport))
+2026-06-12 15:46:39 [INFO] STEP4: All paid-time adjustments complete for Celeste Tompkins (622064 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:40 [INFO] VERIFY: No new checkboxes needed for Celeste Tompkins (622064 (CT Bridgeport)).
+2026-06-12 15:46:40 [INFO] WORKER: Done with Celeste Tompkins (622064 (CT Bridgeport))
+2026-06-12 15:46:40 [INFO] STEP5: Moving to next employee after completing Celeste Tompkins (622064 (CT Bridgeport)).
+2026-06-12 15:46:41 [INFO] WORKER: Processing Cesarina Diaz Sierra (304233 (CT Bridgeport))
+2026-06-12 15:46:42 [INFO] STEP4: All paid-time adjustments complete for Cesarina Diaz Sierra (304233 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:43 [INFO] VERIFY: No new checkboxes needed for Cesarina Diaz Sierra (304233 (CT Bridgeport)).
+2026-06-12 15:46:43 [INFO] WORKER: Done with Cesarina Diaz Sierra (304233 (CT Bridgeport))
+2026-06-12 15:46:43 [INFO] STEP5: Moving to next employee after completing Cesarina Diaz Sierra (304233 (CT Bridgeport)).
+2026-06-12 15:46:44 [INFO] WORKER: Processing Charmaine Distant Boothe (307244 (CT Bridgeport))
+2026-06-12 15:46:44 [INFO] STEP4: All paid-time adjustments complete for Charmaine Distant Boothe (307244 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:45 [INFO] VERIFY: No new checkboxes needed for Charmaine Distant Boothe (307244 (CT Bridgeport)).
+2026-06-12 15:46:45 [INFO] WORKER: Done with Charmaine Distant Boothe (307244 (CT Bridgeport))
+2026-06-12 15:46:45 [INFO] STEP5: Moving to next employee after completing Charmaine Distant Boothe (307244 (CT Bridgeport)).
+2026-06-12 15:46:47 [INFO] WORKER: Processing Christina Olvera (305336 (CT Bridgeport))
+2026-06-12 15:46:47 [INFO] STEP4: All paid-time adjustments complete for Christina Olvera (305336 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:48 [INFO] VERIFY: No new checkboxes needed for Christina Olvera (305336 (CT Bridgeport)).
+2026-06-12 15:46:48 [INFO] WORKER: Done with Christina Olvera (305336 (CT Bridgeport))
+2026-06-12 15:46:48 [INFO] STEP5: Moving to next employee after completing Christina Olvera (305336 (CT Bridgeport)).
+2026-06-12 15:46:49 [INFO] WORKER: Processing Christopher Gomez (621462 (CT Bridgeport))
+2026-06-12 15:46:50 [INFO] STEP4: All paid-time adjustments complete for Christopher Gomez (621462 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:50 [INFO] VERIFY: No new checkboxes needed for Christopher Gomez (621462 (CT Bridgeport)).
+2026-06-12 15:46:50 [INFO] WORKER: Done with Christopher Gomez (621462 (CT Bridgeport))
+2026-06-12 15:46:50 [INFO] STEP5: Moving to next employee after completing Christopher Gomez (621462 (CT Bridgeport)).
+2026-06-12 15:46:51 [INFO] WORKER: Processing Christopher S Samuels (307283 (CT Bridgeport))
+2026-06-12 15:46:52 [INFO] STEP4: All paid-time adjustments complete for Christopher S Samuels (307283 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:52 [INFO] VERIFY: No new checkboxes needed for Christopher S Samuels (307283 (CT Bridgeport)).
+2026-06-12 15:46:52 [INFO] WORKER: Done with Christopher S Samuels (307283 (CT Bridgeport))
+2026-06-12 15:46:52 [INFO] STEP5: Moving to next employee after completing Christopher S Samuels (307283 (CT Bridgeport)).
+2026-06-12 15:46:55 [INFO] WORKER: Processing Courtney Hodge (636979 (CT Bridgeport))
+2026-06-12 15:46:55 [INFO] STEP4: All paid-time adjustments complete for Courtney Hodge (636979 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:56 [INFO] VERIFY: No new checkboxes needed for Courtney Hodge (636979 (CT Bridgeport)).
+2026-06-12 15:46:56 [INFO] WORKER: Done with Courtney Hodge (636979 (CT Bridgeport))
+2026-06-12 15:46:56 [INFO] STEP5: Moving to next employee after completing Courtney Hodge (636979 (CT Bridgeport)).
+2026-06-12 15:46:57 [INFO] WORKER: Processing Cristian Reyes (304181 (CT Bridgeport))
+2026-06-12 15:46:58 [INFO] STEP4: All paid-time adjustments complete for Cristian Reyes (304181 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:46:58 [INFO] VERIFY: No new checkboxes needed for Cristian Reyes (304181 (CT Bridgeport)).
+2026-06-12 15:46:58 [INFO] WORKER: Done with Cristian Reyes (304181 (CT Bridgeport))
+2026-06-12 15:46:58 [INFO] STEP5: Moving to next employee after completing Cristian Reyes (304181 (CT Bridgeport)).
+2026-06-12 15:47:00 [INFO] WORKER: Processing Cristina Olivares Perez (633651 (CT Bridgeport))
+2026-06-12 15:47:00 [INFO] STEP4: All paid-time adjustments complete for Cristina Olivares Perez (633651 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:00 [INFO] VERIFY: No new checkboxes needed for Cristina Olivares Perez (633651 (CT Bridgeport)).
+2026-06-12 15:47:00 [INFO] WORKER: Done with Cristina Olivares Perez (633651 (CT Bridgeport))
+2026-06-12 15:47:00 [INFO] STEP5: Moving to next employee after completing Cristina Olivares Perez (633651 (CT Bridgeport)).
+2026-06-12 15:47:02 [INFO] WORKER: Processing Crucita Gorcica (631000 (CT Bridgeport))
+2026-06-12 15:47:02 [INFO] STEP4: All paid-time adjustments complete for Crucita Gorcica (631000 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:03 [INFO] VERIFY: No new checkboxes needed for Crucita Gorcica (631000 (CT Bridgeport)).
+2026-06-12 15:47:03 [INFO] WORKER: Done with Crucita Gorcica (631000 (CT Bridgeport))
+2026-06-12 15:47:03 [INFO] STEP5: Moving to next employee after completing Crucita Gorcica (631000 (CT Bridgeport)).
+2026-06-12 15:47:04 [INFO] WORKER: Processing CURTIS RILEY (632496 (CT Bridgeport))
+2026-06-12 15:47:05 [INFO] STEP4: All paid-time adjustments complete for CURTIS RILEY (632496 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:05 [INFO] VERIFY: No new checkboxes needed for CURTIS RILEY (632496 (CT Bridgeport)).
+2026-06-12 15:47:05 [INFO] WORKER: Done with CURTIS RILEY (632496 (CT Bridgeport))
+2026-06-12 15:47:05 [INFO] STEP5: Moving to next employee after completing CURTIS RILEY (632496 (CT Bridgeport)).
+2026-06-12 15:47:07 [INFO] WORKER: Processing Custodio Gomes (305451 (CT Bridgeport))
+2026-06-12 15:47:07 [INFO] STEP4: All paid-time adjustments complete for Custodio Gomes (305451 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:07 [INFO] VERIFY: No new checkboxes needed for Custodio Gomes (305451 (CT Bridgeport)).
+2026-06-12 15:47:07 [INFO] WORKER: Done with Custodio Gomes (305451 (CT Bridgeport))
+2026-06-12 15:47:07 [INFO] STEP5: Moving to next employee after completing Custodio Gomes (305451 (CT Bridgeport)).
+2026-06-12 15:47:09 [INFO] WORKER: Processing Cynthia Jenkins (304424 (CT Bridgeport))
+2026-06-12 15:47:09 [INFO] STEP4: All paid-time adjustments complete for Cynthia Jenkins (304424 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:10 [INFO] VERIFY: No new checkboxes needed for Cynthia Jenkins (304424 (CT Bridgeport)).
+2026-06-12 15:47:10 [INFO] WORKER: Done with Cynthia Jenkins (304424 (CT Bridgeport))
+2026-06-12 15:47:10 [INFO] STEP5: Moving to next employee after completing Cynthia Jenkins (304424 (CT Bridgeport)).
+2026-06-12 15:47:11 [INFO] WORKER: Processing Dacia Holness (305014 (CT Bridgeport))
+2026-06-12 15:47:12 [INFO] STEP4: All paid-time adjustments complete for Dacia Holness (305014 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:13 [INFO] VERIFY: No new checkboxes needed for Dacia Holness (305014 (CT Bridgeport)).
+2026-06-12 15:47:13 [INFO] WORKER: Done with Dacia Holness (305014 (CT Bridgeport))
+2026-06-12 15:47:13 [INFO] STEP5: Moving to next employee after completing Dacia Holness (305014 (CT Bridgeport)).
+2026-06-12 15:47:14 [INFO] WORKER: Processing Danae Wright (613193 (CT Bridgeport))
+2026-06-12 15:47:15 [INFO] STEP4: All paid-time adjustments complete for Danae Wright (613193 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:15 [INFO] VERIFY: No new checkboxes needed for Danae Wright (613193 (CT Bridgeport)).
+2026-06-12 15:47:15 [INFO] WORKER: Done with Danae Wright (613193 (CT Bridgeport))
+2026-06-12 15:47:15 [INFO] STEP5: Moving to next employee after completing Danae Wright (613193 (CT Bridgeport)).
+2026-06-12 15:47:18 [INFO] WORKER: Processing Daphne Carter (621080 (CT Bridgeport))
+2026-06-12 15:47:18 [INFO] STEP4: All paid-time adjustments complete for Daphne Carter (621080 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:19 [INFO] VERIFY: No new checkboxes needed for Daphne Carter (621080 (CT Bridgeport)).
+2026-06-12 15:47:19 [INFO] WORKER: Done with Daphne Carter (621080 (CT Bridgeport))
+2026-06-12 15:47:19 [INFO] STEP5: Moving to next employee after completing Daphne Carter (621080 (CT Bridgeport)).
+2026-06-12 15:47:22 [INFO] WORKER: Processing David Paduani Lozada (306815 (CT Bridgeport))
+2026-06-12 15:47:22 [INFO] STEP4: All paid-time adjustments complete for David Paduani Lozada (306815 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:22 [INFO] VERIFY: No new checkboxes needed for David Paduani Lozada (306815 (CT Bridgeport)).
+2026-06-12 15:47:22 [INFO] WORKER: Done with David Paduani Lozada (306815 (CT Bridgeport))
+2026-06-12 15:47:22 [INFO] STEP5: Moving to next employee after completing David Paduani Lozada (306815 (CT Bridgeport)).
+2026-06-12 15:47:24 [INFO] WORKER: Processing David Mattei (304194 (CT Bridgeport))
+2026-06-12 15:47:24 [INFO] STEP4: All paid-time adjustments complete for David Mattei (304194 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:25 [INFO] VERIFY: No new checkboxes needed for David Mattei (304194 (CT Bridgeport)).
+2026-06-12 15:47:25 [INFO] WORKER: Done with David Mattei (304194 (CT Bridgeport))
+2026-06-12 15:47:25 [INFO] STEP5: Moving to next employee after completing David Mattei (304194 (CT Bridgeport)).
+2026-06-12 15:47:26 [INFO] WORKER: Processing David Roebuck (304468 (CT Bridgeport))
+2026-06-12 15:47:26 [INFO] STEP4: All paid-time adjustments complete for David Roebuck (304468 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:27 [INFO] VERIFY: Skipping 'Bridge Charter 116224' for David Roebuck (304468 (CT Bridgeport)) — excluded from verification.
+2026-06-12 15:47:27 [INFO] VERIFY: No new checkboxes needed for David Roebuck (304468 (CT Bridgeport)).
+2026-06-12 15:47:27 [INFO] WORKER: Done with David Roebuck (304468 (CT Bridgeport))
+2026-06-12 15:47:27 [INFO] STEP5: Moving to next employee after completing David Roebuck (304468 (CT Bridgeport)).
+2026-06-12 15:47:28 [INFO] WORKER: Processing David Saez (304477 (CT Bridgeport))
+2026-06-12 15:47:29 [INFO] STEP4: All paid-time adjustments complete for David Saez (304477 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:29 [INFO] VERIFY: No new checkboxes needed for David Saez (304477 (CT Bridgeport)).
+2026-06-12 15:47:29 [INFO] WORKER: Done with David Saez (304477 (CT Bridgeport))
+2026-06-12 15:47:29 [INFO] STEP5: Moving to next employee after completing David Saez (304477 (CT Bridgeport)).
+2026-06-12 15:47:32 [INFO] WORKER: Processing David Alvarez (214 (CT Bridgeport))
+2026-06-12 15:47:33 [INFO] STEP4: All paid-time adjustments complete for David Alvarez (214 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:33 [INFO] VERIFY: No new checkboxes needed for David Alvarez (214 (CT Bridgeport)).
+2026-06-12 15:47:33 [INFO] WORKER: Done with David Alvarez (214 (CT Bridgeport))
+2026-06-12 15:47:33 [INFO] STEP5: Moving to next employee after completing David Alvarez (214 (CT Bridgeport)).
+2026-06-12 15:47:36 [INFO] WORKER: Processing Daysi Andino (304729 (CT Bridgeport))
+2026-06-12 15:47:36 [INFO] STEP4: All paid-time adjustments complete for Daysi Andino (304729 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:37 [INFO] VERIFY: No new checkboxes needed for Daysi Andino (304729 (CT Bridgeport)).
+2026-06-12 15:47:37 [INFO] WORKER: Done with Daysi Andino (304729 (CT Bridgeport))
+2026-06-12 15:47:37 [INFO] STEP5: Moving to next employee after completing Daysi Andino (304729 (CT Bridgeport)).
+2026-06-12 15:47:38 [INFO] WORKER: Processing Deazinea Young (621682 (CT Bridgeport))
+2026-06-12 15:47:39 [INFO] STEP4: All paid-time adjustments complete for Deazinea Young (621682 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:39 [INFO] VERIFY: No new checkboxes needed for Deazinea Young (621682 (CT Bridgeport)).
+2026-06-12 15:47:39 [INFO] WORKER: Done with Deazinea Young (621682 (CT Bridgeport))
+2026-06-12 15:47:39 [INFO] STEP5: Moving to next employee after completing Deazinea Young (621682 (CT Bridgeport)).
+2026-06-12 15:47:41 [INFO] WORKER: Processing Deborah Mayo (305375 (CT Bridgeport))
+2026-06-12 15:47:41 [INFO] STEP4: All paid-time adjustments complete for Deborah Mayo (305375 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:42 [INFO] VERIFY: No new checkboxes needed for Deborah Mayo (305375 (CT Bridgeport)).
+2026-06-12 15:47:42 [INFO] WORKER: Done with Deborah Mayo (305375 (CT Bridgeport))
+2026-06-12 15:47:42 [INFO] STEP5: Moving to next employee after completing Deborah Mayo (305375 (CT Bridgeport)).
+2026-06-12 15:47:43 [INFO] WORKER: Processing Deborah Bryant (304227 (CT Bridgeport))
+2026-06-12 15:47:43 [INFO] STEP4: All paid-time adjustments complete for Deborah Bryant (304227 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:44 [INFO] VERIFY: No new checkboxes needed for Deborah Bryant (304227 (CT Bridgeport)).
+2026-06-12 15:47:44 [INFO] WORKER: Done with Deborah Bryant (304227 (CT Bridgeport))
+2026-06-12 15:47:44 [INFO] STEP5: Moving to next employee after completing Deborah Bryant (304227 (CT Bridgeport)).
+2026-06-12 15:47:47 [INFO] WORKER: Processing Denay Wray (304249 (CT Bridgeport))
+2026-06-12 15:47:47 [INFO] STEP4: All paid-time adjustments complete for Denay Wray (304249 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:48 [INFO] VERIFY: No new checkboxes needed for Denay Wray (304249 (CT Bridgeport)).
+2026-06-12 15:47:48 [INFO] WORKER: Done with Denay Wray (304249 (CT Bridgeport))
+2026-06-12 15:47:48 [INFO] STEP5: Moving to next employee after completing Denay Wray (304249 (CT Bridgeport)).
+2026-06-12 15:47:49 [INFO] WORKER: Processing Deniel Diaz-Perez (636295 (CT Bridgeport))
+2026-06-12 15:47:50 [INFO] STEP4: All paid-time adjustments complete for Deniel Diaz-Perez (636295 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:50 [INFO] VERIFY: No new checkboxes needed for Deniel Diaz-Perez (636295 (CT Bridgeport)).
+2026-06-12 15:47:50 [INFO] WORKER: Done with Deniel Diaz-Perez (636295 (CT Bridgeport))
+2026-06-12 15:47:50 [INFO] STEP5: Moving to next employee after completing Deniel Diaz-Perez (636295 (CT Bridgeport)).
+2026-06-12 15:47:52 [INFO] WORKER: Processing Denise Matthews (304645 (CT Bridgeport))
+2026-06-12 15:47:52 [INFO] STEP4: All paid-time adjustments complete for Denise Matthews (304645 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:53 [INFO] VERIFY: No new checkboxes needed for Denise Matthews (304645 (CT Bridgeport)).
+2026-06-12 15:47:53 [INFO] WORKER: Done with Denise Matthews (304645 (CT Bridgeport))
+2026-06-12 15:47:53 [INFO] STEP5: Moving to next employee after completing Denise Matthews (304645 (CT Bridgeport)).
+2026-06-12 15:47:54 [INFO] WORKER: Processing Denise Boria (304286 (CT Bridgeport))
+2026-06-12 15:47:55 [INFO] STEP4: All paid-time adjustments complete for Denise Boria (304286 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:55 [INFO] VERIFY: No new checkboxes needed for Denise Boria (304286 (CT Bridgeport)).
+2026-06-12 15:47:55 [INFO] WORKER: Done with Denise Boria (304286 (CT Bridgeport))
+2026-06-12 15:47:55 [INFO] STEP5: Moving to next employee after completing Denise Boria (304286 (CT Bridgeport)).
+2026-06-12 15:47:57 [INFO] WORKER: Processing Derrick Mann (634753 (CT Bridgeport))
+2026-06-12 15:47:57 [INFO] STEP4: All paid-time adjustments complete for Derrick Mann (634753 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:47:58 [INFO] VERIFY: No new checkboxes needed for Derrick Mann (634753 (CT Bridgeport)).
+2026-06-12 15:47:58 [INFO] WORKER: Done with Derrick Mann (634753 (CT Bridgeport))
+2026-06-12 15:47:58 [INFO] STEP5: Moving to next employee after completing Derrick Mann (634753 (CT Bridgeport)).
+2026-06-12 15:47:59 [INFO] WORKER: Processing Desiree Diaz (632492 (CT Bridgeport))
+2026-06-12 15:47:59 [INFO] STEP4: All paid-time adjustments complete for Desiree Diaz (632492 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:00 [INFO] VERIFY: No new checkboxes needed for Desiree Diaz (632492 (CT Bridgeport)).
+2026-06-12 15:48:00 [INFO] WORKER: Done with Desiree Diaz (632492 (CT Bridgeport))
+2026-06-12 15:48:00 [INFO] STEP5: Moving to next employee after completing Desiree Diaz (632492 (CT Bridgeport)).
+2026-06-12 15:48:02 [INFO] WORKER: Processing Destiny Vereen (631811 (CT Bridgeport))
+2026-06-12 15:48:03 [INFO] STEP4: All paid-time adjustments complete for Destiny Vereen (631811 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:03 [INFO] VERIFY: No new checkboxes needed for Destiny Vereen (631811 (CT Bridgeport)).
+2026-06-12 15:48:03 [INFO] WORKER: Done with Destiny Vereen (631811 (CT Bridgeport))
+2026-06-12 15:48:03 [INFO] STEP5: Moving to next employee after completing Destiny Vereen (631811 (CT Bridgeport)).
+2026-06-12 15:48:07 [INFO] WORKER: Processing Doris Candelario (304659 (CT Bridgeport))
+2026-06-12 15:48:07 [INFO] STEP4: All paid-time adjustments complete for Doris Candelario (304659 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:08 [INFO] VERIFY: No new checkboxes needed for Doris Candelario (304659 (CT Bridgeport)).
+2026-06-12 15:48:08 [INFO] WORKER: Done with Doris Candelario (304659 (CT Bridgeport))
+2026-06-12 15:48:08 [INFO] STEP5: Moving to next employee after completing Doris Candelario (304659 (CT Bridgeport)).
+2026-06-12 15:48:09 [INFO] WORKER: Processing Dorrell Watson (304251 (CT Bridgeport))
+2026-06-12 15:48:10 [INFO] STEP4: All paid-time adjustments complete for Dorrell Watson (304251 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:10 [INFO] VERIFY: No new checkboxes needed for Dorrell Watson (304251 (CT Bridgeport)).
+2026-06-12 15:48:10 [INFO] WORKER: Done with Dorrell Watson (304251 (CT Bridgeport))
+2026-06-12 15:48:10 [INFO] STEP5: Moving to next employee after completing Dorrell Watson (304251 (CT Bridgeport)).
+2026-06-12 15:48:12 [INFO] WORKER: Processing Dudley Ludger (616482 (CT Bridgeport))
+2026-06-12 15:48:12 [INFO] STEP4: All paid-time adjustments complete for Dudley Ludger (616482 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:12 [INFO] VERIFY: No new checkboxes needed for Dudley Ludger (616482 (CT Bridgeport)).
+2026-06-12 15:48:12 [INFO] WORKER: Done with Dudley Ludger (616482 (CT Bridgeport))
+2026-06-12 15:48:12 [INFO] STEP5: Moving to next employee after completing Dudley Ludger (616482 (CT Bridgeport)).
+2026-06-12 15:48:14 [INFO] WORKER: Processing Eleanor Hopkins (304406 (CT Bridgeport))
+2026-06-12 15:48:14 [INFO] STEP4: All paid-time adjustments complete for Eleanor Hopkins (304406 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:15 [INFO] VERIFY: No new checkboxes needed for Eleanor Hopkins (304406 (CT Bridgeport)).
+2026-06-12 15:48:15 [INFO] WORKER: Done with Eleanor Hopkins (304406 (CT Bridgeport))
+2026-06-12 15:48:15 [INFO] STEP5: Moving to next employee after completing Eleanor Hopkins (304406 (CT Bridgeport)).
+2026-06-12 15:48:16 [INFO] WORKER: Processing Elizabeth Bosques-velez (304208 (CT Bridgeport))
+2026-06-12 15:48:17 [INFO] STEP4: All paid-time adjustments complete for Elizabeth Bosques-velez (304208 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:17 [INFO] VERIFY: No new checkboxes needed for Elizabeth Bosques-velez (304208 (CT Bridgeport)).
+2026-06-12 15:48:17 [INFO] WORKER: Done with Elizabeth Bosques-velez (304208 (CT Bridgeport))
+2026-06-12 15:48:17 [INFO] STEP5: Moving to next employee after completing Elizabeth Bosques-velez (304208 (CT Bridgeport)).
+2026-06-12 15:48:19 [INFO] WORKER: Processing Elizabeth Baez (304248 (CT Bridgeport))
+2026-06-12 15:48:19 [INFO] STEP4: All paid-time adjustments complete for Elizabeth Baez (304248 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:20 [INFO] VERIFY: No new checkboxes needed for Elizabeth Baez (304248 (CT Bridgeport)).
+2026-06-12 15:48:20 [INFO] WORKER: Done with Elizabeth Baez (304248 (CT Bridgeport))
+2026-06-12 15:48:20 [INFO] STEP5: Moving to next employee after completing Elizabeth Baez (304248 (CT Bridgeport)).
+2026-06-12 15:48:21 [INFO] WORKER: Processing Enid Cosme (304207 (CT Bridgeport))
+2026-06-12 15:48:21 [INFO] STEP4: All paid-time adjustments complete for Enid Cosme (304207 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:22 [INFO] VERIFY: No new checkboxes needed for Enid Cosme (304207 (CT Bridgeport)).
+2026-06-12 15:48:22 [INFO] WORKER: Done with Enid Cosme (304207 (CT Bridgeport))
+2026-06-12 15:48:22 [INFO] STEP5: Moving to next employee after completing Enid Cosme (304207 (CT Bridgeport)).
+2026-06-12 15:48:23 [INFO] WORKER: Processing Eugenia Lozada Otero (304434 (CT Bridgeport))
+2026-06-12 15:48:24 [INFO] STEP4: All paid-time adjustments complete for Eugenia Lozada Otero (304434 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:24 [INFO] VERIFY: No new checkboxes needed for Eugenia Lozada Otero (304434 (CT Bridgeport)).
+2026-06-12 15:48:24 [INFO] WORKER: Done with Eugenia Lozada Otero (304434 (CT Bridgeport))
+2026-06-12 15:48:24 [INFO] STEP5: Moving to next employee after completing Eugenia Lozada Otero (304434 (CT Bridgeport)).
+2026-06-12 15:48:27 [INFO] WORKER: Processing Fernanda Woolford (304423 (CT Bridgeport))
+2026-06-12 15:48:27 [INFO] STEP4: All paid-time adjustments complete for Fernanda Woolford (304423 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:28 [INFO] VERIFY: No new checkboxes needed for Fernanda Woolford (304423 (CT Bridgeport)).
+2026-06-12 15:48:28 [INFO] WORKER: Done with Fernanda Woolford (304423 (CT Bridgeport))
+2026-06-12 15:48:28 [INFO] STEP5: Moving to next employee after completing Fernanda Woolford (304423 (CT Bridgeport)).
+2026-06-12 15:48:29 [INFO] WORKER: Processing Florentino Jimenez (306973 (CT Bridgeport))
+2026-06-12 15:48:30 [INFO] STEP4: All paid-time adjustments complete for Florentino Jimenez (306973 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:30 [INFO] VERIFY: No new checkboxes needed for Florentino Jimenez (306973 (CT Bridgeport)).
+2026-06-12 15:48:30 [INFO] WORKER: Done with Florentino Jimenez (306973 (CT Bridgeport))
+2026-06-12 15:48:30 [INFO] STEP5: Moving to next employee after completing Florentino Jimenez (306973 (CT Bridgeport)).
+2026-06-12 15:48:31 [INFO] WORKER: Processing Frances Estrada (307000 (CT Bridgeport))
+2026-06-12 15:48:32 [INFO] STEP4: All paid-time adjustments complete for Frances Estrada (307000 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:32 [INFO] VERIFY: No new checkboxes needed for Frances Estrada (307000 (CT Bridgeport)).
+2026-06-12 15:48:32 [INFO] WORKER: Done with Frances Estrada (307000 (CT Bridgeport))
+2026-06-12 15:48:32 [INFO] STEP5: Moving to next employee after completing Frances Estrada (307000 (CT Bridgeport)).
+2026-06-12 15:48:33 [INFO] WORKER: Processing Garnett Murray (305454 (CT Bridgeport))
+2026-06-12 15:48:34 [INFO] STEP4: All paid-time adjustments complete for Garnett Murray (305454 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:35 [INFO] VERIFY: No new checkboxes needed for Garnett Murray (305454 (CT Bridgeport)).
+2026-06-12 15:48:35 [INFO] WORKER: Done with Garnett Murray (305454 (CT Bridgeport))
+2026-06-12 15:48:35 [INFO] STEP5: Moving to next employee after completing Garnett Murray (305454 (CT Bridgeport)).
+2026-06-12 15:48:36 [INFO] WORKER: Processing Gaspard Nicolas (304858 (CT Bridgeport))
+2026-06-12 15:48:37 [INFO] STEP4: All paid-time adjustments complete for Gaspard Nicolas (304858 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:37 [INFO] VERIFY: No new checkboxes needed for Gaspard Nicolas (304858 (CT Bridgeport)).
+2026-06-12 15:48:37 [INFO] WORKER: Done with Gaspard Nicolas (304858 (CT Bridgeport))
+2026-06-12 15:48:37 [INFO] STEP5: Moving to next employee after completing Gaspard Nicolas (304858 (CT Bridgeport)).
+2026-06-12 15:48:38 [INFO] WORKER: Processing Gavin Petrie (304189 (CT Bridgeport))
+2026-06-12 15:48:39 [INFO] STEP4: All paid-time adjustments complete for Gavin Petrie (304189 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:39 [INFO] VERIFY: No new checkboxes needed for Gavin Petrie (304189 (CT Bridgeport)).
+2026-06-12 15:48:39 [INFO] WORKER: Done with Gavin Petrie (304189 (CT Bridgeport))
+2026-06-12 15:48:39 [INFO] STEP5: Moving to next employee after completing Gavin Petrie (304189 (CT Bridgeport)).
+2026-06-12 15:48:42 [INFO] WORKER: Processing Gerard Lemy (623409 (CT Bridgeport))
+2026-06-12 15:48:42 [INFO] STEP4: All paid-time adjustments complete for Gerard Lemy (623409 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:43 [INFO] VERIFY: No new checkboxes needed for Gerard Lemy (623409 (CT Bridgeport)).
+2026-06-12 15:48:43 [INFO] WORKER: Done with Gerard Lemy (623409 (CT Bridgeport))
+2026-06-12 15:48:43 [INFO] STEP5: Moving to next employee after completing Gerard Lemy (623409 (CT Bridgeport)).
+2026-06-12 15:48:44 [INFO] WORKER: Processing Gertrudis Reyes (304896 (CT Bridgeport))
+2026-06-12 15:48:45 [INFO] STEP4: All paid-time adjustments complete for Gertrudis Reyes (304896 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:45 [INFO] VERIFY: No new checkboxes needed for Gertrudis Reyes (304896 (CT Bridgeport)).
+2026-06-12 15:48:45 [INFO] WORKER: Done with Gertrudis Reyes (304896 (CT Bridgeport))
+2026-06-12 15:48:45 [INFO] STEP5: Moving to next employee after completing Gertrudis Reyes (304896 (CT Bridgeport)).
+2026-06-12 15:48:48 [INFO] WORKER: Processing Giselle Bonaparte (305249 (CT Bridgeport))
+2026-06-12 15:48:48 [INFO] STEP4: All paid-time adjustments complete for Giselle Bonaparte (305249 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:49 [INFO] VERIFY: No new checkboxes needed for Giselle Bonaparte (305249 (CT Bridgeport)).
+2026-06-12 15:48:49 [INFO] WORKER: Done with Giselle Bonaparte (305249 (CT Bridgeport))
+2026-06-12 15:48:49 [INFO] STEP5: Moving to next employee after completing Giselle Bonaparte (305249 (CT Bridgeport)).
+2026-06-12 15:48:50 [INFO] WORKER: Processing Gladys Stith (304186 (CT Bridgeport))
+2026-06-12 15:48:50 [INFO] STEP4: All paid-time adjustments complete for Gladys Stith (304186 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:51 [INFO] VERIFY: No new checkboxes needed for Gladys Stith (304186 (CT Bridgeport)).
+2026-06-12 15:48:51 [INFO] WORKER: Done with Gladys Stith (304186 (CT Bridgeport))
+2026-06-12 15:48:51 [INFO] STEP5: Moving to next employee after completing Gladys Stith (304186 (CT Bridgeport)).
+2026-06-12 15:48:52 [INFO] WORKER: Processing Gladys Digsby (611078 (CT Bridgeport))
+2026-06-12 15:48:53 [INFO] STEP4: All paid-time adjustments complete for Gladys Digsby (611078 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:54 [INFO] VERIFY: No new checkboxes needed for Gladys Digsby (611078 (CT Bridgeport)).
+2026-06-12 15:48:54 [INFO] WORKER: Done with Gladys Digsby (611078 (CT Bridgeport))
+2026-06-12 15:48:54 [INFO] STEP5: Moving to next employee after completing Gladys Digsby (611078 (CT Bridgeport)).
+2026-06-12 15:48:55 [INFO] WORKER: Processing Gloria Reese (304410 (CT Bridgeport))
+2026-06-12 15:48:55 [INFO] STEP4: All paid-time adjustments complete for Gloria Reese (304410 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:56 [INFO] VERIFY: No new checkboxes needed for Gloria Reese (304410 (CT Bridgeport)).
+2026-06-12 15:48:56 [INFO] WORKER: Done with Gloria Reese (304410 (CT Bridgeport))
+2026-06-12 15:48:56 [INFO] STEP5: Moving to next employee after completing Gloria Reese (304410 (CT Bridgeport)).
+2026-06-12 15:48:57 [INFO] WORKER: Processing Gloria Isaac (610737 (CT Bridgeport))
+2026-06-12 15:48:58 [INFO] STEP4: All paid-time adjustments complete for Gloria Isaac (610737 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:48:58 [INFO] VERIFY: No new checkboxes needed for Gloria Isaac (610737 (CT Bridgeport)).
+2026-06-12 15:48:58 [INFO] WORKER: Done with Gloria Isaac (610737 (CT Bridgeport))
+2026-06-12 15:48:58 [INFO] STEP5: Moving to next employee after completing Gloria Isaac (610737 (CT Bridgeport)).
+2026-06-12 15:49:00 [INFO] WORKER: Processing Guerlita Alphonse (305004 (CT Bridgeport))
+2026-06-12 15:49:01 [INFO] STEP4: All paid-time adjustments complete for Guerlita Alphonse (305004 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:01 [INFO] VERIFY: No new checkboxes needed for Guerlita Alphonse (305004 (CT Bridgeport)).
+2026-06-12 15:49:01 [INFO] WORKER: Done with Guerlita Alphonse (305004 (CT Bridgeport))
+2026-06-12 15:49:01 [INFO] STEP5: Moving to next employee after completing Guerlita Alphonse (305004 (CT Bridgeport)).
+2026-06-12 15:49:03 [INFO] WORKER: Processing Haywood Lewis (304250 (CT Bridgeport))
+2026-06-12 15:49:03 [INFO] STEP4: All paid-time adjustments complete for Haywood Lewis (304250 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:03 [INFO] VERIFY: No new checkboxes needed for Haywood Lewis (304250 (CT Bridgeport)).
+2026-06-12 15:49:03 [INFO] WORKER: Done with Haywood Lewis (304250 (CT Bridgeport))
+2026-06-12 15:49:03 [INFO] STEP5: Moving to next employee after completing Haywood Lewis (304250 (CT Bridgeport)).
+2026-06-12 15:49:06 [INFO] WORKER: Processing Helena Medeiros (305768 (CT Bridgeport))
+2026-06-12 15:49:07 [INFO] STEP4: All paid-time adjustments complete for Helena Medeiros (305768 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:08 [INFO] VERIFY: No new checkboxes needed for Helena Medeiros (305768 (CT Bridgeport)).
+2026-06-12 15:49:08 [INFO] WORKER: Done with Helena Medeiros (305768 (CT Bridgeport))
+2026-06-12 15:49:08 [INFO] STEP5: Moving to next employee after completing Helena Medeiros (305768 (CT Bridgeport)).
+2026-06-12 15:49:09 [INFO] WORKER: Processing Henry Dominguez (304246 (CT Bridgeport))
+2026-06-12 15:49:09 [INFO] STEP4: All paid-time adjustments complete for Henry Dominguez (304246 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:10 [INFO] VERIFY: No new checkboxes needed for Henry Dominguez (304246 (CT Bridgeport)).
+2026-06-12 15:49:10 [INFO] WORKER: Done with Henry Dominguez (304246 (CT Bridgeport))
+2026-06-12 15:49:10 [INFO] STEP5: Moving to next employee after completing Henry Dominguez (304246 (CT Bridgeport)).
+2026-06-12 15:49:11 [INFO] WORKER: Processing Hilda Henriquez (304819 (CT Bridgeport))
+2026-06-12 15:49:12 [INFO] STEP4: All paid-time adjustments complete for Hilda Henriquez (304819 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:12 [INFO] VERIFY: No new checkboxes needed for Hilda Henriquez (304819 (CT Bridgeport)).
+2026-06-12 15:49:12 [INFO] WORKER: Done with Hilda Henriquez (304819 (CT Bridgeport))
+2026-06-12 15:49:12 [INFO] STEP5: Moving to next employee after completing Hilda Henriquez (304819 (CT Bridgeport)).
+2026-06-12 15:49:13 [INFO] WORKER: Processing Hiram Garcia Jr (307405 (CT Bridgeport))
+2026-06-12 15:49:14 [INFO] STEP4: All paid-time adjustments complete for Hiram Garcia Jr (307405 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:14 [INFO] VERIFY: No new checkboxes needed for Hiram Garcia Jr (307405 (CT Bridgeport)).
+2026-06-12 15:49:14 [INFO] WORKER: Done with Hiram Garcia Jr (307405 (CT Bridgeport))
+2026-06-12 15:49:14 [INFO] STEP5: Moving to next employee after completing Hiram Garcia Jr (307405 (CT Bridgeport)).
+2026-06-12 15:49:16 [INFO] WORKER: Processing Hop Nguyen (304225 (CT Bridgeport))
+2026-06-12 15:49:16 [INFO] STEP4: All paid-time adjustments complete for Hop Nguyen (304225 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:16 [INFO] VERIFY: No new checkboxes needed for Hop Nguyen (304225 (CT Bridgeport)).
+2026-06-12 15:49:16 [INFO] WORKER: Done with Hop Nguyen (304225 (CT Bridgeport))
+2026-06-12 15:49:16 [INFO] STEP5: Moving to next employee after completing Hop Nguyen (304225 (CT Bridgeport)).
+2026-06-12 15:49:19 [INFO] WORKER: Processing hubert desir (631611 (CT Bridgeport))
+2026-06-12 15:49:19 [INFO] STEP4: All paid-time adjustments complete for hubert desir (631611 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:20 [INFO] VERIFY: No new checkboxes needed for hubert desir (631611 (CT Bridgeport)).
+2026-06-12 15:49:20 [INFO] WORKER: Done with hubert desir (631611 (CT Bridgeport))
+2026-06-12 15:49:20 [INFO] STEP5: Moving to next employee after completing hubert desir (631611 (CT Bridgeport)).
+2026-06-12 15:49:21 [INFO] WORKER: Processing Iliana Altagracia Schals de Menaldo (625672 (CT Bridgeport))
+2026-06-12 15:49:22 [INFO] STEP4: All paid-time adjustments complete for Iliana Altagracia Schals de Menaldo (625672 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:22 [INFO] VERIFY: No new checkboxes needed for Iliana Altagracia Schals de Menaldo (625672 (CT Bridgeport)).
+2026-06-12 15:49:22 [INFO] WORKER: Done with Iliana Altagracia Schals de Menaldo (625672 (CT Bridgeport))
+2026-06-12 15:49:22 [INFO] STEP5: Moving to next employee after completing Iliana Altagracia Schals de Menaldo (625672 (CT Bridgeport)).
+2026-06-12 15:49:23 [INFO] WORKER: Processing Irma Jefferson-Graham (304177 (CT Bridgeport))
+2026-06-12 15:49:24 [INFO] STEP4: All paid-time adjustments complete for Irma Jefferson-Graham (304177 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:24 [INFO] VERIFY: No new checkboxes needed for Irma Jefferson-Graham (304177 (CT Bridgeport)).
+2026-06-12 15:49:24 [INFO] WORKER: Done with Irma Jefferson-Graham (304177 (CT Bridgeport))
+2026-06-12 15:49:24 [INFO] STEP5: Moving to next employee after completing Irma Jefferson-Graham (304177 (CT Bridgeport)).
+2026-06-12 15:49:26 [INFO] WORKER: Processing Isaac Pierce (304775 (CT Bridgeport))
+2026-06-12 15:49:26 [INFO] STEP4: All paid-time adjustments complete for Isaac Pierce (304775 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:27 [INFO] VERIFY: No new checkboxes needed for Isaac Pierce (304775 (CT Bridgeport)).
+2026-06-12 15:49:27 [INFO] WORKER: Done with Isaac Pierce (304775 (CT Bridgeport))
+2026-06-12 15:49:27 [INFO] STEP5: Moving to next employee after completing Isaac Pierce (304775 (CT Bridgeport)).
+2026-06-12 15:49:28 [INFO] WORKER: Processing Isabel Collada (304260 (CT Bridgeport))
+2026-06-12 15:49:29 [INFO] STEP4: All paid-time adjustments complete for Isabel Collada (304260 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:29 [INFO] VERIFY: No new checkboxes needed for Isabel Collada (304260 (CT Bridgeport)).
+2026-06-12 15:49:29 [INFO] WORKER: Done with Isabel Collada (304260 (CT Bridgeport))
+2026-06-12 15:49:29 [INFO] STEP5: Moving to next employee after completing Isabel Collada (304260 (CT Bridgeport)).
+2026-06-12 15:49:31 [INFO] WORKER: Processing Ishmel Clarke (637154 (CT Bridgeport))
+2026-06-12 15:49:31 [INFO] STEP4: All paid-time adjustments complete for Ishmel Clarke (637154 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:31 [INFO] VERIFY: No new checkboxes needed for Ishmel Clarke (637154 (CT Bridgeport)).
+2026-06-12 15:49:31 [INFO] WORKER: Done with Ishmel Clarke (637154 (CT Bridgeport))
+2026-06-12 15:49:31 [INFO] STEP5: Moving to next employee after completing Ishmel Clarke (637154 (CT Bridgeport)).
+2026-06-12 15:49:34 [INFO] WORKER: Processing Ivette Janet Feliciano (629375 (CT Bridgeport))
+2026-06-12 15:49:35 [INFO] STEP4: All paid-time adjustments complete for Ivette Janet Feliciano (629375 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:35 [INFO] VERIFY: No new checkboxes needed for Ivette Janet Feliciano (629375 (CT Bridgeport)).
+2026-06-12 15:49:35 [INFO] WORKER: Done with Ivette Janet Feliciano (629375 (CT Bridgeport))
+2026-06-12 15:49:35 [INFO] STEP5: Moving to next employee after completing Ivette Janet Feliciano (629375 (CT Bridgeport)).
+2026-06-12 15:49:36 [INFO] WORKER: Processing Jackeline Vega (304188 (CT Bridgeport))
+2026-06-12 15:49:37 [INFO] STEP4: All paid-time adjustments complete for Jackeline Vega (304188 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:37 [INFO] VERIFY: No new checkboxes needed for Jackeline Vega (304188 (CT Bridgeport)).
+2026-06-12 15:49:37 [INFO] WORKER: Done with Jackeline Vega (304188 (CT Bridgeport))
+2026-06-12 15:49:37 [INFO] STEP5: Moving to next employee after completing Jackeline Vega (304188 (CT Bridgeport)).
+2026-06-12 15:49:38 [INFO] WORKER: Processing Jacqueline Pankey (305624 (CT Bridgeport))
+2026-06-12 15:49:39 [INFO] STEP4: All paid-time adjustments complete for Jacqueline Pankey (305624 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:40 [INFO] VERIFY: No new checkboxes needed for Jacqueline Pankey (305624 (CT Bridgeport)).
+2026-06-12 15:49:40 [INFO] WORKER: Done with Jacqueline Pankey (305624 (CT Bridgeport))
+2026-06-12 15:49:40 [INFO] STEP5: Moving to next employee after completing Jacqueline Pankey (305624 (CT Bridgeport)).
+2026-06-12 15:49:41 [INFO] WORKER: Processing Jahaida Diaz (305290 (CT Bridgeport))
+2026-06-12 15:49:41 [INFO] STEP4: All paid-time adjustments complete for Jahaida Diaz (305290 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:42 [INFO] VERIFY: No new checkboxes needed for Jahaida Diaz (305290 (CT Bridgeport)).
+2026-06-12 15:49:42 [INFO] WORKER: Done with Jahaida Diaz (305290 (CT Bridgeport))
+2026-06-12 15:49:42 [INFO] STEP5: Moving to next employee after completing Jahaida Diaz (305290 (CT Bridgeport)).
+2026-06-12 15:49:44 [INFO] WORKER: Processing Jameisha Mcclain (623755 (CT Bridgeport))
+2026-06-12 15:49:45 [INFO] STEP4: All paid-time adjustments complete for Jameisha Mcclain (623755 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:46 [INFO] VERIFY: No new checkboxes needed for Jameisha Mcclain (623755 (CT Bridgeport)).
+2026-06-12 15:49:46 [INFO] WORKER: Done with Jameisha Mcclain (623755 (CT Bridgeport))
+2026-06-12 15:49:46 [INFO] STEP5: Moving to next employee after completing Jameisha Mcclain (623755 (CT Bridgeport)).
+2026-06-12 15:49:47 [INFO] WORKER: Processing James Coby (304458 (CT Bridgeport))
+2026-06-12 15:49:47 [INFO] STEP4: All paid-time adjustments complete for James Coby (304458 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:48 [INFO] VERIFY: No new checkboxes needed for James Coby (304458 (CT Bridgeport)).
+2026-06-12 15:49:48 [INFO] WORKER: Done with James Coby (304458 (CT Bridgeport))
+2026-06-12 15:49:48 [INFO] STEP5: Moving to next employee after completing James Coby (304458 (CT Bridgeport)).
+2026-06-12 15:49:49 [INFO] WORKER: Processing Jamia Smith (304442 (CT Bridgeport))
+2026-06-12 15:49:50 [INFO] STEP4: All paid-time adjustments complete for Jamia Smith (304442 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:50 [INFO] VERIFY: No new checkboxes needed for Jamia Smith (304442 (CT Bridgeport)).
+2026-06-12 15:49:50 [INFO] WORKER: Done with Jamia Smith (304442 (CT Bridgeport))
+2026-06-12 15:49:50 [INFO] STEP5: Moving to next employee after completing Jamia Smith (304442 (CT Bridgeport)).
+2026-06-12 15:49:52 [INFO] WORKER: Processing Janaya Patterson (625899 (CT Bridgeport))
+2026-06-12 15:49:52 [INFO] STEP4: All paid-time adjustments complete for Janaya Patterson (625899 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:52 [INFO] VERIFY: No new checkboxes needed for Janaya Patterson (625899 (CT Bridgeport)).
+2026-06-12 15:49:52 [INFO] WORKER: Done with Janaya Patterson (625899 (CT Bridgeport))
+2026-06-12 15:49:52 [INFO] STEP5: Moving to next employee after completing Janaya Patterson (625899 (CT Bridgeport)).
+2026-06-12 15:49:55 [INFO] WORKER: Processing Janet Roman (304701 (CT Bridgeport))
+2026-06-12 15:49:56 [INFO] STEP4: All paid-time adjustments complete for Janet Roman (304701 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:56 [INFO] VERIFY: No new checkboxes needed for Janet Roman (304701 (CT Bridgeport)).
+2026-06-12 15:49:56 [INFO] WORKER: Done with Janet Roman (304701 (CT Bridgeport))
+2026-06-12 15:49:56 [INFO] STEP5: Moving to next employee after completing Janet Roman (304701 (CT Bridgeport)).
+2026-06-12 15:49:58 [INFO] WORKER: Processing Janet Williams (305170 (CT Bridgeport))
+2026-06-12 15:49:58 [INFO] STEP4: All paid-time adjustments complete for Janet Williams (305170 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:49:58 [INFO] VERIFY: No new checkboxes needed for Janet Williams (305170 (CT Bridgeport)).
+2026-06-12 15:49:58 [INFO] WORKER: Done with Janet Williams (305170 (CT Bridgeport))
+2026-06-12 15:49:58 [INFO] STEP5: Moving to next employee after completing Janet Williams (305170 (CT Bridgeport)).
+2026-06-12 15:50:00 [INFO] WORKER: Processing Janice Rodriguez (304776 (CT Bridgeport))
+2026-06-12 15:50:00 [INFO] STEP4: All paid-time adjustments complete for Janice Rodriguez (304776 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:01 [INFO] VERIFY: No new checkboxes needed for Janice Rodriguez (304776 (CT Bridgeport)).
+2026-06-12 15:50:01 [INFO] WORKER: Done with Janice Rodriguez (304776 (CT Bridgeport))
+2026-06-12 15:50:01 [INFO] STEP5: Moving to next employee after completing Janice Rodriguez (304776 (CT Bridgeport)).
+2026-06-12 15:50:02 [INFO] WORKER: Processing Janiya Serrano (623810 (CT Bridgeport))
+2026-06-12 15:50:02 [INFO] STEP4: All paid-time adjustments complete for Janiya Serrano (623810 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:03 [INFO] VERIFY: No new checkboxes needed for Janiya Serrano (623810 (CT Bridgeport)).
+2026-06-12 15:50:03 [INFO] WORKER: Done with Janiya Serrano (623810 (CT Bridgeport))
+2026-06-12 15:50:03 [INFO] STEP5: Moving to next employee after completing Janiya Serrano (623810 (CT Bridgeport)).
+2026-06-12 15:50:06 [INFO] WORKER: Processing Janyra Marcano (304375 (CT Bridgeport))
+2026-06-12 15:50:06 [INFO] STEP4: All paid-time adjustments complete for Janyra Marcano (304375 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:07 [INFO] VERIFY: No new checkboxes needed for Janyra Marcano (304375 (CT Bridgeport)).
+2026-06-12 15:50:07 [INFO] WORKER: Done with Janyra Marcano (304375 (CT Bridgeport))
+2026-06-12 15:50:07 [INFO] STEP5: Moving to next employee after completing Janyra Marcano (304375 (CT Bridgeport)).
+2026-06-12 15:50:09 [INFO] WORKER: Processing Jasmin Reyes (307174 (CT Bridgeport))
+2026-06-12 15:50:10 [INFO] STEP4: All paid-time adjustments complete for Jasmin Reyes (307174 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:11 [INFO] VERIFY: No new checkboxes needed for Jasmin Reyes (307174 (CT Bridgeport)).
+2026-06-12 15:50:11 [INFO] WORKER: Done with Jasmin Reyes (307174 (CT Bridgeport))
+2026-06-12 15:50:11 [INFO] STEP5: Moving to next employee after completing Jasmin Reyes (307174 (CT Bridgeport)).
+2026-06-12 15:50:12 [INFO] WORKER: Processing Jasmin Serrano (631533 (CT Bridgeport))
+2026-06-12 15:50:12 [INFO] STEP4: All paid-time adjustments complete for Jasmin Serrano (631533 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:13 [INFO] VERIFY: No new checkboxes needed for Jasmin Serrano (631533 (CT Bridgeport)).
+2026-06-12 15:50:13 [INFO] WORKER: Done with Jasmin Serrano (631533 (CT Bridgeport))
+2026-06-12 15:50:13 [INFO] STEP5: Moving to next employee after completing Jasmin Serrano (631533 (CT Bridgeport)).
+2026-06-12 15:50:14 [INFO] WORKER: Processing Jasmine Dominguez (614406 (CT Bridgeport))
+2026-06-12 15:50:15 [INFO] STEP4: All paid-time adjustments complete for Jasmine Dominguez (614406 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:15 [INFO] VERIFY: No new checkboxes needed for Jasmine Dominguez (614406 (CT Bridgeport)).
+2026-06-12 15:50:15 [INFO] WORKER: Done with Jasmine Dominguez (614406 (CT Bridgeport))
+2026-06-12 15:50:15 [INFO] STEP5: Moving to next employee after completing Jasmine Dominguez (614406 (CT Bridgeport)).
+2026-06-12 15:50:17 [INFO] WORKER: Processing Jasmine Nogueras (305167 (CT Bridgeport))
+2026-06-12 15:50:17 [INFO] STEP4: All paid-time adjustments complete for Jasmine Nogueras (305167 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:18 [INFO] VERIFY: No new checkboxes needed for Jasmine Nogueras (305167 (CT Bridgeport)).
+2026-06-12 15:50:18 [INFO] WORKER: Done with Jasmine Nogueras (305167 (CT Bridgeport))
+2026-06-12 15:50:18 [INFO] STEP5: Moving to next employee after completing Jasmine Nogueras (305167 (CT Bridgeport)).
+2026-06-12 15:50:19 [INFO] WORKER: Processing Jayden Allen (621086 (CT Bridgeport))
+2026-06-12 15:50:19 [INFO] STEP4: All paid-time adjustments complete for Jayden Allen (621086 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:20 [INFO] VERIFY: No new checkboxes needed for Jayden Allen (621086 (CT Bridgeport)).
+2026-06-12 15:50:20 [INFO] WORKER: Done with Jayden Allen (621086 (CT Bridgeport))
+2026-06-12 15:50:20 [INFO] STEP5: Moving to next employee after completing Jayden Allen (621086 (CT Bridgeport)).
+2026-06-12 15:50:21 [INFO] WORKER: Processing Jayne Gary (636972 (CT Bridgeport))
+2026-06-12 15:50:22 [INFO] STEP4: All paid-time adjustments complete for Jayne Gary (636972 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:22 [INFO] VERIFY: No new checkboxes needed for Jayne Gary (636972 (CT Bridgeport)).
+2026-06-12 15:50:22 [INFO] WORKER: Done with Jayne Gary (636972 (CT Bridgeport))
+2026-06-12 15:50:22 [INFO] STEP5: Moving to next employee after completing Jayne Gary (636972 (CT Bridgeport)).
+2026-06-12 15:50:23 [INFO] WORKER: Processing Jeanette Ruiz (304646 (CT Bridgeport))
+2026-06-12 15:50:24 [INFO] STEP4: All paid-time adjustments complete for Jeanette Ruiz (304646 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:25 [INFO] VERIFY: No new checkboxes needed for Jeanette Ruiz (304646 (CT Bridgeport)).
+2026-06-12 15:50:25 [INFO] WORKER: Done with Jeanette Ruiz (304646 (CT Bridgeport))
+2026-06-12 15:50:25 [INFO] STEP5: Moving to next employee after completing Jeanette Ruiz (304646 (CT Bridgeport)).
+2026-06-12 15:50:27 [INFO] WORKER: Processing Jennifer Martin (306890 (CT Bridgeport))
+2026-06-12 15:50:28 [INFO] STEP4: All paid-time adjustments complete for Jennifer Martin (306890 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:28 [INFO] VERIFY: No new checkboxes needed for Jennifer Martin (306890 (CT Bridgeport)).
+2026-06-12 15:50:28 [INFO] WORKER: Done with Jennifer Martin (306890 (CT Bridgeport))
+2026-06-12 15:50:28 [INFO] STEP5: Moving to next employee after completing Jennifer Martin (306890 (CT Bridgeport)).
+2026-06-12 15:50:30 [INFO] WORKER: Processing Jerry Chappell (608102 (CT Bridgeport))
+2026-06-12 15:50:30 [INFO] STEP4: All paid-time adjustments complete for Jerry Chappell (608102 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:30 [INFO] VERIFY: No new checkboxes needed for Jerry Chappell (608102 (CT Bridgeport)).
+2026-06-12 15:50:30 [INFO] WORKER: Done with Jerry Chappell (608102 (CT Bridgeport))
+2026-06-12 15:50:30 [INFO] STEP5: Moving to next employee after completing Jerry Chappell (608102 (CT Bridgeport)).
+2026-06-12 15:50:32 [INFO] WORKER: Processing Jessica Feliciano (307028 (CT Bridgeport))
+2026-06-12 15:50:32 [INFO] STEP4: All paid-time adjustments complete for Jessica Feliciano (307028 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:33 [INFO] VERIFY: No new checkboxes needed for Jessica Feliciano (307028 (CT Bridgeport)).
+2026-06-12 15:50:33 [INFO] WORKER: Done with Jessica Feliciano (307028 (CT Bridgeport))
+2026-06-12 15:50:33 [INFO] STEP5: Moving to next employee after completing Jessica Feliciano (307028 (CT Bridgeport)).
+2026-06-12 15:50:34 [INFO] WORKER: Processing Jessica Sharpe (305550 (CT Bridgeport))
+2026-06-12 15:50:35 [INFO] STEP4: All paid-time adjustments complete for Jessica Sharpe (305550 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:36 [INFO] VERIFY: No new checkboxes needed for Jessica Sharpe (305550 (CT Bridgeport)).
+2026-06-12 15:50:36 [INFO] WORKER: Done with Jessica Sharpe (305550 (CT Bridgeport))
+2026-06-12 15:50:36 [INFO] STEP5: Moving to next employee after completing Jessica Sharpe (305550 (CT Bridgeport)).
+2026-06-12 15:50:37 [INFO] WORKER: Processing Jessica Mazo (627069 (CT Bridgeport))
+2026-06-12 15:50:38 [INFO] STEP4: All paid-time adjustments complete for Jessica Mazo (627069 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:38 [INFO] VERIFY: No new checkboxes needed for Jessica Mazo (627069 (CT Bridgeport)).
+2026-06-12 15:50:38 [INFO] WORKER: Done with Jessica Mazo (627069 (CT Bridgeport))
+2026-06-12 15:50:38 [INFO] STEP5: Moving to next employee after completing Jessica Mazo (627069 (CT Bridgeport)).
+2026-06-12 15:50:40 [INFO] WORKER: Processing Joane Romulus (614178 (CT Bridgeport))
+2026-06-12 15:50:40 [INFO] STEP4: All paid-time adjustments complete for Joane Romulus (614178 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:41 [INFO] VERIFY: No new checkboxes needed for Joane Romulus (614178 (CT Bridgeport)).
+2026-06-12 15:50:41 [INFO] WORKER: Done with Joane Romulus (614178 (CT Bridgeport))
+2026-06-12 15:50:41 [INFO] STEP5: Moving to next employee after completing Joane Romulus (614178 (CT Bridgeport)).
+2026-06-12 15:50:42 [INFO] WORKER: Processing JOHN HUNTER (634798 (CT Bridgeport))
+2026-06-12 15:50:42 [INFO] STEP4: All paid-time adjustments complete for JOHN HUNTER (634798 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:43 [INFO] VERIFY: No new checkboxes needed for JOHN HUNTER (634798 (CT Bridgeport)).
+2026-06-12 15:50:43 [INFO] WORKER: Done with JOHN HUNTER (634798 (CT Bridgeport))
+2026-06-12 15:50:43 [INFO] STEP5: Moving to next employee after completing JOHN HUNTER (634798 (CT Bridgeport)).
+2026-06-12 15:50:44 [INFO] WORKER: Processing Johnny Rodriguez Jr. (304732 (CT Bridgeport))
+2026-06-12 15:50:45 [INFO] STEP4: All paid-time adjustments complete for Johnny Rodriguez Jr. (304732 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:45 [INFO] VERIFY: No new checkboxes needed for Johnny Rodriguez Jr. (304732 (CT Bridgeport)).
+2026-06-12 15:50:45 [INFO] WORKER: Done with Johnny Rodriguez Jr. (304732 (CT Bridgeport))
+2026-06-12 15:50:45 [INFO] STEP5: Moving to next employee after completing Johnny Rodriguez Jr. (304732 (CT Bridgeport)).
+2026-06-12 15:50:47 [INFO] WORKER: Processing Jose Irizarry (304705 (CT Bridgeport))
+2026-06-12 15:50:47 [INFO] STEP4: All paid-time adjustments complete for Jose Irizarry (304705 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:47 [INFO] VERIFY: No new checkboxes needed for Jose Irizarry (304705 (CT Bridgeport)).
+2026-06-12 15:50:47 [INFO] WORKER: Done with Jose Irizarry (304705 (CT Bridgeport))
+2026-06-12 15:50:47 [INFO] STEP5: Moving to next employee after completing Jose Irizarry (304705 (CT Bridgeport)).
+2026-06-12 15:50:49 [INFO] WORKER: Processing Joseph Wright (304952 (CT Bridgeport))
+2026-06-12 15:50:49 [INFO] STEP4: All paid-time adjustments complete for Joseph Wright (304952 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:50 [INFO] VERIFY: No new checkboxes needed for Joseph Wright (304952 (CT Bridgeport)).
+2026-06-12 15:50:50 [INFO] WORKER: Done with Joseph Wright (304952 (CT Bridgeport))
+2026-06-12 15:50:50 [INFO] STEP5: Moving to next employee after completing Joseph Wright (304952 (CT Bridgeport)).
+2026-06-12 15:50:51 [INFO] WORKER: Processing Juan Rosa (304201 (CT Bridgeport))
+2026-06-12 15:50:52 [INFO] STEP4: All paid-time adjustments complete for Juan Rosa (304201 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:52 [INFO] VERIFY: No new checkboxes needed for Juan Rosa (304201 (CT Bridgeport)).
+2026-06-12 15:50:52 [INFO] WORKER: Done with Juan Rosa (304201 (CT Bridgeport))
+2026-06-12 15:50:52 [INFO] STEP5: Moving to next employee after completing Juan Rosa (304201 (CT Bridgeport)).
+2026-06-12 15:50:53 [INFO] WORKER: Processing Juan Escobar Mayorga (304257 (CT Bridgeport))
+2026-06-12 15:50:54 [INFO] STEP4: All paid-time adjustments complete for Juan Escobar Mayorga (304257 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:54 [INFO] VERIFY: No new checkboxes needed for Juan Escobar Mayorga (304257 (CT Bridgeport)).
+2026-06-12 15:50:54 [INFO] WORKER: Done with Juan Escobar Mayorga (304257 (CT Bridgeport))
+2026-06-12 15:50:54 [INFO] STEP5: Moving to next employee after completing Juan Escobar Mayorga (304257 (CT Bridgeport)).
+2026-06-12 15:50:56 [INFO] WORKER: Processing Juan Romero (000011 (CT Bridgeport))
+2026-06-12 15:50:56 [INFO] STEP4: All paid-time adjustments complete for Juan Romero (000011 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:57 [INFO] VERIFY: No new checkboxes needed for Juan Romero (000011 (CT Bridgeport)).
+2026-06-12 15:50:57 [INFO] WORKER: Done with Juan Romero (000011 (CT Bridgeport))
+2026-06-12 15:50:57 [INFO] STEP5: Moving to next employee after completing Juan Romero (000011 (CT Bridgeport)).
+2026-06-12 15:50:58 [INFO] WORKER: Processing Judy Brayboy (000012 (CT Bridgeport))
+2026-06-12 15:50:59 [INFO] STEP4: All paid-time adjustments complete for Judy Brayboy (000012 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:50:59 [INFO] VERIFY: No new checkboxes needed for Judy Brayboy (000012 (CT Bridgeport)).
+2026-06-12 15:50:59 [INFO] WORKER: Done with Judy Brayboy (000012 (CT Bridgeport))
+2026-06-12 15:50:59 [INFO] STEP5: Moving to next employee after completing Judy Brayboy (000012 (CT Bridgeport)).
+2026-06-12 15:51:01 [INFO] WORKER: Processing Julio Dorvelus (304706 (CT Bridgeport))
+2026-06-12 15:51:02 [INFO] STEP4: All paid-time adjustments complete for Julio Dorvelus (304706 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:03 [INFO] VERIFY: No new checkboxes needed for Julio Dorvelus (304706 (CT Bridgeport)).
+2026-06-12 15:51:03 [INFO] WORKER: Done with Julio Dorvelus (304706 (CT Bridgeport))
+2026-06-12 15:51:03 [INFO] STEP5: Moving to next employee after completing Julio Dorvelus (304706 (CT Bridgeport)).
+2026-06-12 15:51:04 [INFO] WORKER: Processing Kadia Heath-Charles (622301 (CT Bridgeport))
+2026-06-12 15:51:05 [INFO] STEP4: All paid-time adjustments complete for Kadia Heath-Charles (622301 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:06 [INFO] VERIFY: No new checkboxes needed for Kadia Heath-Charles (622301 (CT Bridgeport)).
+2026-06-12 15:51:06 [INFO] WORKER: Done with Kadia Heath-Charles (622301 (CT Bridgeport))
+2026-06-12 15:51:06 [INFO] STEP5: Moving to next employee after completing Kadia Heath-Charles (622301 (CT Bridgeport)).
+2026-06-12 15:51:08 [INFO] WORKER: Processing Kanisha Eaddy (304245 (CT Bridgeport))
+2026-06-12 15:51:09 [INFO] STEP4: All paid-time adjustments complete for Kanisha Eaddy (304245 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:09 [INFO] VERIFY: No new checkboxes needed for Kanisha Eaddy (304245 (CT Bridgeport)).
+2026-06-12 15:51:09 [INFO] WORKER: Done with Kanisha Eaddy (304245 (CT Bridgeport))
+2026-06-12 15:51:09 [INFO] STEP5: Moving to next employee after completing Kanisha Eaddy (304245 (CT Bridgeport)).
+2026-06-12 15:51:10 [INFO] WORKER: Processing Karen Gardner (633595 (CT Bridgeport))
+2026-06-12 15:51:11 [INFO] STEP4: All paid-time adjustments complete for Karen Gardner (633595 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:11 [INFO] VERIFY: No new checkboxes needed for Karen Gardner (633595 (CT Bridgeport)).
+2026-06-12 15:51:11 [INFO] WORKER: Done with Karen Gardner (633595 (CT Bridgeport))
+2026-06-12 15:51:11 [INFO] STEP5: Moving to next employee after completing Karen Gardner (633595 (CT Bridgeport)).
+2026-06-12 15:51:12 [INFO] WORKER: Processing Karena Rogers (304789 (CT Bridgeport))
+2026-06-12 15:51:13 [INFO] STEP4: All paid-time adjustments complete for Karena Rogers (304789 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:14 [INFO] VERIFY: No new checkboxes needed for Karena Rogers (304789 (CT Bridgeport)).
+2026-06-12 15:51:14 [INFO] WORKER: Done with Karena Rogers (304789 (CT Bridgeport))
+2026-06-12 15:51:14 [INFO] STEP5: Moving to next employee after completing Karena Rogers (304789 (CT Bridgeport)).
+2026-06-12 15:51:16 [INFO] WORKER: Processing Katherine Siguencia (634761 (CT Bridgeport))
+2026-06-12 15:51:17 [INFO] STEP4: All paid-time adjustments complete for Katherine Siguencia (634761 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:17 [INFO] VERIFY: No new checkboxes needed for Katherine Siguencia (634761 (CT Bridgeport)).
+2026-06-12 15:51:17 [INFO] WORKER: Done with Katherine Siguencia (634761 (CT Bridgeport))
+2026-06-12 15:51:17 [INFO] STEP5: Moving to next employee after completing Katherine Siguencia (634761 (CT Bridgeport)).
+2026-06-12 15:51:18 [INFO] WORKER: Processing Katherine Dariana Delgado Rondon (625376 (CT Bridgeport))
+2026-06-12 15:51:19 [INFO] STEP4: All paid-time adjustments complete for Katherine Dariana Delgado Rondon (625376 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:19 [INFO] VERIFY: No new checkboxes needed for Katherine Dariana Delgado Rondon (625376 (CT Bridgeport)).
+2026-06-12 15:51:19 [INFO] WORKER: Done with Katherine Dariana Delgado Rondon (625376 (CT Bridgeport))
+2026-06-12 15:51:19 [INFO] STEP5: Moving to next employee after completing Katherine Dariana Delgado Rondon (625376 (CT Bridgeport)).
+2026-06-12 15:51:20 [INFO] WORKER: Processing Kathy Palmer (304644 (CT Bridgeport))
+2026-06-12 15:51:21 [INFO] STEP4: All paid-time adjustments complete for Kathy Palmer (304644 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:21 [INFO] VERIFY: No new checkboxes needed for Kathy Palmer (304644 (CT Bridgeport)).
+2026-06-12 15:51:21 [INFO] WORKER: Done with Kathy Palmer (304644 (CT Bridgeport))
+2026-06-12 15:51:21 [INFO] STEP5: Moving to next employee after completing Kathy Palmer (304644 (CT Bridgeport)).
+2026-06-12 15:51:23 [INFO] WORKER: Processing Katina Smith (304170 (CT Bridgeport))
+2026-06-12 15:51:23 [INFO] STEP4: All paid-time adjustments complete for Katina Smith (304170 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:24 [INFO] VERIFY: No new checkboxes needed for Katina Smith (304170 (CT Bridgeport)).
+2026-06-12 15:51:24 [INFO] WORKER: Done with Katina Smith (304170 (CT Bridgeport))
+2026-06-12 15:51:24 [INFO] STEP5: Moving to next employee after completing Katina Smith (304170 (CT Bridgeport)).
+2026-06-12 15:51:25 [INFO] WORKER: Processing Katrina Washington (304209 (CT Bridgeport))
+2026-06-12 15:51:25 [INFO] STEP4: All paid-time adjustments complete for Katrina Washington (304209 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:26 [INFO] VERIFY: No new checkboxes needed for Katrina Washington (304209 (CT Bridgeport)).
+2026-06-12 15:51:26 [INFO] WORKER: Done with Katrina Washington (304209 (CT Bridgeport))
+2026-06-12 15:51:26 [INFO] STEP5: Moving to next employee after completing Katrina Washington (304209 (CT Bridgeport)).
+2026-06-12 15:51:28 [INFO] WORKER: Processing Keisha Scott (632497 (CT Bridgeport))
+2026-06-12 15:51:28 [INFO] STEP4: All paid-time adjustments complete for Keisha Scott (632497 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:28 [INFO] VERIFY: No new checkboxes needed for Keisha Scott (632497 (CT Bridgeport)).
+2026-06-12 15:51:28 [INFO] WORKER: Done with Keisha Scott (632497 (CT Bridgeport))
+2026-06-12 15:51:28 [INFO] STEP5: Moving to next employee after completing Keisha Scott (632497 (CT Bridgeport)).
+2026-06-12 15:51:30 [INFO] WORKER: Processing kelly bostick (614378 (CT Bridgeport))
+2026-06-12 15:51:30 [INFO] STEP4: All paid-time adjustments complete for kelly bostick (614378 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:31 [INFO] VERIFY: No new checkboxes needed for kelly bostick (614378 (CT Bridgeport)).
+2026-06-12 15:51:31 [INFO] WORKER: Done with kelly bostick (614378 (CT Bridgeport))
+2026-06-12 15:51:31 [INFO] STEP5: Moving to next employee after completing kelly bostick (614378 (CT Bridgeport)).
+2026-06-12 15:51:32 [INFO] WORKER: Processing Kenneth Grace (306404 (CT Bridgeport))
+2026-06-12 15:51:33 [INFO] STEP4: All paid-time adjustments complete for Kenneth Grace (306404 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:34 [INFO] VERIFY: No new checkboxes needed for Kenneth Grace (306404 (CT Bridgeport)).
+2026-06-12 15:51:34 [INFO] WORKER: Done with Kenneth Grace (306404 (CT Bridgeport))
+2026-06-12 15:51:34 [INFO] STEP5: Moving to next employee after completing Kenneth Grace (306404 (CT Bridgeport)).
+2026-06-12 15:51:35 [INFO] WORKER: Processing Kenny Gracia (304824 (CT Bridgeport))
+2026-06-12 15:51:36 [INFO] STEP4: All paid-time adjustments complete for Kenny Gracia (304824 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:36 [INFO] VERIFY: No new checkboxes needed for Kenny Gracia (304824 (CT Bridgeport)).
+2026-06-12 15:51:36 [INFO] WORKER: Done with Kenny Gracia (304824 (CT Bridgeport))
+2026-06-12 15:51:36 [INFO] STEP5: Moving to next employee after completing Kenny Gracia (304824 (CT Bridgeport)).
+2026-06-12 15:51:37 [INFO] WORKER: Processing Kenrick Smith (307024 (CT Bridgeport))
+2026-06-12 15:51:38 [INFO] STEP4: All paid-time adjustments complete for Kenrick Smith (307024 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:38 [INFO] VERIFY: No new checkboxes needed for Kenrick Smith (307024 (CT Bridgeport)).
+2026-06-12 15:51:38 [INFO] WORKER: Done with Kenrick Smith (307024 (CT Bridgeport))
+2026-06-12 15:51:38 [INFO] STEP5: Moving to next employee after completing Kenrick Smith (307024 (CT Bridgeport)).
+2026-06-12 15:51:40 [INFO] WORKER: Processing Kenroy Taylor (614630 (CT Bridgeport))
+2026-06-12 15:51:40 [INFO] STEP4: All paid-time adjustments complete for Kenroy Taylor (614630 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:41 [INFO] VERIFY: No new checkboxes needed for Kenroy Taylor (614630 (CT Bridgeport)).
+2026-06-12 15:51:41 [INFO] WORKER: Done with Kenroy Taylor (614630 (CT Bridgeport))
+2026-06-12 15:51:41 [INFO] STEP5: Moving to next employee after completing Kenroy Taylor (614630 (CT Bridgeport)).
+2026-06-12 15:51:42 [INFO] WORKER: Processing Kereen Richard’s Dixon (631537 (CT Bridgeport))
+2026-06-12 15:51:42 [INFO] STEP4: All paid-time adjustments complete for Kereen Richard’s Dixon (631537 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:43 [INFO] VERIFY: No new checkboxes needed for Kereen Richard’s Dixon (631537 (CT Bridgeport)).
+2026-06-12 15:51:43 [INFO] WORKER: Done with Kereen Richard’s Dixon (631537 (CT Bridgeport))
+2026-06-12 15:51:43 [INFO] STEP5: Moving to next employee after completing Kereen Richard’s Dixon (631537 (CT Bridgeport)).
+2026-06-12 15:51:44 [INFO] WORKER: Processing Kevin Jeffreys (304459 (CT Bridgeport))
+2026-06-12 15:51:45 [INFO] STEP4: All paid-time adjustments complete for Kevin Jeffreys (304459 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:45 [INFO] VERIFY: No new checkboxes needed for Kevin Jeffreys (304459 (CT Bridgeport)).
+2026-06-12 15:51:45 [INFO] WORKER: Done with Kevin Jeffreys (304459 (CT Bridgeport))
+2026-06-12 15:51:45 [INFO] STEP5: Moving to next employee after completing Kevin Jeffreys (304459 (CT Bridgeport)).
+2026-06-12 15:51:46 [INFO] WORKER: Processing Khrist Wilfong (636973 (CT Bridgeport))
+2026-06-12 15:51:47 [INFO] STEP4: All paid-time adjustments complete for Khrist Wilfong (636973 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:47 [INFO] VERIFY: No new checkboxes needed for Khrist Wilfong (636973 (CT Bridgeport)).
+2026-06-12 15:51:47 [INFO] WORKER: Done with Khrist Wilfong (636973 (CT Bridgeport))
+2026-06-12 15:51:47 [INFO] STEP5: Moving to next employee after completing Khrist Wilfong (636973 (CT Bridgeport)).
+2026-06-12 15:51:48 [INFO] WORKER: Processing Kirsten Bryant-Browne (632286 (CT Bridgeport))
+2026-06-12 15:51:49 [INFO] STEP4: All paid-time adjustments complete for Kirsten Bryant-Browne (632286 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:50 [INFO] VERIFY: No new checkboxes needed for Kirsten Bryant-Browne (632286 (CT Bridgeport)).
+2026-06-12 15:51:50 [INFO] WORKER: Done with Kirsten Bryant-Browne (632286 (CT Bridgeport))
+2026-06-12 15:51:50 [INFO] STEP5: Moving to next employee after completing Kirsten Bryant-Browne (632286 (CT Bridgeport)).
+2026-06-12 15:51:51 [INFO] WORKER: Processing Krishna Miley (304267 (CT Bridgeport))
+2026-06-12 15:51:51 [INFO] STEP4: All paid-time adjustments complete for Krishna Miley (304267 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:52 [INFO] VERIFY: No new checkboxes needed for Krishna Miley (304267 (CT Bridgeport)).
+2026-06-12 15:51:52 [INFO] WORKER: Done with Krishna Miley (304267 (CT Bridgeport))
+2026-06-12 15:51:52 [INFO] STEP5: Moving to next employee after completing Krishna Miley (304267 (CT Bridgeport)).
+2026-06-12 15:51:53 [INFO] WORKER: Processing Krystal Nogueras Peet (306729 (CT Bridgeport))
+2026-06-12 15:51:54 [INFO] STEP4: All paid-time adjustments complete for Krystal Nogueras Peet (306729 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:55 [INFO] VERIFY: No new checkboxes needed for Krystal Nogueras Peet (306729 (CT Bridgeport)).
+2026-06-12 15:51:55 [INFO] WORKER: Done with Krystal Nogueras Peet (306729 (CT Bridgeport))
+2026-06-12 15:51:55 [INFO] STEP5: Moving to next employee after completing Krystal Nogueras Peet (306729 (CT Bridgeport)).
+2026-06-12 15:51:56 [INFO] WORKER: Processing Lakena Norris (304273 (CT Bridgeport))
+2026-06-12 15:51:57 [INFO] STEP4: All paid-time adjustments complete for Lakena Norris (304273 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:57 [INFO] VERIFY: No new checkboxes needed for Lakena Norris (304273 (CT Bridgeport)).
+2026-06-12 15:51:57 [INFO] WORKER: Done with Lakena Norris (304273 (CT Bridgeport))
+2026-06-12 15:51:57 [INFO] STEP5: Moving to next employee after completing Lakena Norris (304273 (CT Bridgeport)).
+2026-06-12 15:51:58 [INFO] WORKER: Processing LASHIKA WILLIAMS (625674 (CT Bridgeport))
+2026-06-12 15:51:59 [INFO] STEP4: All paid-time adjustments complete for LASHIKA WILLIAMS (625674 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:51:59 [INFO] VERIFY: No new checkboxes needed for LASHIKA WILLIAMS (625674 (CT Bridgeport)).
+2026-06-12 15:51:59 [INFO] WORKER: Done with LASHIKA WILLIAMS (625674 (CT Bridgeport))
+2026-06-12 15:51:59 [INFO] STEP5: Moving to next employee after completing LASHIKA WILLIAMS (625674 (CT Bridgeport)).
+2026-06-12 15:52:01 [INFO] WORKER: Processing Latonia Stevens (304861 (CT Bridgeport))
+2026-06-12 15:52:01 [INFO] STEP4: All paid-time adjustments complete for Latonia Stevens (304861 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:02 [INFO] VERIFY: No new checkboxes needed for Latonia Stevens (304861 (CT Bridgeport)).
+2026-06-12 15:52:02 [INFO] WORKER: Done with Latonia Stevens (304861 (CT Bridgeport))
+2026-06-12 15:52:02 [INFO] STEP5: Moving to next employee after completing Latonia Stevens (304861 (CT Bridgeport)).
+2026-06-12 15:52:03 [INFO] WORKER: Processing Latoya Burton (306175 (CT Bridgeport))
+2026-06-12 15:52:04 [INFO] STEP4: All paid-time adjustments complete for Latoya Burton (306175 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:04 [INFO] VERIFY: No new checkboxes needed for Latoya Burton (306175 (CT Bridgeport)).
+2026-06-12 15:52:04 [INFO] WORKER: Done with Latoya Burton (306175 (CT Bridgeport))
+2026-06-12 15:52:04 [INFO] STEP5: Moving to next employee after completing Latoya Burton (306175 (CT Bridgeport)).
+2026-06-12 15:52:06 [INFO] WORKER: Processing Latoya Robinson (304302 (CT Bridgeport))
+2026-06-12 15:52:06 [INFO] STEP4: All paid-time adjustments complete for Latoya Robinson (304302 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:07 [INFO] VERIFY: No new checkboxes needed for Latoya Robinson (304302 (CT Bridgeport)).
+2026-06-12 15:52:07 [INFO] WORKER: Done with Latoya Robinson (304302 (CT Bridgeport))
+2026-06-12 15:52:07 [INFO] STEP5: Moving to next employee after completing Latoya Robinson (304302 (CT Bridgeport)).
+2026-06-12 15:52:08 [INFO] WORKER: Processing Latoya Hill (636977 (CT Bridgeport))
+2026-06-12 15:52:08 [INFO] STEP4: All paid-time adjustments complete for Latoya Hill (636977 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:09 [INFO] VERIFY: No new checkboxes needed for Latoya Hill (636977 (CT Bridgeport)).
+2026-06-12 15:52:09 [INFO] WORKER: Done with Latoya Hill (636977 (CT Bridgeport))
+2026-06-12 15:52:09 [INFO] STEP5: Moving to next employee after completing Latoya Hill (636977 (CT Bridgeport)).
+2026-06-12 15:52:10 [INFO] WORKER: Processing La-Trena Scott (615970 (CT Bridgeport))
+2026-06-12 15:52:11 [INFO] STEP4: All paid-time adjustments complete for La-Trena Scott (615970 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:11 [INFO] VERIFY: No new checkboxes needed for La-Trena Scott (615970 (CT Bridgeport)).
+2026-06-12 15:52:11 [INFO] WORKER: Done with La-Trena Scott (615970 (CT Bridgeport))
+2026-06-12 15:52:11 [INFO] STEP5: Moving to next employee after completing La-Trena Scott (615970 (CT Bridgeport)).
+2026-06-12 15:52:13 [INFO] WORKER: Processing Laura Belamour (307341 (CT Bridgeport))
+2026-06-12 15:52:13 [INFO] STEP4: All paid-time adjustments complete for Laura Belamour (307341 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:14 [INFO] VERIFY: No new checkboxes needed for Laura Belamour (307341 (CT Bridgeport)).
+2026-06-12 15:52:14 [INFO] WORKER: Done with Laura Belamour (307341 (CT Bridgeport))
+2026-06-12 15:52:14 [INFO] STEP5: Moving to next employee after completing Laura Belamour (307341 (CT Bridgeport)).
+2026-06-12 15:52:15 [INFO] WORKER: Processing Laura Gonzalez (632622 (CT Bridgeport))
+2026-06-12 15:52:16 [INFO] STEP4: All paid-time adjustments complete for Laura Gonzalez (632622 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:16 [INFO] VERIFY: No new checkboxes needed for Laura Gonzalez (632622 (CT Bridgeport)).
+2026-06-12 15:52:16 [INFO] WORKER: Done with Laura Gonzalez (632622 (CT Bridgeport))
+2026-06-12 15:52:16 [INFO] STEP5: Moving to next employee after completing Laura Gonzalez (632622 (CT Bridgeport)).
+2026-06-12 15:52:17 [INFO] WORKER: Processing Leather Bennett (305472 (CT Bridgeport))
+2026-06-12 15:52:18 [INFO] STEP4: All paid-time adjustments complete for Leather Bennett (305472 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:18 [INFO] VERIFY: No new checkboxes needed for Leather Bennett (305472 (CT Bridgeport)).
+2026-06-12 15:52:18 [INFO] WORKER: Done with Leather Bennett (305472 (CT Bridgeport))
+2026-06-12 15:52:18 [INFO] STEP5: Moving to next employee after completing Leather Bennett (305472 (CT Bridgeport)).
+2026-06-12 15:52:19 [INFO] WORKER: Processing Leon Williams Jr (627415 (CT Bridgeport))
+2026-06-12 15:52:20 [INFO] STEP4: All paid-time adjustments complete for Leon Williams Jr (627415 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:20 [INFO] VERIFY: No new checkboxes needed for Leon Williams Jr (627415 (CT Bridgeport)).
+2026-06-12 15:52:20 [INFO] WORKER: Done with Leon Williams Jr (627415 (CT Bridgeport))
+2026-06-12 15:52:20 [INFO] STEP5: Moving to next employee after completing Leon Williams Jr (627415 (CT Bridgeport)).
+2026-06-12 15:52:22 [INFO] WORKER: Processing Leondra James (305610 (CT Bridgeport))
+2026-06-12 15:52:22 [INFO] STEP4: All paid-time adjustments complete for Leondra James (305610 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:23 [INFO] VERIFY: No new checkboxes needed for Leondra James (305610 (CT Bridgeport)).
+2026-06-12 15:52:23 [INFO] WORKER: Done with Leondra James (305610 (CT Bridgeport))
+2026-06-12 15:52:23 [INFO] STEP5: Moving to next employee after completing Leondra James (305610 (CT Bridgeport)).
+2026-06-12 15:52:24 [INFO] WORKER: Processing leroy smith (617099 (CT Bridgeport))
+2026-06-12 15:52:24 [INFO] STEP4: All paid-time adjustments complete for leroy smith (617099 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:25 [INFO] VERIFY: No new checkboxes needed for leroy smith (617099 (CT Bridgeport)).
+2026-06-12 15:52:25 [INFO] WORKER: Done with leroy smith (617099 (CT Bridgeport))
+2026-06-12 15:52:25 [INFO] STEP5: Moving to next employee after completing leroy smith (617099 (CT Bridgeport)).
+2026-06-12 15:52:26 [INFO] WORKER: Processing Lisa Francis (612930 (CT Bridgeport))
+2026-06-12 15:52:26 [INFO] STEP4: All paid-time adjustments complete for Lisa Francis (612930 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:27 [INFO] VERIFY: No new checkboxes needed for Lisa Francis (612930 (CT Bridgeport)).
+2026-06-12 15:52:27 [INFO] WORKER: Done with Lisa Francis (612930 (CT Bridgeport))
+2026-06-12 15:52:27 [INFO] STEP5: Moving to next employee after completing Lisa Francis (612930 (CT Bridgeport)).
+2026-06-12 15:52:28 [INFO] WORKER: Processing Lisa Gordon (306641 (CT Bridgeport))
+2026-06-12 15:52:29 [INFO] STEP4: All paid-time adjustments complete for Lisa Gordon (306641 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:29 [INFO] VERIFY: No new checkboxes needed for Lisa Gordon (306641 (CT Bridgeport)).
+2026-06-12 15:52:29 [INFO] WORKER: Done with Lisa Gordon (306641 (CT Bridgeport))
+2026-06-12 15:52:29 [INFO] STEP5: Moving to next employee after completing Lisa Gordon (306641 (CT Bridgeport)).
+2026-06-12 15:52:30 [INFO] WORKER: Processing Lisa Collazo (632494 (CT Bridgeport))
+2026-06-12 15:52:31 [INFO] STEP4: All paid-time adjustments complete for Lisa Collazo (632494 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:31 [INFO] VERIFY: No new checkboxes needed for Lisa Collazo (632494 (CT Bridgeport)).
+2026-06-12 15:52:31 [INFO] WORKER: Done with Lisa Collazo (632494 (CT Bridgeport))
+2026-06-12 15:52:31 [INFO] STEP5: Moving to next employee after completing Lisa Collazo (632494 (CT Bridgeport)).
+2026-06-12 15:52:33 [INFO] WORKER: Processing Lismari Martorony (306572 (CT Bridgeport))
+2026-06-12 15:52:33 [INFO] STEP4: All paid-time adjustments complete for Lismari Martorony (306572 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:34 [INFO] VERIFY: No new checkboxes needed for Lismari Martorony (306572 (CT Bridgeport)).
+2026-06-12 15:52:34 [INFO] WORKER: Done with Lismari Martorony (306572 (CT Bridgeport))
+2026-06-12 15:52:34 [INFO] STEP5: Moving to next employee after completing Lismari Martorony (306572 (CT Bridgeport)).
+2026-06-12 15:52:35 [INFO] WORKER: Processing Lorraine Benjamin (305388 (CT Bridgeport))
+2026-06-12 15:52:35 [INFO] STEP4: All paid-time adjustments complete for Lorraine Benjamin (305388 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:36 [INFO] VERIFY: No new checkboxes needed for Lorraine Benjamin (305388 (CT Bridgeport)).
+2026-06-12 15:52:36 [INFO] WORKER: Done with Lorraine Benjamin (305388 (CT Bridgeport))
+2026-06-12 15:52:36 [INFO] STEP5: Moving to next employee after completing Lorraine Benjamin (305388 (CT Bridgeport)).
+2026-06-12 15:52:37 [INFO] WORKER: Processing Lorsa Augustin (306886 (CT Bridgeport))
+2026-06-12 15:52:38 [INFO] STEP4: All paid-time adjustments complete for Lorsa Augustin (306886 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:39 [INFO] VERIFY: No new checkboxes needed for Lorsa Augustin (306886 (CT Bridgeport)).
+2026-06-12 15:52:39 [INFO] WORKER: Done with Lorsa Augustin (306886 (CT Bridgeport))
+2026-06-12 15:52:39 [INFO] STEP5: Moving to next employee after completing Lorsa Augustin (306886 (CT Bridgeport)).
+2026-06-12 15:52:40 [INFO] WORKER: Processing Louis Johnson (304933 (CT Bridgeport))
+2026-06-12 15:52:41 [INFO] STEP4: All paid-time adjustments complete for Louis Johnson (304933 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:41 [INFO] VERIFY: No new checkboxes needed for Louis Johnson (304933 (CT Bridgeport)).
+2026-06-12 15:52:41 [INFO] WORKER: Done with Louis Johnson (304933 (CT Bridgeport))
+2026-06-12 15:52:41 [INFO] STEP5: Moving to next employee after completing Louis Johnson (304933 (CT Bridgeport)).
+2026-06-12 15:52:43 [INFO] WORKER: Processing Lucia Colon (305043 (CT Bridgeport))
+2026-06-12 15:52:44 [INFO] STEP4: All paid-time adjustments complete for Lucia Colon (305043 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:45 [INFO] VERIFY: No new checkboxes needed for Lucia Colon (305043 (CT Bridgeport)).
+2026-06-12 15:52:45 [INFO] WORKER: Done with Lucia Colon (305043 (CT Bridgeport))
+2026-06-12 15:52:45 [INFO] STEP5: Moving to next employee after completing Lucia Colon (305043 (CT Bridgeport)).
+2026-06-12 15:52:46 [INFO] WORKER: Processing Lucy Machado (304516 (CT Bridgeport))
+2026-06-12 15:52:47 [INFO] STEP4: All paid-time adjustments complete for Lucy Machado (304516 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:48 [INFO] VERIFY: No new checkboxes needed for Lucy Machado (304516 (CT Bridgeport)).
+2026-06-12 15:52:48 [INFO] WORKER: Done with Lucy Machado (304516 (CT Bridgeport))
+2026-06-12 15:52:48 [INFO] STEP5: Moving to next employee after completing Lucy Machado (304516 (CT Bridgeport)).
+2026-06-12 15:52:49 [INFO] WORKER: Processing Luella Pettway (304195 (CT Bridgeport))
+2026-06-12 15:52:50 [INFO] STEP4: All paid-time adjustments complete for Luella Pettway (304195 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:50 [INFO] VERIFY: No new checkboxes needed for Luella Pettway (304195 (CT Bridgeport)).
+2026-06-12 15:52:50 [INFO] WORKER: Done with Luella Pettway (304195 (CT Bridgeport))
+2026-06-12 15:52:50 [INFO] STEP5: Moving to next employee after completing Luella Pettway (304195 (CT Bridgeport)).
+2026-06-12 15:52:52 [INFO] WORKER: Processing Lurline Williams (306178 (CT Bridgeport))
+2026-06-12 15:52:52 [INFO] STEP4: All paid-time adjustments complete for Lurline Williams (306178 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:53 [INFO] VERIFY: No new checkboxes needed for Lurline Williams (306178 (CT Bridgeport)).
+2026-06-12 15:52:53 [INFO] WORKER: Done with Lurline Williams (306178 (CT Bridgeport))
+2026-06-12 15:52:53 [INFO] STEP5: Moving to next employee after completing Lurline Williams (306178 (CT Bridgeport)).
+2026-06-12 15:52:54 [INFO] WORKER: Processing Luz Rodriguez (304681 (CT Bridgeport))
+2026-06-12 15:52:55 [INFO] STEP4: All paid-time adjustments complete for Luz Rodriguez (304681 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:55 [INFO] VERIFY: No new checkboxes needed for Luz Rodriguez (304681 (CT Bridgeport)).
+2026-06-12 15:52:55 [INFO] WORKER: Done with Luz Rodriguez (304681 (CT Bridgeport))
+2026-06-12 15:52:55 [INFO] STEP5: Moving to next employee after completing Luz Rodriguez (304681 (CT Bridgeport)).
+2026-06-12 15:52:56 [INFO] WORKER: Processing Lydia Gonzalez (632609 (CT Bridgeport))
+2026-06-12 15:52:57 [INFO] STEP4: All paid-time adjustments complete for Lydia Gonzalez (632609 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:52:57 [INFO] VERIFY: No new checkboxes needed for Lydia Gonzalez (632609 (CT Bridgeport)).
+2026-06-12 15:52:57 [INFO] WORKER: Done with Lydia Gonzalez (632609 (CT Bridgeport))
+2026-06-12 15:52:57 [INFO] STEP5: Moving to next employee after completing Lydia Gonzalez (632609 (CT Bridgeport)).
+2026-06-12 15:52:59 [INFO] WORKER: Processing Lynford Arnold (304212 (CT Bridgeport))
+2026-06-12 15:52:59 [INFO] STEP4: All paid-time adjustments complete for Lynford Arnold (304212 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:00 [INFO] VERIFY: No new checkboxes needed for Lynford Arnold (304212 (CT Bridgeport)).
+2026-06-12 15:53:00 [INFO] WORKER: Done with Lynford Arnold (304212 (CT Bridgeport))
+2026-06-12 15:53:00 [INFO] STEP5: Moving to next employee after completing Lynford Arnold (304212 (CT Bridgeport)).
+2026-06-12 15:53:01 [INFO] WORKER: Processing Lysbelle Benitez Espada (304734 (CT Bridgeport))
+2026-06-12 15:53:01 [INFO] STEP4: All paid-time adjustments complete for Lysbelle Benitez Espada (304734 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:02 [INFO] VERIFY: No new checkboxes needed for Lysbelle Benitez Espada (304734 (CT Bridgeport)).
+2026-06-12 15:53:02 [INFO] WORKER: Done with Lysbelle Benitez Espada (304734 (CT Bridgeport))
+2026-06-12 15:53:02 [INFO] STEP5: Moving to next employee after completing Lysbelle Benitez Espada (304734 (CT Bridgeport)).
+2026-06-12 15:53:03 [INFO] WORKER: Processing Macy Harper (304266 (CT Bridgeport))
+2026-06-12 15:53:04 [INFO] STEP4: All paid-time adjustments complete for Macy Harper (304266 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:04 [INFO] VERIFY: No new checkboxes needed for Macy Harper (304266 (CT Bridgeport)).
+2026-06-12 15:53:04 [INFO] WORKER: Done with Macy Harper (304266 (CT Bridgeport))
+2026-06-12 15:53:04 [INFO] STEP5: Moving to next employee after completing Macy Harper (304266 (CT Bridgeport)).
+2026-06-12 15:53:06 [INFO] WORKER: Processing Madeline Andujar (305579 (CT Bridgeport))
+2026-06-12 15:53:06 [INFO] STEP4: All paid-time adjustments complete for Madeline Andujar (305579 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:07 [INFO] VERIFY: No new checkboxes needed for Madeline Andujar (305579 (CT Bridgeport)).
+2026-06-12 15:53:07 [INFO] WORKER: Done with Madeline Andujar (305579 (CT Bridgeport))
+2026-06-12 15:53:07 [INFO] STEP5: Moving to next employee after completing Madeline Andujar (305579 (CT Bridgeport)).
+2026-06-12 15:53:08 [INFO] WORKER: Processing Magaly Torres-Cruz (628435 (CT Bridgeport))
+2026-06-12 15:53:09 [INFO] STEP4: All paid-time adjustments complete for Magaly Torres-Cruz (628435 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:09 [INFO] VERIFY: No new checkboxes needed for Magaly Torres-Cruz (628435 (CT Bridgeport)).
+2026-06-12 15:53:09 [INFO] WORKER: Done with Magaly Torres-Cruz (628435 (CT Bridgeport))
+2026-06-12 15:53:09 [INFO] STEP5: Moving to next employee after completing Magaly Torres-Cruz (628435 (CT Bridgeport)).
+2026-06-12 15:53:11 [INFO] WORKER: Processing Magda Rodriguez (621969 (CT Bridgeport))
+2026-06-12 15:53:11 [INFO] STEP4: All paid-time adjustments complete for Magda Rodriguez (621969 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:12 [INFO] VERIFY: No new checkboxes needed for Magda Rodriguez (621969 (CT Bridgeport)).
+2026-06-12 15:53:12 [INFO] WORKER: Done with Magda Rodriguez (621969 (CT Bridgeport))
+2026-06-12 15:53:12 [INFO] STEP5: Moving to next employee after completing Magda Rodriguez (621969 (CT Bridgeport)).
+2026-06-12 15:53:13 [INFO] WORKER: Processing Makeda Robinson (304783 (CT Bridgeport))
+2026-06-12 15:53:14 [INFO] STEP4: All paid-time adjustments complete for Makeda Robinson (304783 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:14 [INFO] VERIFY: No new checkboxes needed for Makeda Robinson (304783 (CT Bridgeport)).
+2026-06-12 15:53:14 [INFO] WORKER: Done with Makeda Robinson (304783 (CT Bridgeport))
+2026-06-12 15:53:14 [INFO] STEP5: Moving to next employee after completing Makeda Robinson (304783 (CT Bridgeport)).
+2026-06-12 15:53:15 [INFO] WORKER: Processing Manuel Candelaria (305456 (CT Bridgeport))
+2026-06-12 15:53:16 [INFO] STEP4: All paid-time adjustments complete for Manuel Candelaria (305456 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:17 [INFO] VERIFY: No new checkboxes needed for Manuel Candelaria (305456 (CT Bridgeport)).
+2026-06-12 15:53:17 [INFO] WORKER: Done with Manuel Candelaria (305456 (CT Bridgeport))
+2026-06-12 15:53:17 [INFO] STEP5: Moving to next employee after completing Manuel Candelaria (305456 (CT Bridgeport)).
+2026-06-12 15:53:18 [INFO] WORKER: Processing Marcia Thompson-shaw (304180 (CT Bridgeport))
+2026-06-12 15:53:19 [INFO] STEP4: All paid-time adjustments complete for Marcia Thompson-shaw (304180 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:19 [INFO] VERIFY: No new checkboxes needed for Marcia Thompson-shaw (304180 (CT Bridgeport)).
+2026-06-12 15:53:19 [INFO] WORKER: Done with Marcia Thompson-shaw (304180 (CT Bridgeport))
+2026-06-12 15:53:19 [INFO] STEP5: Moving to next employee after completing Marcia Thompson-shaw (304180 (CT Bridgeport)).
+2026-06-12 15:53:21 [INFO] WORKER: Processing Marckenson Colin (614858 (CT Bridgeport))
+2026-06-12 15:53:21 [INFO] STEP4: All paid-time adjustments complete for Marckenson Colin (614858 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:21 [INFO] VERIFY: Skipping 'Bridge Charter 110056-2' for Marckenson Colin (614858 (CT Bridgeport)) — excluded from verification.
+2026-06-12 15:53:21 [INFO] VERIFY: No new checkboxes needed for Marckenson Colin (614858 (CT Bridgeport)).
+2026-06-12 15:53:21 [INFO] WORKER: Done with Marckenson Colin (614858 (CT Bridgeport))
+2026-06-12 15:53:21 [INFO] STEP5: Moving to next employee after completing Marckenson Colin (614858 (CT Bridgeport)).
+2026-06-12 15:53:23 [INFO] WORKER: Processing Margaret Mcneil (305466 (CT Bridgeport))
+2026-06-12 15:53:23 [INFO] STEP4: All paid-time adjustments complete for Margaret Mcneil (305466 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:24 [INFO] VERIFY: No new checkboxes needed for Margaret Mcneil (305466 (CT Bridgeport)).
+2026-06-12 15:53:24 [INFO] WORKER: Done with Margaret Mcneil (305466 (CT Bridgeport))
+2026-06-12 15:53:24 [INFO] STEP5: Moving to next employee after completing Margaret Mcneil (305466 (CT Bridgeport)).
+2026-06-12 15:53:25 [INFO] WORKER: Processing Margarita Lopez (304441 (CT Bridgeport))
+2026-06-12 15:53:25 [INFO] STEP4: All paid-time adjustments complete for Margarita Lopez (304441 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:26 [INFO] VERIFY: No new checkboxes needed for Margarita Lopez (304441 (CT Bridgeport)).
+2026-06-12 15:53:26 [INFO] WORKER: Done with Margarita Lopez (304441 (CT Bridgeport))
+2026-06-12 15:53:26 [INFO] STEP5: Moving to next employee after completing Margarita Lopez (304441 (CT Bridgeport)).
+2026-06-12 15:53:27 [INFO] WORKER: Processing maria williams (613191 (CT Bridgeport))
+2026-06-12 15:53:28 [INFO] STEP4: All paid-time adjustments complete for maria williams (613191 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:28 [INFO] VERIFY: No new checkboxes needed for maria williams (613191 (CT Bridgeport)).
+2026-06-12 15:53:28 [INFO] WORKER: Done with maria williams (613191 (CT Bridgeport))
+2026-06-12 15:53:28 [INFO] STEP5: Moving to next employee after completing maria williams (613191 (CT Bridgeport)).
+2026-06-12 15:53:30 [INFO] WORKER: Processing maria hernandez (633610 (CT Bridgeport))
+2026-06-12 15:53:30 [INFO] STEP4: All paid-time adjustments complete for maria hernandez (633610 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:31 [INFO] VERIFY: No new checkboxes needed for maria hernandez (633610 (CT Bridgeport)).
+2026-06-12 15:53:31 [INFO] WORKER: Done with maria hernandez (633610 (CT Bridgeport))
+2026-06-12 15:53:31 [INFO] STEP5: Moving to next employee after completing maria hernandez (633610 (CT Bridgeport)).
+2026-06-12 15:53:33 [INFO] WORKER: Processing Maria Bennett (305698 (CT Bridgeport))
+2026-06-12 15:53:34 [INFO] STEP4: All paid-time adjustments complete for Maria Bennett (305698 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:34 [INFO] VERIFY: No new checkboxes needed for Maria Bennett (305698 (CT Bridgeport)).
+2026-06-12 15:53:34 [INFO] WORKER: Done with Maria Bennett (305698 (CT Bridgeport))
+2026-06-12 15:53:34 [INFO] STEP5: Moving to next employee after completing Maria Bennett (305698 (CT Bridgeport)).
+2026-06-12 15:53:35 [INFO] WORKER: Processing Maria Perez (304253 (CT Bridgeport))
+2026-06-12 15:53:36 [INFO] STEP4: All paid-time adjustments complete for Maria Perez (304253 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:37 [INFO] VERIFY: No new checkboxes needed for Maria Perez (304253 (CT Bridgeport)).
+2026-06-12 15:53:37 [INFO] WORKER: Done with Maria Perez (304253 (CT Bridgeport))
+2026-06-12 15:53:37 [INFO] STEP5: Moving to next employee after completing Maria Perez (304253 (CT Bridgeport)).
+2026-06-12 15:53:38 [INFO] WORKER: Processing Maria Rodriguez (304263 (CT Bridgeport))
+2026-06-12 15:53:39 [INFO] STEP4: All paid-time adjustments complete for Maria Rodriguez (304263 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:39 [INFO] VERIFY: No new checkboxes needed for Maria Rodriguez (304263 (CT Bridgeport)).
+2026-06-12 15:53:39 [INFO] WORKER: Done with Maria Rodriguez (304263 (CT Bridgeport))
+2026-06-12 15:53:39 [INFO] STEP5: Moving to next employee after completing Maria Rodriguez (304263 (CT Bridgeport)).
+2026-06-12 15:53:42 [INFO] WORKER: Processing Maribel Gomez (304221 (CT Bridgeport))
+2026-06-12 15:53:42 [INFO] STEP4: All paid-time adjustments complete for Maribel Gomez (304221 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:43 [INFO] VERIFY: No new checkboxes needed for Maribel Gomez (304221 (CT Bridgeport)).
+2026-06-12 15:53:43 [INFO] WORKER: Done with Maribel Gomez (304221 (CT Bridgeport))
+2026-06-12 15:53:43 [INFO] STEP5: Moving to next employee after completing Maribel Gomez (304221 (CT Bridgeport)).
+2026-06-12 15:53:44 [INFO] WORKER: Processing Maritza Morales (621705 (CT Bridgeport))
+2026-06-12 15:53:45 [INFO] STEP4: All paid-time adjustments complete for Maritza Morales (621705 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:46 [INFO] VERIFY: No new checkboxes needed for Maritza Morales (621705 (CT Bridgeport)).
+2026-06-12 15:53:46 [INFO] WORKER: Done with Maritza Morales (621705 (CT Bridgeport))
+2026-06-12 15:53:46 [INFO] STEP5: Moving to next employee after completing Maritza Morales (621705 (CT Bridgeport)).
+2026-06-12 15:53:47 [INFO] WORKER: Processing Marlon Gordon (304264 (CT Bridgeport))
+2026-06-12 15:53:47 [INFO] STEP4: All paid-time adjustments complete for Marlon Gordon (304264 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:48 [INFO] VERIFY: No new checkboxes needed for Marlon Gordon (304264 (CT Bridgeport)).
+2026-06-12 15:53:48 [INFO] WORKER: Done with Marlon Gordon (304264 (CT Bridgeport))
+2026-06-12 15:53:48 [INFO] STEP5: Moving to next employee after completing Marlon Gordon (304264 (CT Bridgeport)).
+2026-06-12 15:53:49 [INFO] WORKER: Processing Marsha Hinton (304462 (CT Bridgeport))
+2026-06-12 15:53:50 [INFO] STEP4: All paid-time adjustments complete for Marsha Hinton (304462 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:50 [INFO] VERIFY: No new checkboxes needed for Marsha Hinton (304462 (CT Bridgeport)).
+2026-06-12 15:53:50 [INFO] WORKER: Done with Marsha Hinton (304462 (CT Bridgeport))
+2026-06-12 15:53:50 [INFO] STEP5: Moving to next employee after completing Marsha Hinton (304462 (CT Bridgeport)).
+2026-06-12 15:53:51 [INFO] WORKER: Processing Mary Wright (306761 (CT Bridgeport))
+2026-06-12 15:53:52 [INFO] STEP4: All paid-time adjustments complete for Mary Wright (306761 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:53 [INFO] VERIFY: No new checkboxes needed for Mary Wright (306761 (CT Bridgeport)).
+2026-06-12 15:53:53 [INFO] WORKER: Done with Mary Wright (306761 (CT Bridgeport))
+2026-06-12 15:53:53 [INFO] STEP5: Moving to next employee after completing Mary Wright (306761 (CT Bridgeport)).
+2026-06-12 15:53:54 [INFO] WORKER: Processing Maureen Savage (304238 (CT Bridgeport))
+2026-06-12 15:53:55 [INFO] STEP4: All paid-time adjustments complete for Maureen Savage (304238 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:55 [INFO] VERIFY: No new checkboxes needed for Maureen Savage (304238 (CT Bridgeport)).
+2026-06-12 15:53:55 [INFO] WORKER: Done with Maureen Savage (304238 (CT Bridgeport))
+2026-06-12 15:53:55 [INFO] STEP5: Moving to next employee after completing Maureen Savage (304238 (CT Bridgeport)).
+2026-06-12 15:53:56 [INFO] WORKER: Processing Melanie Van Norden (304205 (CT Bridgeport))
+2026-06-12 15:53:57 [INFO] STEP4: All paid-time adjustments complete for Melanie Van Norden (304205 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:57 [INFO] VERIFY: No new checkboxes needed for Melanie Van Norden (304205 (CT Bridgeport)).
+2026-06-12 15:53:57 [INFO] WORKER: Done with Melanie Van Norden (304205 (CT Bridgeport))
+2026-06-12 15:53:57 [INFO] STEP5: Moving to next employee after completing Melanie Van Norden (304205 (CT Bridgeport)).
+2026-06-12 15:53:58 [INFO] WORKER: Processing Melanie Rhodes (305769 (CT Bridgeport))
+2026-06-12 15:53:59 [INFO] STEP4: All paid-time adjustments complete for Melanie Rhodes (305769 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:53:59 [INFO] VERIFY: No new checkboxes needed for Melanie Rhodes (305769 (CT Bridgeport)).
+2026-06-12 15:53:59 [INFO] WORKER: Done with Melanie Rhodes (305769 (CT Bridgeport))
+2026-06-12 15:53:59 [INFO] STEP5: Moving to next employee after completing Melanie Rhodes (305769 (CT Bridgeport)).
+2026-06-12 15:54:02 [INFO] WORKER: Processing Michael Williams (612719 (CT Bridgeport))
+2026-06-12 15:54:03 [INFO] STEP4: All paid-time adjustments complete for Michael Williams (612719 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:03 [INFO] VERIFY: No new checkboxes needed for Michael Williams (612719 (CT Bridgeport)).
+2026-06-12 15:54:03 [INFO] WORKER: Done with Michael Williams (612719 (CT Bridgeport))
+2026-06-12 15:54:03 [INFO] STEP5: Moving to next employee after completing Michael Williams (612719 (CT Bridgeport)).
+2026-06-12 15:54:05 [INFO] WORKER: Processing Michael Simms (304290 (CT Bridgeport))
+2026-06-12 15:54:05 [INFO] STEP4: All paid-time adjustments complete for Michael Simms (304290 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:06 [INFO] VERIFY: No new checkboxes needed for Michael Simms (304290 (CT Bridgeport)).
+2026-06-12 15:54:06 [INFO] WORKER: Done with Michael Simms (304290 (CT Bridgeport))
+2026-06-12 15:54:06 [INFO] STEP5: Moving to next employee after completing Michael Simms (304290 (CT Bridgeport)).
+2026-06-12 15:54:07 [INFO] WORKER: Processing Michael Reid (304198 (CT Bridgeport))
+2026-06-12 15:54:07 [INFO] STEP4: All paid-time adjustments complete for Michael Reid (304198 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:08 [INFO] VERIFY: No new checkboxes needed for Michael Reid (304198 (CT Bridgeport)).
+2026-06-12 15:54:08 [INFO] WORKER: Done with Michael Reid (304198 (CT Bridgeport))
+2026-06-12 15:54:08 [INFO] STEP5: Moving to next employee after completing Michael Reid (304198 (CT Bridgeport)).
+2026-06-12 15:54:09 [INFO] WORKER: Processing Michael Stackhouse (304202 (CT Bridgeport))
+2026-06-12 15:54:10 [INFO] STEP4: All paid-time adjustments complete for Michael Stackhouse (304202 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:10 [INFO] VERIFY: No new checkboxes needed for Michael Stackhouse (304202 (CT Bridgeport)).
+2026-06-12 15:54:10 [INFO] WORKER: Done with Michael Stackhouse (304202 (CT Bridgeport))
+2026-06-12 15:54:10 [INFO] STEP5: Moving to next employee after completing Michael Stackhouse (304202 (CT Bridgeport)).
+2026-06-12 15:54:11 [INFO] WORKER: Processing Michael Aguiar (304460 (CT Bridgeport))
+2026-06-12 15:54:12 [INFO] STEP4: All paid-time adjustments complete for Michael Aguiar (304460 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:12 [INFO] VERIFY: No new checkboxes needed for Michael Aguiar (304460 (CT Bridgeport)).
+2026-06-12 15:54:12 [INFO] WORKER: Done with Michael Aguiar (304460 (CT Bridgeport))
+2026-06-12 15:54:12 [INFO] STEP5: Moving to next employee after completing Michael Aguiar (304460 (CT Bridgeport)).
+2026-06-12 15:54:13 [INFO] WORKER: Processing Michael Risen (616163 (CT Bridgeport))
+2026-06-12 15:54:14 [INFO] STEP4: All paid-time adjustments complete for Michael Risen (616163 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:14 [INFO] VERIFY: No new checkboxes needed for Michael Risen (616163 (CT Bridgeport)).
+2026-06-12 15:54:14 [INFO] WORKER: Done with Michael Risen (616163 (CT Bridgeport))
+2026-06-12 15:54:14 [INFO] STEP5: Moving to next employee after completing Michael Risen (616163 (CT Bridgeport)).
+2026-06-12 15:54:15 [INFO] WORKER: Processing Mickey Ratley (304206 (CT Bridgeport))
+2026-06-12 15:54:16 [INFO] STEP4: All paid-time adjustments complete for Mickey Ratley (304206 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:16 [INFO] VERIFY: No new checkboxes needed for Mickey Ratley (304206 (CT Bridgeport)).
+2026-06-12 15:54:16 [INFO] WORKER: Done with Mickey Ratley (304206 (CT Bridgeport))
+2026-06-12 15:54:16 [INFO] STEP5: Moving to next employee after completing Mickey Ratley (304206 (CT Bridgeport)).
+2026-06-12 15:54:18 [INFO] WORKER: Processing MINDY MITCHEL (624276 (CT Bridgeport))
+2026-06-12 15:54:18 [INFO] STEP4: All paid-time adjustments complete for MINDY MITCHEL (624276 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:19 [INFO] VERIFY: No new checkboxes needed for MINDY MITCHEL (624276 (CT Bridgeport)).
+2026-06-12 15:54:19 [INFO] WORKER: Done with MINDY MITCHEL (624276 (CT Bridgeport))
+2026-06-12 15:54:19 [INFO] STEP5: Moving to next employee after completing MINDY MITCHEL (624276 (CT Bridgeport)).
+2026-06-12 15:54:20 [INFO] WORKER: Processing Minely Serrano (304224 (CT Bridgeport))
+2026-06-12 15:54:20 [INFO] STEP4: All paid-time adjustments complete for Minely Serrano (304224 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:21 [INFO] VERIFY: No new checkboxes needed for Minely Serrano (304224 (CT Bridgeport)).
+2026-06-12 15:54:21 [INFO] WORKER: Done with Minely Serrano (304224 (CT Bridgeport))
+2026-06-12 15:54:21 [INFO] STEP5: Moving to next employee after completing Minely Serrano (304224 (CT Bridgeport)).
+2026-06-12 15:54:22 [INFO] WORKER: Processing Mirdrene Beaubrun (622293 (CT Bridgeport))
+2026-06-12 15:54:23 [INFO] STEP4: All paid-time adjustments complete for Mirdrene Beaubrun (622293 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:23 [INFO] VERIFY: No new checkboxes needed for Mirdrene Beaubrun (622293 (CT Bridgeport)).
+2026-06-12 15:54:23 [INFO] WORKER: Done with Mirdrene Beaubrun (622293 (CT Bridgeport))
+2026-06-12 15:54:23 [INFO] STEP5: Moving to next employee after completing Mirdrene Beaubrun (622293 (CT Bridgeport)).
+2026-06-12 15:54:24 [INFO] WORKER: Processing Miriam Thomas (306334 (CT Bridgeport))
+2026-06-12 15:54:25 [INFO] STEP4: All paid-time adjustments complete for Miriam Thomas (306334 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:25 [INFO] VERIFY: No new checkboxes needed for Miriam Thomas (306334 (CT Bridgeport)).
+2026-06-12 15:54:25 [INFO] WORKER: Done with Miriam Thomas (306334 (CT Bridgeport))
+2026-06-12 15:54:25 [INFO] STEP5: Moving to next employee after completing Miriam Thomas (306334 (CT Bridgeport)).
+2026-06-12 15:54:27 [INFO] WORKER: Processing Miriam Miranda (306995 (CT Bridgeport))
+2026-06-12 15:54:27 [INFO] STEP4: All paid-time adjustments complete for Miriam Miranda (306995 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:28 [INFO] VERIFY: No new checkboxes needed for Miriam Miranda (306995 (CT Bridgeport)).
+2026-06-12 15:54:28 [INFO] WORKER: Done with Miriam Miranda (306995 (CT Bridgeport))
+2026-06-12 15:54:28 [INFO] STEP5: Moving to next employee after completing Miriam Miranda (306995 (CT Bridgeport)).
+2026-06-12 15:54:29 [INFO] WORKER: Processing Mirta Gonzalez (304222 (CT Bridgeport))
+2026-06-12 15:54:29 [INFO] STEP4: All paid-time adjustments complete for Mirta Gonzalez (304222 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:30 [INFO] VERIFY: No new checkboxes needed for Mirta Gonzalez (304222 (CT Bridgeport)).
+2026-06-12 15:54:30 [INFO] WORKER: Done with Mirta Gonzalez (304222 (CT Bridgeport))
+2026-06-12 15:54:30 [INFO] STEP5: Moving to next employee after completing Mirta Gonzalez (304222 (CT Bridgeport)).
+2026-06-12 15:54:32 [INFO] WORKER: Processing Mohamed Kungur (305348 (CT Bridgeport))
+2026-06-12 15:54:32 [INFO] STEP4: All paid-time adjustments complete for Mohamed Kungur (305348 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:33 [INFO] VERIFY: No new checkboxes needed for Mohamed Kungur (305348 (CT Bridgeport)).
+2026-06-12 15:54:33 [INFO] WORKER: Done with Mohamed Kungur (305348 (CT Bridgeport))
+2026-06-12 15:54:33 [INFO] STEP5: Moving to next employee after completing Mohamed Kungur (305348 (CT Bridgeport)).
+2026-06-12 15:54:35 [INFO] WORKER: Processing Monica Smalls (304167 (CT Bridgeport))
+2026-06-12 15:54:36 [INFO] STEP4: All paid-time adjustments complete for Monica Smalls (304167 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:36 [INFO] VERIFY: No new checkboxes needed for Monica Smalls (304167 (CT Bridgeport)).
+2026-06-12 15:54:36 [INFO] WORKER: Done with Monica Smalls (304167 (CT Bridgeport))
+2026-06-12 15:54:36 [INFO] STEP5: Moving to next employee after completing Monica Smalls (304167 (CT Bridgeport)).
+2026-06-12 15:54:38 [INFO] WORKER: Processing Mya Pettway (631002 (CT Bridgeport))
+2026-06-12 15:54:38 [INFO] STEP4: All paid-time adjustments complete for Mya Pettway (631002 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:39 [INFO] VERIFY: No new checkboxes needed for Mya Pettway (631002 (CT Bridgeport)).
+2026-06-12 15:54:39 [INFO] WORKER: Done with Mya Pettway (631002 (CT Bridgeport))
+2026-06-12 15:54:39 [INFO] STEP5: Moving to next employee after completing Mya Pettway (631002 (CT Bridgeport)).
+2026-06-12 15:54:40 [INFO] WORKER: Processing Nakia Anderson (631614 (CT Bridgeport))
+2026-06-12 15:54:40 [INFO] STEP4: All paid-time adjustments complete for Nakia Anderson (631614 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:41 [INFO] VERIFY: No new checkboxes needed for Nakia Anderson (631614 (CT Bridgeport)).
+2026-06-12 15:54:41 [INFO] WORKER: Done with Nakia Anderson (631614 (CT Bridgeport))
+2026-06-12 15:54:41 [INFO] STEP5: Moving to next employee after completing Nakia Anderson (631614 (CT Bridgeport)).
+2026-06-12 15:54:42 [INFO] WORKER: Processing Nalekah Chambers (632526 (CT Bridgeport))
+2026-06-12 15:54:43 [INFO] PRE_SCAN: Nalekah Chambers (632526 (CT Bridgeport)) — full employee block scanned: 2 unverified Spare CDL/Monitor task(s) resolved against 3 anchor schedule interval(s) (all classes, verified + unverified).
+2026-06-12 15:54:43 [INFO] SPARE_CONFLICT: Spare CDL for Nalekah Chambers (632526 (CT Bridgeport)) — schedule time 06:30 AM–09:15 AM conflicts with anchor task(s). Resolving against all 4 blocking interval(s).
+2026-06-12 15:54:43 [INFO] OVERLAP_RESOLUTION: Shifting interval to 09:15 AM - 12:00 PM to resolve overlap.
+2026-06-12 15:54:43 [INFO] OVERLAP_RESOLUTION: Shifting interval to 10:36 AM - 01:21 PM to resolve overlap.
+2026-06-12 15:54:43 [WARNING] SKIP: Spare CDL for Nalekah Chambers (632526 (CT Bridgeport)) — conflict shift places start (10:36 AM) past Schedule Hrs end (09:15 AM) — manual review needed.
+2026-06-12 15:54:43 [INFO] SPARE_CONFLICT: Spare CDL for Nalekah Chambers (632526 (CT Bridgeport)) — schedule time 01:15 PM–03:45 PM conflicts with anchor task(s). Resolving against all 4 blocking interval(s).
+2026-06-12 15:54:43 [INFO] OVERLAP_RESOLUTION: Shifting interval to 04:01 PM - 06:31 PM to resolve overlap.
+2026-06-12 15:54:43 [WARNING] SKIP: Spare CDL for Nalekah Chambers (632526 (CT Bridgeport)) — conflict shift places start (04:01 PM) past Schedule Hrs end (03:45 PM) — manual review needed.
+2026-06-12 15:54:43 [INFO] MANUAL_FLAG: Skipping verification for Nalekah Chambers (632526 (CT Bridgeport))
+2026-06-12 15:54:43 [WARNING] WORKER: Skipping verification for Nalekah Chambers (632526 (CT Bridgeport)) (manual review needed)
+2026-06-12 15:54:43 [INFO] STEP5: Moving to next employee after completing Nalekah Chambers (632526 (CT Bridgeport)).
+2026-06-12 15:54:44 [INFO] WORKER: Processing Nancy Schoolfield (304433 (CT Bridgeport))
+2026-06-12 15:54:45 [INFO] STEP4: All paid-time adjustments complete for Nancy Schoolfield (304433 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:45 [INFO] VERIFY: No new checkboxes needed for Nancy Schoolfield (304433 (CT Bridgeport)).
+2026-06-12 15:54:45 [INFO] WORKER: Done with Nancy Schoolfield (304433 (CT Bridgeport))
+2026-06-12 15:54:45 [INFO] STEP5: Moving to next employee after completing Nancy Schoolfield (304433 (CT Bridgeport)).
+2026-06-12 15:54:48 [INFO] WORKER: Processing Nekeshia Jean-baptiste (306638 (CT Bridgeport))
+2026-06-12 15:54:48 [INFO] STEP4: All paid-time adjustments complete for Nekeshia Jean-baptiste (306638 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:49 [INFO] VERIFY: No new checkboxes needed for Nekeshia Jean-baptiste (306638 (CT Bridgeport)).
+2026-06-12 15:54:49 [INFO] WORKER: Done with Nekeshia Jean-baptiste (306638 (CT Bridgeport))
+2026-06-12 15:54:49 [INFO] STEP5: Moving to next employee after completing Nekeshia Jean-baptiste (306638 (CT Bridgeport)).
+2026-06-12 15:54:50 [INFO] WORKER: Processing Nettie Jefferson (304231 (CT Bridgeport))
+2026-06-12 15:54:50 [INFO] STEP4: All paid-time adjustments complete for Nettie Jefferson (304231 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:51 [INFO] VERIFY: No new checkboxes needed for Nettie Jefferson (304231 (CT Bridgeport)).
+2026-06-12 15:54:51 [INFO] WORKER: Done with Nettie Jefferson (304231 (CT Bridgeport))
+2026-06-12 15:54:51 [INFO] STEP5: Moving to next employee after completing Nettie Jefferson (304231 (CT Bridgeport)).
+2026-06-12 15:54:52 [INFO] WORKER: Processing Neycha Figueroa (637560 (CT Bridgeport))
+2026-06-12 15:54:53 [INFO] STEP4: All paid-time adjustments complete for Neycha Figueroa (637560 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:53 [INFO] VERIFY: No new checkboxes needed for Neycha Figueroa (637560 (CT Bridgeport)).
+2026-06-12 15:54:53 [INFO] WORKER: Done with Neycha Figueroa (637560 (CT Bridgeport))
+2026-06-12 15:54:53 [INFO] STEP5: Moving to next employee after completing Neycha Figueroa (637560 (CT Bridgeport)).
+2026-06-12 15:54:54 [INFO] WORKER: Processing Nicolas Mcfee (612558 (CT Bridgeport))
+2026-06-12 15:54:55 [INFO] STEP4: All paid-time adjustments complete for Nicolas Mcfee (612558 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:55 [INFO] VERIFY: No new checkboxes needed for Nicolas Mcfee (612558 (CT Bridgeport)).
+2026-06-12 15:54:55 [INFO] WORKER: Done with Nicolas Mcfee (612558 (CT Bridgeport))
+2026-06-12 15:54:55 [INFO] STEP5: Moving to next employee after completing Nicolas Mcfee (612558 (CT Bridgeport)).
+2026-06-12 15:54:56 [INFO] WORKER: Processing Nivia Ayala (304191 (CT Bridgeport))
+2026-06-12 15:54:57 [INFO] STEP4: All paid-time adjustments complete for Nivia Ayala (304191 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:54:57 [INFO] VERIFY: No new checkboxes needed for Nivia Ayala (304191 (CT Bridgeport)).
+2026-06-12 15:54:57 [INFO] WORKER: Done with Nivia Ayala (304191 (CT Bridgeport))
+2026-06-12 15:54:57 [INFO] STEP5: Moving to next employee after completing Nivia Ayala (304191 (CT Bridgeport)).
+2026-06-12 15:55:01 [INFO] WORKER: Processing Norma Soto (305816 (CT Bridgeport))
+2026-06-12 15:55:02 [INFO] STEP4: All paid-time adjustments complete for Norma Soto (305816 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:02 [INFO] VERIFY: No new checkboxes needed for Norma Soto (305816 (CT Bridgeport)).
+2026-06-12 15:55:02 [INFO] WORKER: Done with Norma Soto (305816 (CT Bridgeport))
+2026-06-12 15:55:02 [INFO] STEP5: Moving to next employee after completing Norma Soto (305816 (CT Bridgeport)).
+2026-06-12 15:55:03 [INFO] WORKER: Processing Okimesoy Fernandez (306331 (CT Bridgeport))
+2026-06-12 15:55:04 [INFO] STEP4: All paid-time adjustments complete for Okimesoy Fernandez (306331 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:05 [INFO] VERIFY: No new checkboxes needed for Okimesoy Fernandez (306331 (CT Bridgeport)).
+2026-06-12 15:55:05 [INFO] WORKER: Done with Okimesoy Fernandez (306331 (CT Bridgeport))
+2026-06-12 15:55:05 [INFO] STEP5: Moving to next employee after completing Okimesoy Fernandez (306331 (CT Bridgeport)).
+2026-06-12 15:55:06 [INFO] WORKER: Processing Omayra Motta (304219 (CT Bridgeport))
+2026-06-12 15:55:06 [INFO] STEP4: All paid-time adjustments complete for Omayra Motta (304219 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:07 [INFO] VERIFY: No new checkboxes needed for Omayra Motta (304219 (CT Bridgeport)).
+2026-06-12 15:55:07 [INFO] WORKER: Done with Omayra Motta (304219 (CT Bridgeport))
+2026-06-12 15:55:07 [INFO] STEP5: Moving to next employee after completing Omayra Motta (304219 (CT Bridgeport)).
+2026-06-12 15:55:08 [INFO] WORKER: Processing Oneil Martinez (631449 (CT Bridgeport))
+2026-06-12 15:55:09 [INFO] STEP4: All paid-time adjustments complete for Oneil Martinez (631449 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:09 [INFO] VERIFY: No new checkboxes needed for Oneil Martinez (631449 (CT Bridgeport)).
+2026-06-12 15:55:09 [INFO] WORKER: Done with Oneil Martinez (631449 (CT Bridgeport))
+2026-06-12 15:55:09 [INFO] STEP5: Moving to next employee after completing Oneil Martinez (631449 (CT Bridgeport)).
+2026-06-12 15:55:10 [INFO] WORKER: Processing Orlando Escalera (304271 (CT Bridgeport))
+2026-06-12 15:55:11 [INFO] STEP4: All paid-time adjustments complete for Orlando Escalera (304271 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:12 [INFO] VERIFY: No new checkboxes needed for Orlando Escalera (304271 (CT Bridgeport)).
+2026-06-12 15:55:12 [INFO] WORKER: Done with Orlando Escalera (304271 (CT Bridgeport))
+2026-06-12 15:55:12 [INFO] STEP5: Moving to next employee after completing Orlando Escalera (304271 (CT Bridgeport)).
+2026-06-12 15:55:13 [INFO] WORKER: Processing Orlando Rivera (304935 (CT Bridgeport))
+2026-06-12 15:55:14 [INFO] STEP4: All paid-time adjustments complete for Orlando Rivera (304935 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:14 [INFO] VERIFY: No new checkboxes needed for Orlando Rivera (304935 (CT Bridgeport)).
+2026-06-12 15:55:14 [INFO] WORKER: Done with Orlando Rivera (304935 (CT Bridgeport))
+2026-06-12 15:55:14 [INFO] STEP5: Moving to next employee after completing Orlando Rivera (304935 (CT Bridgeport)).
+2026-06-12 15:55:16 [INFO] WORKER: Processing Otilia Gomez (304265 (CT Bridgeport))
+2026-06-12 15:55:16 [INFO] STEP4: All paid-time adjustments complete for Otilia Gomez (304265 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:17 [INFO] VERIFY: No new checkboxes needed for Otilia Gomez (304265 (CT Bridgeport)).
+2026-06-12 15:55:17 [INFO] WORKER: Done with Otilia Gomez (304265 (CT Bridgeport))
+2026-06-12 15:55:17 [INFO] STEP5: Moving to next employee after completing Otilia Gomez (304265 (CT Bridgeport)).
+2026-06-12 15:55:18 [INFO] WORKER: Processing Paola Lopez Menaez (304232 (CT Bridgeport))
+2026-06-12 15:55:19 [INFO] STEP4: All paid-time adjustments complete for Paola Lopez Menaez (304232 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:19 [INFO] VERIFY: No new checkboxes needed for Paola Lopez Menaez (304232 (CT Bridgeport)).
+2026-06-12 15:55:19 [INFO] WORKER: Done with Paola Lopez Menaez (304232 (CT Bridgeport))
+2026-06-12 15:55:19 [INFO] STEP5: Moving to next employee after completing Paola Lopez Menaez (304232 (CT Bridgeport)).
+2026-06-12 15:55:20 [INFO] WORKER: Processing Paris Moore (629833 (CT Bridgeport))
+2026-06-12 15:55:21 [INFO] STEP4: All paid-time adjustments complete for Paris Moore (629833 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:21 [INFO] VERIFY: No new checkboxes needed for Paris Moore (629833 (CT Bridgeport)).
+2026-06-12 15:55:21 [INFO] WORKER: Done with Paris Moore (629833 (CT Bridgeport))
+2026-06-12 15:55:21 [INFO] STEP5: Moving to next employee after completing Paris Moore (629833 (CT Bridgeport)).
+2026-06-12 15:55:22 [INFO] WORKER: Processing Patricia Ann Robinson (307388 (CT Bridgeport))
+2026-06-12 15:55:23 [INFO] STEP4: All paid-time adjustments complete for Patricia Ann Robinson (307388 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:24 [INFO] VERIFY: No new checkboxes needed for Patricia Ann Robinson (307388 (CT Bridgeport)).
+2026-06-12 15:55:24 [INFO] WORKER: Done with Patricia Ann Robinson (307388 (CT Bridgeport))
+2026-06-12 15:55:24 [INFO] STEP5: Moving to next employee after completing Patricia Ann Robinson (307388 (CT Bridgeport)).
+2026-06-12 15:55:26 [INFO] WORKER: Processing Presiosa Miller (307036 (CT Bridgeport))
+2026-06-12 15:55:27 [INFO] STEP4: All paid-time adjustments complete for Presiosa Miller (307036 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:27 [INFO] VERIFY: No new checkboxes needed for Presiosa Miller (307036 (CT Bridgeport)).
+2026-06-12 15:55:27 [INFO] WORKER: Done with Presiosa Miller (307036 (CT Bridgeport))
+2026-06-12 15:55:27 [INFO] STEP5: Moving to next employee after completing Presiosa Miller (307036 (CT Bridgeport)).
+2026-06-12 15:55:28 [INFO] WORKER: Processing Quaneice Shanks (304284 (CT Bridgeport))
+2026-06-12 15:55:29 [INFO] STEP4: All paid-time adjustments complete for Quaneice Shanks (304284 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:29 [INFO] VERIFY: No new checkboxes needed for Quaneice Shanks (304284 (CT Bridgeport)).
+2026-06-12 15:55:29 [INFO] WORKER: Done with Quaneice Shanks (304284 (CT Bridgeport))
+2026-06-12 15:55:29 [INFO] STEP5: Moving to next employee after completing Quaneice Shanks (304284 (CT Bridgeport)).
+2026-06-12 15:55:30 [INFO] WORKER: Processing Quanshae Rodgers (305010 (CT Bridgeport))
+2026-06-12 15:55:31 [INFO] STEP4: All paid-time adjustments complete for Quanshae Rodgers (305010 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:32 [INFO] VERIFY: No new checkboxes needed for Quanshae Rodgers (305010 (CT Bridgeport)).
+2026-06-12 15:55:32 [INFO] WORKER: Done with Quanshae Rodgers (305010 (CT Bridgeport))
+2026-06-12 15:55:32 [INFO] STEP5: Moving to next employee after completing Quanshae Rodgers (305010 (CT Bridgeport)).
+2026-06-12 15:55:33 [INFO] WORKER: Processing Rachid El hajji (625895 (CT Bridgeport))
+2026-06-12 15:55:34 [INFO] STEP4: All paid-time adjustments complete for Rachid El hajji (625895 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:34 [INFO] VERIFY: No new checkboxes needed for Rachid El hajji (625895 (CT Bridgeport)).
+2026-06-12 15:55:34 [INFO] WORKER: Done with Rachid El hajji (625895 (CT Bridgeport))
+2026-06-12 15:55:34 [INFO] STEP5: Moving to next employee after completing Rachid El hajji (625895 (CT Bridgeport)).
+2026-06-12 15:55:36 [INFO] WORKER: Processing Raffellina Empty (305273 (CT Bridgeport))
+2026-06-12 15:55:37 [INFO] STEP4: All paid-time adjustments complete for Raffellina Empty (305273 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:37 [INFO] VERIFY: No new checkboxes needed for Raffellina Empty (305273 (CT Bridgeport)).
+2026-06-12 15:55:37 [INFO] WORKER: Done with Raffellina Empty (305273 (CT Bridgeport))
+2026-06-12 15:55:37 [INFO] STEP5: Moving to next employee after completing Raffellina Empty (305273 (CT Bridgeport)).
+2026-06-12 15:55:39 [INFO] WORKER: Processing Ramon Rodriguez (304174 (CT Bridgeport))
+2026-06-12 15:55:39 [INFO] STEP4: All paid-time adjustments complete for Ramon Rodriguez (304174 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:40 [INFO] VERIFY: No new checkboxes needed for Ramon Rodriguez (304174 (CT Bridgeport)).
+2026-06-12 15:55:40 [INFO] WORKER: Done with Ramon Rodriguez (304174 (CT Bridgeport))
+2026-06-12 15:55:40 [INFO] STEP5: Moving to next employee after completing Ramon Rodriguez (304174 (CT Bridgeport)).
+2026-06-12 15:55:41 [INFO] WORKER: Processing Raquel Rivera (304190 (CT Bridgeport))
+2026-06-12 15:55:41 [INFO] STEP4: All paid-time adjustments complete for Raquel Rivera (304190 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:42 [INFO] VERIFY: No new checkboxes needed for Raquel Rivera (304190 (CT Bridgeport)).
+2026-06-12 15:55:42 [INFO] WORKER: Done with Raquel Rivera (304190 (CT Bridgeport))
+2026-06-12 15:55:42 [INFO] STEP5: Moving to next employee after completing Raquel Rivera (304190 (CT Bridgeport)).
+2026-06-12 15:55:43 [INFO] WORKER: Processing Reyna Olivares De Mendoza (304171 (CT Bridgeport))
+2026-06-12 15:55:44 [INFO] STEP4: All paid-time adjustments complete for Reyna Olivares De Mendoza (304171 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:44 [INFO] VERIFY: No new checkboxes needed for Reyna Olivares De Mendoza (304171 (CT Bridgeport)).
+2026-06-12 15:55:44 [INFO] WORKER: Done with Reyna Olivares De Mendoza (304171 (CT Bridgeport))
+2026-06-12 15:55:44 [INFO] STEP5: Moving to next employee after completing Reyna Olivares De Mendoza (304171 (CT Bridgeport)).
+2026-06-12 15:55:45 [INFO] WORKER: Processing Richard Isidor (304197 (CT Bridgeport))
+2026-06-12 15:55:46 [INFO] STEP4: All paid-time adjustments complete for Richard Isidor (304197 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:46 [INFO] VERIFY: No new checkboxes needed for Richard Isidor (304197 (CT Bridgeport)).
+2026-06-12 15:55:46 [INFO] WORKER: Done with Richard Isidor (304197 (CT Bridgeport))
+2026-06-12 15:55:46 [INFO] STEP5: Moving to next employee after completing Richard Isidor (304197 (CT Bridgeport)).
+2026-06-12 15:55:48 [INFO] WORKER: Processing Ricky Nelson Laurencio Reyes (628390 (CT Bridgeport))
+2026-06-12 15:55:48 [INFO] STEP4: All paid-time adjustments complete for Ricky Nelson Laurencio Reyes (628390 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:48 [INFO] VERIFY: No new checkboxes needed for Ricky Nelson Laurencio Reyes (628390 (CT Bridgeport)).
+2026-06-12 15:55:48 [INFO] WORKER: Done with Ricky Nelson Laurencio Reyes (628390 (CT Bridgeport))
+2026-06-12 15:55:48 [INFO] STEP5: Moving to next employee after completing Ricky Nelson Laurencio Reyes (628390 (CT Bridgeport)).
+2026-06-12 15:55:51 [INFO] WORKER: Processing Ronell Green (304784 (CT Bridgeport))
+2026-06-12 15:55:51 [INFO] STEP4: All paid-time adjustments complete for Ronell Green (304784 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:52 [INFO] VERIFY: No new checkboxes needed for Ronell Green (304784 (CT Bridgeport)).
+2026-06-12 15:55:52 [INFO] WORKER: Done with Ronell Green (304784 (CT Bridgeport))
+2026-06-12 15:55:52 [INFO] STEP5: Moving to next employee after completing Ronell Green (304784 (CT Bridgeport)).
+2026-06-12 15:55:53 [INFO] WORKER: Processing Rosa Olivares (304371 (CT Bridgeport))
+2026-06-12 15:55:54 [INFO] STEP4: All paid-time adjustments complete for Rosa Olivares (304371 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:54 [INFO] VERIFY: No new checkboxes needed for Rosa Olivares (304371 (CT Bridgeport)).
+2026-06-12 15:55:54 [INFO] WORKER: Done with Rosa Olivares (304371 (CT Bridgeport))
+2026-06-12 15:55:54 [INFO] STEP5: Moving to next employee after completing Rosa Olivares (304371 (CT Bridgeport)).
+2026-06-12 15:55:55 [INFO] WORKER: Processing Roshely Ramirez (637500 (CT Bridgeport))
+2026-06-12 15:55:56 [INFO] STEP4: All paid-time adjustments complete for Roshely Ramirez (637500 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:56 [INFO] VERIFY: No new checkboxes needed for Roshely Ramirez (637500 (CT Bridgeport)).
+2026-06-12 15:55:56 [INFO] WORKER: Done with Roshely Ramirez (637500 (CT Bridgeport))
+2026-06-12 15:55:56 [INFO] STEP5: Moving to next employee after completing Roshely Ramirez (637500 (CT Bridgeport)).
+2026-06-12 15:55:57 [INFO] WORKER: Processing Rowena Green (305506 (CT Bridgeport))
+2026-06-12 15:55:58 [INFO] STEP4: All paid-time adjustments complete for Rowena Green (305506 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:55:58 [INFO] VERIFY: No new checkboxes needed for Rowena Green (305506 (CT Bridgeport)).
+2026-06-12 15:55:58 [INFO] WORKER: Done with Rowena Green (305506 (CT Bridgeport))
+2026-06-12 15:55:58 [INFO] STEP5: Moving to next employee after completing Rowena Green (305506 (CT Bridgeport)).
+2026-06-12 15:56:00 [INFO] WORKER: Processing Roy Allen Jr (304252 (CT Bridgeport))
+2026-06-12 15:56:00 [INFO] STEP4: All paid-time adjustments complete for Roy Allen Jr (304252 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:01 [INFO] VERIFY: No new checkboxes needed for Roy Allen Jr (304252 (CT Bridgeport)).
+2026-06-12 15:56:01 [INFO] WORKER: Done with Roy Allen Jr (304252 (CT Bridgeport))
+2026-06-12 15:56:01 [INFO] STEP5: Moving to next employee after completing Roy Allen Jr (304252 (CT Bridgeport)).
+2026-06-12 15:56:02 [INFO] WORKER: Processing Ruben Serrano Jr (304463 (CT Bridgeport))
+2026-06-12 15:56:02 [INFO] STEP4: All paid-time adjustments complete for Ruben Serrano Jr (304463 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:03 [INFO] VERIFY: No new checkboxes needed for Ruben Serrano Jr (304463 (CT Bridgeport)).
+2026-06-12 15:56:03 [INFO] WORKER: Done with Ruben Serrano Jr (304463 (CT Bridgeport))
+2026-06-12 15:56:03 [INFO] STEP5: Moving to next employee after completing Ruben Serrano Jr (304463 (CT Bridgeport)).
+2026-06-12 15:56:04 [INFO] WORKER: Processing Ruby Velez (304480 (CT Bridgeport))
+2026-06-12 15:56:04 [INFO] STEP4: All paid-time adjustments complete for Ruby Velez (304480 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:05 [INFO] VERIFY: No new checkboxes needed for Ruby Velez (304480 (CT Bridgeport)).
+2026-06-12 15:56:05 [INFO] WORKER: Done with Ruby Velez (304480 (CT Bridgeport))
+2026-06-12 15:56:05 [INFO] STEP5: Moving to next employee after completing Ruby Velez (304480 (CT Bridgeport)).
+2026-06-12 15:56:06 [INFO] WORKER: Processing Ruperto Montanez Claudio (304308 (CT Bridgeport))
+2026-06-12 15:56:07 [INFO] STEP4: All paid-time adjustments complete for Ruperto Montanez Claudio (304308 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:07 [INFO] VERIFY: No new checkboxes needed for Ruperto Montanez Claudio (304308 (CT Bridgeport)).
+2026-06-12 15:56:07 [INFO] WORKER: Done with Ruperto Montanez Claudio (304308 (CT Bridgeport))
+2026-06-12 15:56:07 [INFO] STEP5: Moving to next employee after completing Ruperto Montanez Claudio (304308 (CT Bridgeport)).
+2026-06-12 15:56:08 [INFO] WORKER: Processing Ruth Chisholm (304363 (CT Bridgeport))
+2026-06-12 15:56:09 [INFO] STEP4: All paid-time adjustments complete for Ruth Chisholm (304363 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:09 [INFO] VERIFY: No new checkboxes needed for Ruth Chisholm (304363 (CT Bridgeport)).
+2026-06-12 15:56:09 [INFO] WORKER: Done with Ruth Chisholm (304363 (CT Bridgeport))
+2026-06-12 15:56:09 [INFO] STEP5: Moving to next employee after completing Ruth Chisholm (304363 (CT Bridgeport)).
+2026-06-12 15:56:10 [INFO] WORKER: Processing Samuel Sanchez (304183 (CT Bridgeport))
+2026-06-12 15:56:11 [INFO] STEP4: All paid-time adjustments complete for Samuel Sanchez (304183 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:12 [INFO] VERIFY: No new checkboxes needed for Samuel Sanchez (304183 (CT Bridgeport)).
+2026-06-12 15:56:12 [INFO] WORKER: Done with Samuel Sanchez (304183 (CT Bridgeport))
+2026-06-12 15:56:12 [INFO] STEP5: Moving to next employee after completing Samuel Sanchez (304183 (CT Bridgeport)).
+2026-06-12 15:56:13 [INFO] WORKER: Processing Sandra Garcia (304411 (CT Bridgeport))
+2026-06-12 15:56:13 [INFO] STEP4: All paid-time adjustments complete for Sandra Garcia (304411 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:14 [INFO] VERIFY: No new checkboxes needed for Sandra Garcia (304411 (CT Bridgeport)).
+2026-06-12 15:56:14 [INFO] WORKER: Done with Sandra Garcia (304411 (CT Bridgeport))
+2026-06-12 15:56:14 [INFO] STEP5: Moving to next employee after completing Sandra Garcia (304411 (CT Bridgeport)).
+2026-06-12 15:56:15 [INFO] WORKER: Processing Scarlet Monteiro (305647 (CT Bridgeport))
+2026-06-12 15:56:16 [INFO] STEP4: All paid-time adjustments complete for Scarlet Monteiro (305647 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:17 [INFO] VERIFY: No new checkboxes needed for Scarlet Monteiro (305647 (CT Bridgeport)).
+2026-06-12 15:56:17 [INFO] WORKER: Done with Scarlet Monteiro (305647 (CT Bridgeport))
+2026-06-12 15:56:17 [INFO] STEP5: Moving to next employee after completing Scarlet Monteiro (305647 (CT Bridgeport)).
+2026-06-12 15:56:18 [INFO] WORKER: Processing Serge Joseph (305006 (CT Bridgeport))
+2026-06-12 15:56:18 [INFO] STEP4: All paid-time adjustments complete for Serge Joseph (305006 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:19 [INFO] VERIFY: No new checkboxes needed for Serge Joseph (305006 (CT Bridgeport)).
+2026-06-12 15:56:19 [INFO] WORKER: Done with Serge Joseph (305006 (CT Bridgeport))
+2026-06-12 15:56:19 [INFO] STEP5: Moving to next employee after completing Serge Joseph (305006 (CT Bridgeport)).
+2026-06-12 15:56:22 [INFO] WORKER: Processing Shadae Daley-Bennett (626900 (CT Bridgeport))
+2026-06-12 15:56:22 [INFO] STEP4: All paid-time adjustments complete for Shadae Daley-Bennett (626900 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:23 [INFO] VERIFY: No new checkboxes needed for Shadae Daley-Bennett (626900 (CT Bridgeport)).
+2026-06-12 15:56:23 [INFO] WORKER: Done with Shadae Daley-Bennett (626900 (CT Bridgeport))
+2026-06-12 15:56:23 [INFO] STEP5: Moving to next employee after completing Shadae Daley-Bennett (626900 (CT Bridgeport)).
+2026-06-12 15:56:24 [INFO] WORKER: Processing Shakoya McBride (617374 (CT Bridgeport))
+2026-06-12 15:56:25 [INFO] STEP4: All paid-time adjustments complete for Shakoya McBride (617374 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:25 [INFO] VERIFY: No new checkboxes needed for Shakoya McBride (617374 (CT Bridgeport)).
+2026-06-12 15:56:25 [INFO] WORKER: Done with Shakoya McBride (617374 (CT Bridgeport))
+2026-06-12 15:56:25 [INFO] STEP5: Moving to next employee after completing Shakoya McBride (617374 (CT Bridgeport)).
+2026-06-12 15:56:26 [INFO] WORKER: Processing Shanika Williams (634751 (CT Bridgeport))
+2026-06-12 15:56:27 [INFO] STEP4: All paid-time adjustments complete for Shanika Williams (634751 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:27 [INFO] VERIFY: No new checkboxes needed for Shanika Williams (634751 (CT Bridgeport)).
+2026-06-12 15:56:27 [INFO] WORKER: Done with Shanika Williams (634751 (CT Bridgeport))
+2026-06-12 15:56:27 [INFO] STEP5: Moving to next employee after completing Shanika Williams (634751 (CT Bridgeport)).
+2026-06-12 15:56:29 [INFO] WORKER: Processing Shaquinthia Gilbert (304168 (CT Bridgeport))
+2026-06-12 15:56:29 [INFO] STEP4: All paid-time adjustments complete for Shaquinthia Gilbert (304168 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:30 [INFO] VERIFY: No new checkboxes needed for Shaquinthia Gilbert (304168 (CT Bridgeport)).
+2026-06-12 15:56:30 [INFO] WORKER: Done with Shaquinthia Gilbert (304168 (CT Bridgeport))
+2026-06-12 15:56:30 [INFO] STEP5: Moving to next employee after completing Shaquinthia Gilbert (304168 (CT Bridgeport)).
+2026-06-12 15:56:31 [INFO] WORKER: Processing Sharon Conklin (307197 (CT Bridgeport))
+2026-06-12 15:56:32 [INFO] STEP4: All paid-time adjustments complete for Sharon Conklin (307197 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:32 [INFO] VERIFY: No new checkboxes needed for Sharon Conklin (307197 (CT Bridgeport)).
+2026-06-12 15:56:32 [INFO] WORKER: Done with Sharon Conklin (307197 (CT Bridgeport))
+2026-06-12 15:56:32 [INFO] STEP5: Moving to next employee after completing Sharon Conklin (307197 (CT Bridgeport)).
+2026-06-12 15:56:34 [INFO] WORKER: Processing Sheena Pointer (306980 (CT Bridgeport))
+2026-06-12 15:56:34 [INFO] STEP4: All paid-time adjustments complete for Sheena Pointer (306980 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:34 [INFO] VERIFY: No new checkboxes needed for Sheena Pointer (306980 (CT Bridgeport)).
+2026-06-12 15:56:34 [INFO] WORKER: Done with Sheena Pointer (306980 (CT Bridgeport))
+2026-06-12 15:56:34 [INFO] STEP5: Moving to next employee after completing Sheena Pointer (306980 (CT Bridgeport)).
+2026-06-12 15:56:36 [INFO] WORKER: Processing Shelly Jones (630998 (CT Bridgeport))
+2026-06-12 15:56:36 [INFO] STEP4: All paid-time adjustments complete for Shelly Jones (630998 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:37 [INFO] VERIFY: No new checkboxes needed for Shelly Jones (630998 (CT Bridgeport)).
+2026-06-12 15:56:37 [INFO] WORKER: Done with Shelly Jones (630998 (CT Bridgeport))
+2026-06-12 15:56:37 [INFO] STEP5: Moving to next employee after completing Shelly Jones (630998 (CT Bridgeport)).
+2026-06-12 15:56:38 [INFO] WORKER: Processing Shericka Jackson Allen (304214 (CT Bridgeport))
+2026-06-12 15:56:39 [INFO] STEP4: All paid-time adjustments complete for Shericka Jackson Allen (304214 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:39 [INFO] VERIFY: No new checkboxes needed for Shericka Jackson Allen (304214 (CT Bridgeport)).
+2026-06-12 15:56:39 [INFO] WORKER: Done with Shericka Jackson Allen (304214 (CT Bridgeport))
+2026-06-12 15:56:39 [INFO] STEP5: Moving to next employee after completing Shericka Jackson Allen (304214 (CT Bridgeport)).
+2026-06-12 15:56:40 [INFO] WORKER: Processing Shirley Kelly (304283 (CT Bridgeport))
+2026-06-12 15:56:41 [INFO] STEP4: All paid-time adjustments complete for Shirley Kelly (304283 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:41 [INFO] VERIFY: No new checkboxes needed for Shirley Kelly (304283 (CT Bridgeport)).
+2026-06-12 15:56:41 [INFO] WORKER: Done with Shirley Kelly (304283 (CT Bridgeport))
+2026-06-12 15:56:41 [INFO] STEP5: Moving to next employee after completing Shirley Kelly (304283 (CT Bridgeport)).
+2026-06-12 15:56:43 [INFO] WORKER: Processing Steven Camacho (632668 (CT Bridgeport))
+2026-06-12 15:56:43 [INFO] STEP4: All paid-time adjustments complete for Steven Camacho (632668 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:44 [INFO] VERIFY: No new checkboxes needed for Steven Camacho (632668 (CT Bridgeport)).
+2026-06-12 15:56:44 [INFO] WORKER: Done with Steven Camacho (632668 (CT Bridgeport))
+2026-06-12 15:56:44 [INFO] STEP5: Moving to next employee after completing Steven Camacho (632668 (CT Bridgeport)).
+2026-06-12 15:56:45 [INFO] WORKER: Processing Sulma Jara (622502 (CT Bridgeport))
+2026-06-12 15:56:45 [INFO] STEP4: All paid-time adjustments complete for Sulma Jara (622502 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:46 [INFO] VERIFY: No new checkboxes needed for Sulma Jara (622502 (CT Bridgeport)).
+2026-06-12 15:56:46 [INFO] WORKER: Done with Sulma Jara (622502 (CT Bridgeport))
+2026-06-12 15:56:46 [INFO] STEP5: Moving to next employee after completing Sulma Jara (622502 (CT Bridgeport)).
+2026-06-12 15:56:47 [INFO] WORKER: Processing Susan Christy (632683 (CT Bridgeport))
+2026-06-12 15:56:47 [INFO] STEP4: All paid-time adjustments complete for Susan Christy (632683 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:48 [INFO] VERIFY: No new checkboxes needed for Susan Christy (632683 (CT Bridgeport)).
+2026-06-12 15:56:48 [INFO] WORKER: Done with Susan Christy (632683 (CT Bridgeport))
+2026-06-12 15:56:48 [INFO] STEP5: Moving to next employee after completing Susan Christy (632683 (CT Bridgeport)).
+2026-06-12 15:56:49 [INFO] WORKER: Processing Syndia Andujar Nieves (306983 (CT Bridgeport))
+2026-06-12 15:56:50 [INFO] STEP4: All paid-time adjustments complete for Syndia Andujar Nieves (306983 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:50 [INFO] VERIFY: No new checkboxes needed for Syndia Andujar Nieves (306983 (CT Bridgeport)).
+2026-06-12 15:56:50 [INFO] WORKER: Done with Syndia Andujar Nieves (306983 (CT Bridgeport))
+2026-06-12 15:56:50 [INFO] STEP5: Moving to next employee after completing Syndia Andujar Nieves (306983 (CT Bridgeport)).
+2026-06-12 15:56:51 [INFO] WORKER: Processing Takia Hunt (637487 (CT Bridgeport))
+2026-06-12 15:56:52 [INFO] STEP4: All paid-time adjustments complete for Takia Hunt (637487 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:52 [INFO] VERIFY: No new checkboxes needed for Takia Hunt (637487 (CT Bridgeport)).
+2026-06-12 15:56:52 [INFO] WORKER: Done with Takia Hunt (637487 (CT Bridgeport))
+2026-06-12 15:56:52 [INFO] STEP5: Moving to next employee after completing Takia Hunt (637487 (CT Bridgeport)).
+2026-06-12 15:56:53 [INFO] WORKER: Processing Tami Crespo (304258 (CT Bridgeport))
+2026-06-12 15:56:54 [INFO] STEP4: All paid-time adjustments complete for Tami Crespo (304258 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:55 [INFO] VERIFY: No new checkboxes needed for Tami Crespo (304258 (CT Bridgeport)).
+2026-06-12 15:56:55 [INFO] WORKER: Done with Tami Crespo (304258 (CT Bridgeport))
+2026-06-12 15:56:55 [INFO] STEP5: Moving to next employee after completing Tami Crespo (304258 (CT Bridgeport)).
+2026-06-12 15:56:57 [INFO] WORKER: Processing Tangie Thomas (306600 (CT Bridgeport))
+2026-06-12 15:56:58 [INFO] STEP4: All paid-time adjustments complete for Tangie Thomas (306600 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:56:59 [INFO] VERIFY: No new checkboxes needed for Tangie Thomas (306600 (CT Bridgeport)).
+2026-06-12 15:56:59 [INFO] WORKER: Done with Tangie Thomas (306600 (CT Bridgeport))
+2026-06-12 15:56:59 [INFO] STEP5: Moving to next employee after completing Tangie Thomas (306600 (CT Bridgeport)).
+2026-06-12 15:57:00 [INFO] WORKER: Processing Tanya Norris (305376 (CT Bridgeport))
+2026-06-12 15:57:00 [INFO] STEP4: All paid-time adjustments complete for Tanya Norris (305376 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:01 [INFO] VERIFY: No new checkboxes needed for Tanya Norris (305376 (CT Bridgeport)).
+2026-06-12 15:57:01 [INFO] WORKER: Done with Tanya Norris (305376 (CT Bridgeport))
+2026-06-12 15:57:01 [INFO] STEP5: Moving to next employee after completing Tanya Norris (305376 (CT Bridgeport)).
+2026-06-12 15:57:02 [INFO] WORKER: Processing Teikel Mitchell (305587 (CT Bridgeport))
+2026-06-12 15:57:03 [INFO] STEP4: All paid-time adjustments complete for Teikel Mitchell (305587 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:03 [INFO] VERIFY: No new checkboxes needed for Teikel Mitchell (305587 (CT Bridgeport)).
+2026-06-12 15:57:03 [INFO] WORKER: Done with Teikel Mitchell (305587 (CT Bridgeport))
+2026-06-12 15:57:03 [INFO] STEP5: Moving to next employee after completing Teikel Mitchell (305587 (CT Bridgeport)).
+2026-06-12 15:57:05 [INFO] WORKER: Processing Terrell A Fleming (307358 (CT Bridgeport))
+2026-06-12 15:57:06 [INFO] STEP4: All paid-time adjustments complete for Terrell A Fleming (307358 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:06 [INFO] VERIFY: No new checkboxes needed for Terrell A Fleming (307358 (CT Bridgeport)).
+2026-06-12 15:57:06 [INFO] WORKER: Done with Terrell A Fleming (307358 (CT Bridgeport))
+2026-06-12 15:57:06 [INFO] STEP5: Moving to next employee after completing Terrell A Fleming (307358 (CT Bridgeport)).
+2026-06-12 15:57:08 [INFO] WORKER: Processing Terry Thompson (305469 (CT Bridgeport))
+2026-06-12 15:57:08 [INFO] STEP4: All paid-time adjustments complete for Terry Thompson (305469 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:09 [INFO] VERIFY: No new checkboxes needed for Terry Thompson (305469 (CT Bridgeport)).
+2026-06-12 15:57:09 [INFO] WORKER: Done with Terry Thompson (305469 (CT Bridgeport))
+2026-06-12 15:57:09 [INFO] STEP5: Moving to next employee after completing Terry Thompson (305469 (CT Bridgeport)).
+2026-06-12 15:57:11 [INFO] WORKER: Processing Timothy Walls (305011 (CT Bridgeport))
+2026-06-12 15:57:12 [INFO] STEP4: All paid-time adjustments complete for Timothy Walls (305011 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:13 [INFO] VERIFY: No new checkboxes needed for Timothy Walls (305011 (CT Bridgeport)).
+2026-06-12 15:57:13 [INFO] WORKER: Done with Timothy Walls (305011 (CT Bridgeport))
+2026-06-12 15:57:13 [INFO] STEP5: Moving to next employee after completing Timothy Walls (305011 (CT Bridgeport)).
+2026-06-12 15:57:14 [INFO] WORKER: Processing Tirza Brodie (304216 (CT Bridgeport))
+2026-06-12 15:57:14 [INFO] STEP4: All paid-time adjustments complete for Tirza Brodie (304216 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:15 [INFO] VERIFY: No new checkboxes needed for Tirza Brodie (304216 (CT Bridgeport)).
+2026-06-12 15:57:15 [INFO] WORKER: Done with Tirza Brodie (304216 (CT Bridgeport))
+2026-06-12 15:57:15 [INFO] STEP5: Moving to next employee after completing Tirza Brodie (304216 (CT Bridgeport)).
+2026-06-12 15:57:16 [INFO] WORKER: Processing Tommy Reddick (304315 (CT Bridgeport))
+2026-06-12 15:57:17 [INFO] STEP4: All paid-time adjustments complete for Tommy Reddick (304315 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:17 [INFO] VERIFY: Skipping 'Bridge Charter 115992' for Tommy Reddick (304315 (CT Bridgeport)) — excluded from verification.
+2026-06-12 15:57:18 [INFO] VERIFY: Skipping 'Bridge Charter Bridge Charter - 66529267' for Tommy Reddick (304315 (CT Bridgeport)) — excluded from verification.
+2026-06-12 15:57:18 [INFO] VERIFY: No new checkboxes needed for Tommy Reddick (304315 (CT Bridgeport)).
+2026-06-12 15:57:18 [INFO] WORKER: Done with Tommy Reddick (304315 (CT Bridgeport))
+2026-06-12 15:57:18 [INFO] STEP5: Moving to next employee after completing Tommy Reddick (304315 (CT Bridgeport)).
+2026-06-12 15:57:20 [INFO] WORKER: Processing Toshiba Cabral (304237 (CT Bridgeport))
+2026-06-12 15:57:21 [INFO] STEP4: All paid-time adjustments complete for Toshiba Cabral (304237 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:21 [INFO] VERIFY: No new checkboxes needed for Toshiba Cabral (304237 (CT Bridgeport)).
+2026-06-12 15:57:21 [INFO] WORKER: Done with Toshiba Cabral (304237 (CT Bridgeport))
+2026-06-12 15:57:21 [INFO] STEP5: Moving to next employee after completing Toshiba Cabral (304237 (CT Bridgeport)).
+2026-06-12 15:57:22 [INFO] WORKER: Processing Trudy Powell-McGee (617253 (CT Bridgeport))
+2026-06-12 15:57:23 [INFO] STEP4: All paid-time adjustments complete for Trudy Powell-McGee (617253 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:23 [INFO] VERIFY: No new checkboxes needed for Trudy Powell-McGee (617253 (CT Bridgeport)).
+2026-06-12 15:57:23 [INFO] WORKER: Done with Trudy Powell-McGee (617253 (CT Bridgeport))
+2026-06-12 15:57:23 [INFO] STEP5: Moving to next employee after completing Trudy Powell-McGee (617253 (CT Bridgeport)).
+2026-06-12 15:57:24 [INFO] WORKER: Processing Tyrell Briggs (305060 (CT Bridgeport))
+2026-06-12 15:57:25 [INFO] STEP4: All paid-time adjustments complete for Tyrell Briggs (305060 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:26 [INFO] VERIFY: No new checkboxes needed for Tyrell Briggs (305060 (CT Bridgeport)).
+2026-06-12 15:57:26 [INFO] WORKER: Done with Tyrell Briggs (305060 (CT Bridgeport))
+2026-06-12 15:57:26 [INFO] STEP5: Moving to next employee after completing Tyrell Briggs (305060 (CT Bridgeport)).
+2026-06-12 15:57:27 [INFO] WORKER: Processing Tyrone Hennegan (304175 (CT Bridgeport))
+2026-06-12 15:57:27 [INFO] STEP4: All paid-time adjustments complete for Tyrone Hennegan (304175 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:28 [INFO] VERIFY: No new checkboxes needed for Tyrone Hennegan (304175 (CT Bridgeport)).
+2026-06-12 15:57:28 [INFO] WORKER: Done with Tyrone Hennegan (304175 (CT Bridgeport))
+2026-06-12 15:57:28 [INFO] STEP5: Moving to next employee after completing Tyrone Hennegan (304175 (CT Bridgeport)).
+2026-06-12 15:57:30 [INFO] WORKER: Processing Tyronne Ruiz (632641 (CT Bridgeport))
+2026-06-12 15:57:30 [INFO] STEP4: All paid-time adjustments complete for Tyronne Ruiz (632641 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:30 [INFO] VERIFY: No new checkboxes needed for Tyronne Ruiz (632641 (CT Bridgeport)).
+2026-06-12 15:57:30 [INFO] WORKER: Done with Tyronne Ruiz (632641 (CT Bridgeport))
+2026-06-12 15:57:30 [INFO] STEP5: Moving to next employee after completing Tyronne Ruiz (632641 (CT Bridgeport)).
+2026-06-12 15:57:32 [INFO] WORKER: Processing Ulysse Despeignes (304342 (CT Bridgeport))
+2026-06-12 15:57:32 [INFO] STEP4: All paid-time adjustments complete for Ulysse Despeignes (304342 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:33 [INFO] VERIFY: No new checkboxes needed for Ulysse Despeignes (304342 (CT Bridgeport)).
+2026-06-12 15:57:33 [INFO] WORKER: Done with Ulysse Despeignes (304342 (CT Bridgeport))
+2026-06-12 15:57:33 [INFO] STEP5: Moving to next employee after completing Ulysse Despeignes (304342 (CT Bridgeport)).
+2026-06-12 15:57:34 [INFO] WORKER: Processing Valerie Felton (304235 (CT Bridgeport))
+2026-06-12 15:57:35 [INFO] STEP4: All paid-time adjustments complete for Valerie Felton (304235 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:35 [INFO] VERIFY: No new checkboxes needed for Valerie Felton (304235 (CT Bridgeport)).
+2026-06-12 15:57:35 [INFO] WORKER: Done with Valerie Felton (304235 (CT Bridgeport))
+2026-06-12 15:57:35 [INFO] STEP5: Moving to next employee after completing Valerie Felton (304235 (CT Bridgeport)).
+2026-06-12 15:57:36 [INFO] WORKER: Processing Valerie Butler (306796 (CT Bridgeport))
+2026-06-12 15:57:37 [INFO] STEP4: All paid-time adjustments complete for Valerie Butler (306796 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:38 [INFO] VERIFY: No new checkboxes needed for Valerie Butler (306796 (CT Bridgeport)).
+2026-06-12 15:57:38 [INFO] WORKER: Done with Valerie Butler (306796 (CT Bridgeport))
+2026-06-12 15:57:38 [INFO] STEP5: Moving to next employee after completing Valerie Butler (306796 (CT Bridgeport)).
+2026-06-12 15:57:44 [INFO] WORKER: Processing Vanessa Long (304230 (CT Bridgeport))
+2026-06-12 15:57:45 [INFO] STEP4: All paid-time adjustments complete for Vanessa Long (304230 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:45 [INFO] VERIFY: No new checkboxes needed for Vanessa Long (304230 (CT Bridgeport)).
+2026-06-12 15:57:45 [INFO] WORKER: Done with Vanessa Long (304230 (CT Bridgeport))
+2026-06-12 15:57:45 [INFO] STEP5: Moving to next employee after completing Vanessa Long (304230 (CT Bridgeport)).
+2026-06-12 15:57:52 [INFO] WORKER: Processing Vantasia Kitchings (304391 (CT Bridgeport))
+2026-06-12 15:57:52 [INFO] STEP4: All paid-time adjustments complete for Vantasia Kitchings (304391 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:53 [INFO] VERIFY: No new checkboxes needed for Vantasia Kitchings (304391 (CT Bridgeport)).
+2026-06-12 15:57:53 [INFO] WORKER: Done with Vantasia Kitchings (304391 (CT Bridgeport))
+2026-06-12 15:57:53 [INFO] STEP5: Moving to next employee after completing Vantasia Kitchings (304391 (CT Bridgeport)).
+2026-06-12 15:57:54 [INFO] WORKER: Processing Victor Llera Jr (304244 (CT Bridgeport))
+2026-06-12 15:57:55 [INFO] STEP4: All paid-time adjustments complete for Victor Llera Jr (304244 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:55 [INFO] VERIFY: No new checkboxes needed for Victor Llera Jr (304244 (CT Bridgeport)).
+2026-06-12 15:57:55 [INFO] WORKER: Done with Victor Llera Jr (304244 (CT Bridgeport))
+2026-06-12 15:57:55 [INFO] STEP5: Moving to next employee after completing Victor Llera Jr (304244 (CT Bridgeport)).
+2026-06-12 15:57:56 [INFO] WORKER: Processing Victoria Rincon (304517 (CT Bridgeport))
+2026-06-12 15:57:57 [INFO] STEP4: All paid-time adjustments complete for Victoria Rincon (304517 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:57:57 [INFO] VERIFY: No new checkboxes needed for Victoria Rincon (304517 (CT Bridgeport)).
+2026-06-12 15:57:57 [INFO] WORKER: Done with Victoria Rincon (304517 (CT Bridgeport))
+2026-06-12 15:57:57 [INFO] STEP5: Moving to next employee after completing Victoria Rincon (304517 (CT Bridgeport)).
+2026-06-12 15:57:58 [INFO] WORKER: Processing Victoria Feliciano (304211 (CT Bridgeport))
+2026-06-12 15:57:59 [INFO] STEP4: All paid-time adjustments complete for Victoria Feliciano (304211 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:00 [INFO] VERIFY: No new checkboxes needed for Victoria Feliciano (304211 (CT Bridgeport)).
+2026-06-12 15:58:00 [INFO] WORKER: Done with Victoria Feliciano (304211 (CT Bridgeport))
+2026-06-12 15:58:00 [INFO] STEP5: Moving to next employee after completing Victoria Feliciano (304211 (CT Bridgeport)).
+2026-06-12 15:58:01 [INFO] WORKER: Processing Victor J Lopez (631812 (CT Bridgeport))
+2026-06-12 15:58:01 [INFO] STEP4: All paid-time adjustments complete for Victor J Lopez (631812 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:02 [INFO] VERIFY: No new checkboxes needed for Victor J Lopez (631812 (CT Bridgeport)).
+2026-06-12 15:58:02 [INFO] WORKER: Done with Victor J Lopez (631812 (CT Bridgeport))
+2026-06-12 15:58:02 [INFO] STEP5: Moving to next employee after completing Victor J Lopez (631812 (CT Bridgeport)).
+2026-06-12 15:58:04 [INFO] WORKER: Processing Voris A Eastwood (307356 (CT Bridgeport))
+2026-06-12 15:58:05 [INFO] STEP4: All paid-time adjustments complete for Voris A Eastwood (307356 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:05 [INFO] VERIFY: No new checkboxes needed for Voris A Eastwood (307356 (CT Bridgeport)).
+2026-06-12 15:58:05 [INFO] WORKER: Done with Voris A Eastwood (307356 (CT Bridgeport))
+2026-06-12 15:58:05 [INFO] STEP5: Moving to next employee after completing Voris A Eastwood (307356 (CT Bridgeport)).
+2026-06-12 15:58:06 [INFO] WORKER: Processing Wanda Cedeno (304512 (CT Bridgeport))
+2026-06-12 15:58:07 [INFO] STEP4: All paid-time adjustments complete for Wanda Cedeno (304512 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:08 [INFO] VERIFY: No new checkboxes needed for Wanda Cedeno (304512 (CT Bridgeport)).
+2026-06-12 15:58:08 [INFO] WORKER: Done with Wanda Cedeno (304512 (CT Bridgeport))
+2026-06-12 15:58:08 [INFO] STEP5: Moving to next employee after completing Wanda Cedeno (304512 (CT Bridgeport)).
+2026-06-12 15:58:09 [INFO] WORKER: Processing Wenroy Reid (623419 (CT Bridgeport))
+2026-06-12 15:58:09 [INFO] STEP4: All paid-time adjustments complete for Wenroy Reid (623419 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:10 [INFO] VERIFY: Skipping 'Bridge Charter 110056-1' for Wenroy Reid (623419 (CT Bridgeport)) — excluded from verification.
+2026-06-12 15:58:10 [INFO] VERIFY: No new checkboxes needed for Wenroy Reid (623419 (CT Bridgeport)).
+2026-06-12 15:58:10 [INFO] WORKER: Done with Wenroy Reid (623419 (CT Bridgeport))
+2026-06-12 15:58:10 [INFO] STEP5: Moving to next employee after completing Wenroy Reid (623419 (CT Bridgeport)).
+2026-06-12 15:58:11 [INFO] WORKER: Processing Wilfredo Echevarria (304218 (CT Bridgeport))
+2026-06-12 15:58:12 [INFO] STEP4: All paid-time adjustments complete for Wilfredo Echevarria (304218 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:12 [INFO] VERIFY: No new checkboxes needed for Wilfredo Echevarria (304218 (CT Bridgeport)).
+2026-06-12 15:58:12 [INFO] WORKER: Done with Wilfredo Echevarria (304218 (CT Bridgeport))
+2026-06-12 15:58:12 [INFO] STEP5: Moving to next employee after completing Wilfredo Echevarria (304218 (CT Bridgeport)).
+2026-06-12 15:58:13 [INFO] WORKER: Processing William Allen  Jr (304984 (CT Bridgeport))
+2026-06-12 15:58:14 [INFO] STEP4: All paid-time adjustments complete for William Allen  Jr (304984 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:15 [INFO] VERIFY: No new checkboxes needed for William Allen  Jr (304984 (CT Bridgeport)).
+2026-06-12 15:58:15 [INFO] WORKER: Done with William Allen  Jr (304984 (CT Bridgeport))
+2026-06-12 15:58:15 [INFO] STEP5: Moving to next employee after completing William Allen  Jr (304984 (CT Bridgeport)).
+2026-06-12 15:58:16 [INFO] WORKER: Processing Wismick Germain (617309 (CT Bridgeport))
+2026-06-12 15:58:17 [INFO] STEP4: All paid-time adjustments complete for Wismick Germain (617309 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:17 [INFO] VERIFY: No new checkboxes needed for Wismick Germain (617309 (CT Bridgeport)).
+2026-06-12 15:58:17 [INFO] WORKER: Done with Wismick Germain (617309 (CT Bridgeport))
+2026-06-12 15:58:17 [INFO] STEP5: Moving to next employee after completing Wismick Germain (617309 (CT Bridgeport)).
+2026-06-12 15:58:18 [INFO] WORKER: Processing Yajaira Lopez Perez (304407 (CT Bridgeport))
+2026-06-12 15:58:19 [INFO] STEP4: All paid-time adjustments complete for Yajaira Lopez Perez (304407 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:20 [INFO] VERIFY: No new checkboxes needed for Yajaira Lopez Perez (304407 (CT Bridgeport)).
+2026-06-12 15:58:20 [INFO] WORKER: Done with Yajaira Lopez Perez (304407 (CT Bridgeport))
+2026-06-12 15:58:20 [INFO] STEP5: Moving to next employee after completing Yajaira Lopez Perez (304407 (CT Bridgeport)).
+2026-06-12 15:58:21 [INFO] WORKER: Processing Yoki Rudolph (629453 (CT Bridgeport))
+2026-06-12 15:58:21 [INFO] STEP4: All paid-time adjustments complete for Yoki Rudolph (629453 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:22 [INFO] VERIFY: No new checkboxes needed for Yoki Rudolph (629453 (CT Bridgeport)).
+2026-06-12 15:58:22 [INFO] WORKER: Done with Yoki Rudolph (629453 (CT Bridgeport))
+2026-06-12 15:58:22 [INFO] STEP5: Moving to next employee after completing Yoki Rudolph (629453 (CT Bridgeport)).
+2026-06-12 15:58:23 [INFO] WORKER: Processing Yolanda Tucker (304974 (CT Bridgeport))
+2026-06-12 15:58:24 [INFO] STEP4: All paid-time adjustments complete for Yolanda Tucker (304974 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:24 [INFO] VERIFY: No new checkboxes needed for Yolanda Tucker (304974 (CT Bridgeport)).
+2026-06-12 15:58:24 [INFO] WORKER: Done with Yolanda Tucker (304974 (CT Bridgeport))
+2026-06-12 15:58:24 [INFO] STEP5: Moving to next employee after completing Yolanda Tucker (304974 (CT Bridgeport)).
+2026-06-12 15:58:25 [INFO] WORKER: Processing Yolanda Rodriguez (304200 (CT Bridgeport))
+2026-06-12 15:58:26 [INFO] STEP4: All paid-time adjustments complete for Yolanda Rodriguez (304200 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:27 [INFO] VERIFY: No new checkboxes needed for Yolanda Rodriguez (304200 (CT Bridgeport)).
+2026-06-12 15:58:27 [INFO] WORKER: Done with Yolanda Rodriguez (304200 (CT Bridgeport))
+2026-06-12 15:58:27 [INFO] STEP5: Moving to next employee after completing Yolanda Rodriguez (304200 (CT Bridgeport)).
+2026-06-12 15:58:28 [INFO] WORKER: Processing Yordaliza Garcia Marte (614267 (CT Bridgeport))
+2026-06-12 15:58:29 [INFO] STEP4: All paid-time adjustments complete for Yordaliza Garcia Marte (614267 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:29 [INFO] VERIFY: No new checkboxes needed for Yordaliza Garcia Marte (614267 (CT Bridgeport)).
+2026-06-12 15:58:29 [INFO] WORKER: Done with Yordaliza Garcia Marte (614267 (CT Bridgeport))
+2026-06-12 15:58:29 [INFO] STEP5: Moving to next employee after completing Yordaliza Garcia Marte (614267 (CT Bridgeport)).
+2026-06-12 15:58:31 [INFO] WORKER: Processing Yosemiko Fernandez (304256 (CT Bridgeport))
+2026-06-12 15:58:31 [INFO] STEP4: All paid-time adjustments complete for Yosemiko Fernandez (304256 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:32 [INFO] VERIFY: No new checkboxes needed for Yosemiko Fernandez (304256 (CT Bridgeport)).
+2026-06-12 15:58:32 [INFO] WORKER: Done with Yosemiko Fernandez (304256 (CT Bridgeport))
+2026-06-12 15:58:32 [INFO] STEP5: Moving to next employee after completing Yosemiko Fernandez (304256 (CT Bridgeport)).
+2026-06-12 15:58:33 [INFO] WORKER: Processing Yuderka Sanchez (304918 (CT Bridgeport))
+2026-06-12 15:58:34 [INFO] STEP4: All paid-time adjustments complete for Yuderka Sanchez (304918 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:34 [INFO] VERIFY: Skipping 'Bridge Charter 115379' for Yuderka Sanchez (304918 (CT Bridgeport)) — excluded from verification.
+2026-06-12 15:58:34 [INFO] VERIFY: Skipping 'Bridge Charter Bridge Charter - 66866216' for Yuderka Sanchez (304918 (CT Bridgeport)) — excluded from verification.
+2026-06-12 15:58:34 [INFO] VERIFY: No new checkboxes needed for Yuderka Sanchez (304918 (CT Bridgeport)).
+2026-06-12 15:58:34 [INFO] WORKER: Done with Yuderka Sanchez (304918 (CT Bridgeport))
+2026-06-12 15:58:34 [INFO] STEP5: Moving to next employee after completing Yuderka Sanchez (304918 (CT Bridgeport)).
+2026-06-12 15:58:36 [INFO] WORKER: Processing Yvette Gordon (304405 (CT Bridgeport))
+2026-06-12 15:58:36 [INFO] STEP4: All paid-time adjustments complete for Yvette Gordon (304405 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:37 [INFO] VERIFY: No new checkboxes needed for Yvette Gordon (304405 (CT Bridgeport)).
+2026-06-12 15:58:37 [INFO] WORKER: Done with Yvette Gordon (304405 (CT Bridgeport))
+2026-06-12 15:58:37 [INFO] STEP5: Moving to next employee after completing Yvette Gordon (304405 (CT Bridgeport)).
+2026-06-12 15:58:38 [INFO] WORKER: Processing Yvon Vante (307190 (CT Bridgeport))
+2026-06-12 15:58:39 [INFO] STEP4: All paid-time adjustments complete for Yvon Vante (307190 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:39 [INFO] VERIFY: No new checkboxes needed for Yvon Vante (307190 (CT Bridgeport)).
+2026-06-12 15:58:39 [INFO] WORKER: Done with Yvon Vante (307190 (CT Bridgeport))
+2026-06-12 15:58:39 [INFO] STEP5: Moving to next employee after completing Yvon Vante (307190 (CT Bridgeport)).
+2026-06-12 15:58:40 [INFO] WORKER: Processing Yvonne Smith-lowers (304412 (CT Bridgeport))
+2026-06-12 15:58:41 [INFO] STEP4: All paid-time adjustments complete for Yvonne Smith-lowers (304412 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:41 [INFO] VERIFY: No new checkboxes needed for Yvonne Smith-lowers (304412 (CT Bridgeport)).
+2026-06-12 15:58:41 [INFO] WORKER: Done with Yvonne Smith-lowers (304412 (CT Bridgeport))
+2026-06-12 15:58:41 [INFO] STEP5: Moving to next employee after completing Yvonne Smith-lowers (304412 (CT Bridgeport)).
+2026-06-12 15:58:43 [INFO] WORKER: Processing zeralva iscania alvarez de los  santos (627062 (CT Bridgeport))
+2026-06-12 15:58:43 [INFO] STEP4: All paid-time adjustments complete for zeralva iscania alvarez de los  santos (627062 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:44 [INFO] VERIFY: No new checkboxes needed for zeralva iscania alvarez de los  santos (627062 (CT Bridgeport)).
+2026-06-12 15:58:44 [INFO] WORKER: Done with zeralva iscania alvarez de los  santos (627062 (CT Bridgeport))
+2026-06-12 15:58:44 [INFO] STEP5: Moving to next employee after completing zeralva iscania alvarez de los  santos (627062 (CT Bridgeport)).
+2026-06-12 15:58:45 [INFO] WORKER: Processing Zileniz Rodriguez (637342 (CT Bridgeport))
+2026-06-12 15:58:46 [INFO] STEP4: All paid-time adjustments complete for Zileniz Rodriguez (637342 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:46 [INFO] VERIFY: No new checkboxes needed for Zileniz Rodriguez (637342 (CT Bridgeport)).
+2026-06-12 15:58:46 [INFO] WORKER: Done with Zileniz Rodriguez (637342 (CT Bridgeport))
+2026-06-12 15:58:46 [INFO] STEP5: Moving to next employee after completing Zileniz Rodriguez (637342 (CT Bridgeport)).
+2026-06-12 15:58:47 [INFO] WORKER: Processing Zina Moore (304895 (CT Bridgeport))
+2026-06-12 15:58:48 [INFO] STEP4: All paid-time adjustments complete for Zina Moore (304895 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:48 [INFO] VERIFY: No new checkboxes needed for Zina Moore (304895 (CT Bridgeport)).
+2026-06-12 15:58:48 [INFO] WORKER: Done with Zina Moore (304895 (CT Bridgeport))
+2026-06-12 15:58:48 [INFO] STEP5: Moving to next employee after completing Zina Moore (304895 (CT Bridgeport)).
+2026-06-12 15:58:50 [INFO] WORKER: Processing Zuleika Lugo Busanet (304817 (CT Bridgeport))
+2026-06-12 15:58:50 [INFO] STEP4: All paid-time adjustments complete for Zuleika Lugo Busanet (304817 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:58:51 [INFO] VERIFY: No new checkboxes needed for Zuleika Lugo Busanet (304817 (CT Bridgeport)).
+2026-06-12 15:58:51 [INFO] WORKER: Done with Zuleika Lugo Busanet (304817 (CT Bridgeport))
+2026-06-12 15:58:51 [INFO] STEP5: Moving to next employee after completing Zuleika Lugo Busanet (304817 (CT Bridgeport)).
+2026-06-12 15:59:11 [INFO] WORKER: Processing Zulema E Ortiz Alicea (307403 (CT Bridgeport))
+2026-06-12 15:59:12 [INFO] STEP4: All paid-time adjustments complete for Zulema E Ortiz Alicea (307403 (CT Bridgeport)). Proceeding to verification.
+2026-06-12 15:59:13 [INFO] VERIFY: No new checkboxes needed for Zulema E Ortiz Alicea (307403 (CT Bridgeport)).
+2026-06-12 15:59:13 [INFO] WORKER: Done with Zulema E Ortiz Alicea (307403 (CT Bridgeport))
+2026-06-12 15:59:13 [INFO] STEP5: Moving to next employee after completing Zulema E Ortiz Alicea (307403 (CT Bridgeport)).
+2026-06-12 15:59:13 [INFO] COMPLETE: Automation finished successfully.
+2026-06-12 15:59:13 [INFO] UI: Controls re-enabled.
