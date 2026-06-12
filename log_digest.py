@@ -1,20 +1,23 @@
 """
-Post-run AI log digest using the Claude API.
+Post-run AI log digest using a local Ollama model.
 
-After automation completes this module reads the session log and asks Claude
-to summarise outcomes, surface failure patterns, and suggest improvements.
-The result is displayed in the "AI Run Analysis" panel in the GUI.
+After automation completes this module reads the session log and asks a
+local LLM (llama3.2 by default) to summarise outcomes, surface failure
+patterns, and suggest improvements.  The result is displayed in the
+"AI Run Analysis" panel in the GUI.
 
-Requires the ANTHROPIC_API_KEY environment variable to be set, and the
-'anthropic' package to be installed (pip install anthropic).
+Requirements:
+  - Ollama desktop app running in the background  (https://ollama.com)
+  - llama3.2 model pulled:  ollama pull llama3.2
+  - Python package installed:  pip install ollama
 """
 
 import logging
 import os
-from typing import Optional
 
 LOG_FILE      = os.path.join("logs", "automation_activity.log")
-MAX_LOG_CHARS = 20_000   # trim very long logs to stay within token budget
+MAX_LOG_CHARS = 20_000   # trim very long logs to stay within the model's context
+DEFAULT_MODEL = "llama3.2"
 
 
 # ---------------------------------------------------------------------------
@@ -37,34 +40,24 @@ def _read_log(max_chars: int = MAX_LOG_CHARS) -> str:
 # Digest generation
 # ---------------------------------------------------------------------------
 
-def generate_digest(api_key: Optional[str] = None) -> str:
+def generate_digest(model: str = DEFAULT_MODEL) -> str:
     """
-    Calls the Claude claude-sonnet-4-6 API to analyse the session log.
+    Calls a local Ollama model to analyse the session log.
 
     Args:
-        api_key: Anthropic API key.  Falls back to the ANTHROPIC_API_KEY
-                 environment variable if not supplied.
+        model: Ollama model name to use (default: "llama3.2").
 
     Returns:
         A formatted multi-section analysis string, or a human-readable
-        error message if the API is unavailable.
+        error message if Ollama is unavailable.
     """
-    key = api_key or os.environ.get("ANTHROPIC_API_KEY", "")
-    if not key:
-        return (
-            "AI analysis unavailable — API key not configured.\n\n"
-            "Set the ANTHROPIC_API_KEY environment variable to enable this feature.\n"
-            "Example (Windows, current session):\n"
-            "  $env:ANTHROPIC_API_KEY = 'sk-ant-...'"
-        )
-
     try:
-        import anthropic
+        import ollama
     except ImportError:
         return (
-            "AI analysis unavailable — 'anthropic' package not installed.\n\n"
+            "AI analysis unavailable — 'ollama' package not installed.\n\n"
             "Run the following command and restart the app:\n"
-            "  pip install anthropic"
+            "  pip install ollama"
         )
 
     log_content = _read_log()
@@ -112,13 +105,26 @@ LOG:
 {log_content}"""
 
     try:
-        client = anthropic.Anthropic(api_key=key)
-        msg    = client.messages.create(
-            model      = "claude-sonnet-4-6",
-            max_tokens = 1024,
-            messages   = [{"role": "user", "content": prompt}],
+        logging.info(f"DIGEST: Sending log to Ollama model '{model}'...")
+        response = ollama.chat(
+            model    = model,
+            messages = [{"role": "user", "content": prompt}],
         )
-        return msg.content[0].text
+        return response.message.content
     except Exception as e:
-        logging.error(f"DIGEST: Claude API call failed: {e}")
-        return f"AI analysis failed.\n\nError: {e}"
+        # Common causes: Ollama service not running, model not pulled.
+        err = str(e)
+        if "connect" in err.lower() or "connection" in err.lower():
+            hint = (
+                "Ollama service is not running.\n"
+                "Start it via the Ollama desktop app or run: ollama serve"
+            )
+        elif "not found" in err.lower() or "404" in err:
+            hint = (
+                f"Model '{model}' is not available locally.\n"
+                f"Pull it first by running: ollama pull {model}"
+            )
+        else:
+            hint = f"Error: {e}"
+        logging.error(f"DIGEST: Ollama call failed: {e}")
+        return f"AI analysis failed.\n\n{hint}"
