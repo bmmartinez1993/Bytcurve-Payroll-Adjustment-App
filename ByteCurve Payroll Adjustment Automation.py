@@ -36,6 +36,13 @@ from automation_core_refactored import (
     COL_PAID_START,
     COL_PAID_END,
 )
+from employee_scorer import (
+    load_history,
+    save_history,
+    sort_employees_by_priority,
+    record_outcome,
+)
+from log_digest import generate_digest
 
 # --- LOGGING CONFIGURATION ---
 
@@ -1753,6 +1760,9 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
         logging.warning("EMP_FILTER: No employees found in dropdown — nothing to process.")
         return
 
+    history = load_history()
+    employee_names = sort_employees_by_priority(employee_names, history)
+
     processed_workers: set[str] = set()
     grid_rows_sel = f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row"
 
@@ -1806,8 +1816,12 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
                 f"WORKER: Skipping verification for {worker_display} (manual review needed)"
             )
 
+        record_outcome(emp_filter_name, success=adjustments_ok,
+                       manual_flag=not adjustments_ok, history=history)
         logging.info(f"STEP5: Moving to next employee after completing {worker_display}.")
         processed_workers.add(worker_id)
+
+    save_history(history)
 
 
 # ===========================================================================
@@ -1815,7 +1829,8 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
 # ===========================================================================
 
 def run_playwright_automation(log_text_widget, username: str, password: str,
-                              start_button, stop_button) -> None:
+                              start_button, stop_button,
+                              digest_widget=None) -> None:
     global USERNAME, PASSWORD, AUTOMATION_STOP_FLAG
     USERNAME = username
     PASSWORD = password
@@ -1871,9 +1886,22 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
         AUTOMATION_STOP_FLAG = False
         logging.info("UI: Controls re-enabled.")
 
+        if digest_widget is not None:
+            def _update_digest(text: str) -> None:
+                digest_widget.delete(1.0, ctk.END)
+                digest_widget.insert(ctk.END, text)
+
+            def _run_digest() -> None:
+                digest_widget.after(0, lambda: _update_digest("Analyzing run log with AI..."))
+                result = generate_digest()
+                digest_widget.after(0, lambda: _update_digest(result))
+
+            threading.Thread(target=_run_digest, daemon=True).start()
+
 
 def start_automation_thread(log_text_widget, username_entry, password_entry,
-                            save_creds_var, start_button, stop_button) -> None:
+                            save_creds_var, start_button, stop_button,
+                            digest_widget=None) -> None:
     global AUTOMATION_STOP_FLAG, AUTOMATION_THREAD
 
     username = username_entry.get()
@@ -1894,7 +1922,7 @@ def start_automation_thread(log_text_widget, username_entry, password_entry,
     AUTOMATION_STOP_FLAG = False
     t = threading.Thread(
         target=run_playwright_automation,
-        args=(log_text_widget, username, password, start_button, stop_button),
+        args=(log_text_widget, username, password, start_button, stop_button, digest_widget),
         daemon=True,
     )
     AUTOMATION_THREAD = t
@@ -1918,7 +1946,7 @@ def start_gui_and_automation() -> None:
 
     root = ctk.CTk()
     root.title("ByteCurve Payroll Adjustment Automation")
-    root.geometry("800x650")
+    root.geometry("800x860")
     root.configure(fg_color=BS_GRAY_100)
 
     encryption_key       = load_key()
@@ -1969,7 +1997,7 @@ def start_gui_and_automation() -> None:
         fg_color=BS_PRIMARY, text_color=BS_WHITE, hover_color=BS_BLUE,
         command=lambda: start_automation_thread(
             log_text_widget, username_entry, password_entry,
-            save_creds_var, start_button, stop_button
+            save_creds_var, start_button, stop_button, digest_text_widget
         ),
     )
     start_button.pack(side=ctk.LEFT, padx=5)
@@ -1991,6 +2019,26 @@ def start_gui_and_automation() -> None:
         fg_color=BS_GRAY_800, text_color=BS_WHITE,
     )
     log_text_widget.pack(fill=ctk.BOTH, expand=True, padx=10, pady=5)
+
+    # --- AI Analysis frame ---
+    digest_frame = ctk.CTkFrame(root, fg_color=BS_GRAY_200, corner_radius=10)
+    digest_frame.pack(pady=(0, 10), padx=10, fill=ctk.X)
+
+    ctk.CTkLabel(
+        digest_frame, text="AI Run Analysis", text_color=BS_GRAY_900,
+    ).pack(pady=(6, 2))
+
+    digest_text_widget = ctk.CTkTextbox(
+        digest_frame, width=780, height=165,
+        fg_color=BS_GRAY_800, text_color=BS_WHITE,
+    )
+    digest_text_widget.pack(fill=ctk.X, padx=10, pady=(0, 10))
+    digest_text_widget.insert(
+        ctk.END,
+        "AI analysis will appear here after the run completes.\n"
+        "Set the ANTHROPIC_API_KEY environment variable to enable this feature.",
+    )
+    digest_text_widget.configure(state="disabled")
 
     root.mainloop()
 
