@@ -1450,9 +1450,13 @@ def process_worker_adjustments(
     return stats['tasks_with_errors'] == 0, stats
 
 
-def wait_for_loading(page: Page, timeout_ms: int = 20000) -> None:
+def wait_for_loading(page: Page, timeout_ms: int = 20000) -> bool:
     """
     Waits for the ByteCurve loading overlay to disappear.
+
+    Returns True if the page is ready (overlay gone or never appeared),
+    False if the overlay is still visible after timeout_ms — indicating a
+    potential network stall that the caller should handle.
 
     Args:
         page: Playwright Page object
@@ -1460,10 +1464,22 @@ def wait_for_loading(page: Page, timeout_ms: int = 20000) -> None:
     """
     page.wait_for_timeout(500)  # Brief pause to allow any dynamic loader to trigger
     try:
-        # Wait for the spinner to be hidden
         page.wait_for_selector(".page-loading", state="hidden", timeout=timeout_ms)
+        return True
     except Exception:
-        pass  # Loading element might not exist or already hidden
+        # Timeout expired — confirm whether the overlay is genuinely still visible.
+        try:
+            return not page.locator(".page-loading").is_visible()
+        except Exception:
+            return True  # Cannot confirm state; assume ready
+
+
+def is_page_loading(page: Page) -> bool:
+    """Returns True if the ByteCurve page-loading overlay is currently visible."""
+    try:
+        return page.locator(".page-loading").is_visible()
+    except Exception:
+        return False
 
 
 # ============================================================================
