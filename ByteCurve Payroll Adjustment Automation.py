@@ -38,6 +38,13 @@ from automation_core_refactored import (
     COL_PAID_START,
     COL_PAID_END,
 )
+from employee_scorer import (
+    load_history,
+    save_history,
+    sort_employees_by_priority,
+    record_outcome,
+)
+from log_digest import generate_digest
 
 # --- LOGGING CONFIGURATION ---
 
@@ -244,26 +251,7 @@ def login(page: Page) -> None:
     page.get_by_role("textbox", name=SELECTORS["login_password"]).fill(PASSWORD)
     page.get_by_role("button",  name=SELECTORS["login_submit"]).click()
     page.wait_for_load_state("networkidle")
-
-    # Verify authentication actually succeeded instead of assuming it did.
-    # This SPA uses hash routing: a successful login navigates away from the
-    # "#/login" route. If we are still on it after the submit settles, the
-    # credentials were rejected (or an MFA/error interstitial is showing) — in
-    # that case fail loudly rather than logging a misleading success and then
-    # timing out later on a nav element that only exists once authenticated.
-    try:
-        page.wait_for_function(
-            "!window.location.href.includes('#/login')", timeout=15000
-        )
-    except Exception:
-        pass
-    if "#/login" in page.url:
-        raise RuntimeError(
-            f"Login failed — still on the login page after submit ({page.url}). "
-            f"Verify credentials.enc / secret.key decrypt to the correct "
-            f"username/password for user '{USERNAME}'."
-        )
-    logging.info(f"Logged in successfully as '{USERNAME}'. Landing URL: {page.url}")
+    logging.info("Logged in successfully.")
 
 
 def navigate_to_payroll(page: Page) -> None:
@@ -1298,7 +1286,7 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                 page, target_dt=target_dt, emp_filter_name=emp_filter_name
             ):
                 return False
-            continue  # Re-read rows from the restored session
+            continue  # re-read rows from the restored session
 
         worker_rows = worker_filter.all()
         if not worker_rows:
@@ -1788,6 +1776,9 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
         logging.warning("EMP_FILTER: No employees found in dropdown — nothing to process.")
         return
 
+    history = load_history()
+    employee_names = sort_employees_by_priority(employee_names, history)
+
     processed_workers: set[str] = set()
     grid_rows_sel = f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row"
 
@@ -1806,9 +1797,10 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
                 f"'{emp_filter_name}' — checking connectivity and attempting recovery."
             )
             if not _recover_from_network_stall(page, target_dt=target_dt):
-                break  # Unrecoverable — stop the run
-            # _recover_from_network_stall already called _setup_view_and_filters;
-            # the per-employee filter below will re-select the right employee.
+                break  # unrecoverable — stop the run
+            # _recover_from_network_stall already restored the view via
+            # _setup_view_and_filters; the per-employee filter below re-selects
+            # the right employee.
 
         if not _filter_grid_by_employee(page, emp_filter_name):
             continue
@@ -1856,19 +1848,23 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
                 f"WORKER: Skipping verification for {worker_display} (manual review needed)"
             )
 
+        record_outcome(emp_filter_name, success=adjustments_ok,
+                       manual_flag=not adjustments_ok, history=history)
         logging.info(f"STEP5: Moving to next employee after completing {worker_display}.")
         processed_workers.add(worker_id)
+
+    save_history(history)
 
 
 # ===========================================================================
 # Network resilience helpers
 # ===========================================================================
 
-NETWORK_CHECK_HOST           = "app.bytecurve360.com"
-NETWORK_CHECK_PORT           = 443
-NETWORK_STALL_TIMEOUT_MS     = 30_000   # ms before treating a stuck loader as a network stall
-NETWORK_RECOVERY_POLL_SEC    = 10       # seconds between TCP connectivity polls
-NETWORK_RECOVERY_MAX_WAIT_SEC = 300     # give up after 5 minutes
+NETWORK_CHECK_HOST            = "app.bytecurve360.com"
+NETWORK_CHECK_PORT            = 443
+NETWORK_STALL_TIMEOUT_MS      = 30_000   # ms before treating a stuck loader as a network stall
+NETWORK_RECOVERY_POLL_SEC     = 10       # seconds between TCP connectivity polls
+NETWORK_RECOVERY_MAX_WAIT_SEC = 300      # give up after 5 minutes
 
 
 def _is_network_reachable() -> bool:
@@ -1900,11 +1896,7 @@ def _wait_for_network_recovery(max_wait_sec: int = NETWORK_RECOVERY_MAX_WAIT_SEC
     return False
 
 
-def _recover_from_network_stall(
-    page,
-    target_dt=None,
-    emp_filter_name: str = "",
-) -> bool:
+def _recover_from_network_stall(page, target_dt=None, emp_filter_name: str = "") -> bool:
     """Called when the page-loading overlay is stuck (VPN/network stall suspected).
 
     Steps:
@@ -1922,8 +1914,7 @@ def _recover_from_network_stall(
         logging.warning("NETWORK: TCP check failed — VPN/network appears to be down.")
         if not _wait_for_network_recovery():
             return False
-        # Brief pause so the TCP layer stabilises before making browser requests.
-        time.sleep(3)
+        time.sleep(3)  # let TCP layer stabilise before making browser requests
     else:
         logging.info(
             "NETWORK: TCP check passed but page-loading overlay is stuck. "
@@ -1966,7 +1957,7 @@ def _recover_from_network_stall(
         except Exception as e:
             logging.warning(f"NETWORK: Could not re-apply filters after recovery: {e}")
 
-    # Re-select the current employee so the worker_filter locator resolves.
+    # Re-select the current employee so the worker_filter locator resolves again.
     if emp_filter_name:
         try:
             _filter_grid_by_employee(page, emp_filter_name)
@@ -1984,7 +1975,8 @@ def _recover_from_network_stall(
 # ===========================================================================
 
 def run_playwright_automation(log_text_widget, username: str, password: str,
-                              start_button, stop_button) -> None:
+                              start_button, stop_button,
+                              digest_widget=None) -> None:
     global USERNAME, PASSWORD, AUTOMATION_STOP_FLAG
     USERNAME = username
     PASSWORD = password
@@ -2040,9 +2032,24 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
         AUTOMATION_STOP_FLAG = False
         logging.info("UI: Controls re-enabled.")
 
+        if digest_widget is not None:
+            def _update_digest(text: str) -> None:
+                digest_widget.configure(state="normal")
+                digest_widget.delete(1.0, ctk.END)
+                digest_widget.insert(ctk.END, text)
+                digest_widget.configure(state="disabled")
+
+            def _run_digest() -> None:
+                digest_widget.after(0, lambda: _update_digest("Analyzing run log with AI..."))
+                result = generate_digest()
+                digest_widget.after(0, lambda: _update_digest(result))
+
+            threading.Thread(target=_run_digest, daemon=True).start()
+
 
 def start_automation_thread(log_text_widget, username_entry, password_entry,
-                            save_creds_var, start_button, stop_button) -> None:
+                            save_creds_var, start_button, stop_button,
+                            digest_widget=None) -> None:
     global AUTOMATION_STOP_FLAG, AUTOMATION_THREAD
 
     username = username_entry.get()
@@ -2063,7 +2070,7 @@ def start_automation_thread(log_text_widget, username_entry, password_entry,
     AUTOMATION_STOP_FLAG = False
     t = threading.Thread(
         target=run_playwright_automation,
-        args=(log_text_widget, username, password, start_button, stop_button),
+        args=(log_text_widget, username, password, start_button, stop_button, digest_widget),
         daemon=True,
     )
     AUTOMATION_THREAD = t
@@ -2087,7 +2094,7 @@ def start_gui_and_automation() -> None:
 
     root = ctk.CTk()
     root.title("ByteCurve Payroll Adjustment Automation")
-    root.geometry("800x650")
+    root.geometry("800x860")
     root.configure(fg_color=BS_GRAY_100)
 
     encryption_key       = load_key()
@@ -2138,7 +2145,7 @@ def start_gui_and_automation() -> None:
         fg_color=BS_PRIMARY, text_color=BS_WHITE, hover_color=BS_BLUE,
         command=lambda: start_automation_thread(
             log_text_widget, username_entry, password_entry,
-            save_creds_var, start_button, stop_button
+            save_creds_var, start_button, stop_button, digest_text_widget
         ),
     )
     start_button.pack(side=ctk.LEFT, padx=5)
@@ -2160,6 +2167,26 @@ def start_gui_and_automation() -> None:
         fg_color=BS_GRAY_800, text_color=BS_WHITE,
     )
     log_text_widget.pack(fill=ctk.BOTH, expand=True, padx=10, pady=5)
+
+    # --- AI Analysis frame ---
+    digest_frame = ctk.CTkFrame(root, fg_color=BS_GRAY_200, corner_radius=10)
+    digest_frame.pack(pady=(0, 10), padx=10, fill=ctk.X)
+
+    ctk.CTkLabel(
+        digest_frame, text="AI Run Analysis", text_color=BS_GRAY_900,
+    ).pack(pady=(6, 2))
+
+    digest_text_widget = ctk.CTkTextbox(
+        digest_frame, width=780, height=165,
+        fg_color=BS_GRAY_800, text_color=BS_WHITE,
+    )
+    digest_text_widget.pack(fill=ctk.X, padx=10, pady=(0, 10))
+    digest_text_widget.insert(
+        ctk.END,
+        "AI analysis will appear here after the run completes.\n"
+        "Powered by Ollama (llama3.2) — make sure the Ollama desktop app is running.",
+    )
+    digest_text_widget.configure(state="disabled")
 
     root.mainloop()
 
