@@ -13,7 +13,7 @@ FROM mcr.microsoft.com/playwright/python:v1.58.0-jammy
 #   scrot       – screenshot utility used by pyautogui on Linux
 #   xdotool     – keyboard/mouse injection fallback for pyautogui
 # ---------------------------------------------------------------------------
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     xvfb \
     python3-tk \
     tk-dev \
