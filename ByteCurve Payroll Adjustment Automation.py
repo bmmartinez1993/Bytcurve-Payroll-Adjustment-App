@@ -5,6 +5,7 @@ from datetime import datetime as dt
 import os
 import random
 import re
+import socket
 import time
 import pyautogui
 import logging
@@ -30,6 +31,7 @@ from automation_core_refactored import (
     adjust_time_entry,
     verify_task_checkbox,
     wait_for_loading,
+    is_page_loading,
     # Constants
     MAX_RETRY_ATTEMPTS,
     MAX_TIME_SHIFT_MINUTES,
@@ -1284,6 +1286,20 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
             page.wait_for_timeout(400)
 
         wait_for_loading(page)
+
+        # If the page-loading overlay is still visible after the normal wait,
+        # a VPN/network stall is the likely cause — attempt full session recovery.
+        if is_page_loading(page):
+            logging.warning(
+                f"NETWORK: Page-loading overlay still present for {worker_display} "
+                "— checking connectivity and attempting recovery."
+            )
+            if not _recover_from_network_stall(
+                page, target_dt=target_dt, emp_filter_name=emp_filter_name
+            ):
+                return False
+            continue  # Re-read rows from the restored session
+
         worker_rows = worker_filter.all()
         if not worker_rows:
             if _stale_budget > 0:
@@ -1779,6 +1795,21 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
         if AUTOMATION_STOP_FLAG:
             break
 
+        # Guard against a VPN drop that occurred between employees: the
+        # page-loading overlay would block the employee-filter click and
+        # produce the exact timeout seen in the log.  Detect it here before
+        # touching any UI element and recover if needed.
+        wait_for_loading(page)
+        if is_page_loading(page):
+            logging.warning(
+                f"NETWORK: Page-loading overlay stuck before filtering for "
+                f"'{emp_filter_name}' — checking connectivity and attempting recovery."
+            )
+            if not _recover_from_network_stall(page, target_dt=target_dt):
+                break  # Unrecoverable — stop the run
+            # _recover_from_network_stall already called _setup_view_and_filters;
+            # the per-employee filter below will re-select the right employee.
+
         if not _filter_grid_by_employee(page, emp_filter_name):
             continue
 
@@ -1827,6 +1858,125 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
 
         logging.info(f"STEP5: Moving to next employee after completing {worker_display}.")
         processed_workers.add(worker_id)
+
+
+# ===========================================================================
+# Network resilience helpers
+# ===========================================================================
+
+NETWORK_CHECK_HOST           = "app.bytecurve360.com"
+NETWORK_CHECK_PORT           = 443
+NETWORK_STALL_TIMEOUT_MS     = 30_000   # ms before treating a stuck loader as a network stall
+NETWORK_RECOVERY_POLL_SEC    = 10       # seconds between TCP connectivity polls
+NETWORK_RECOVERY_MAX_WAIT_SEC = 300     # give up after 5 minutes
+
+
+def _is_network_reachable() -> bool:
+    """TCP handshake to the app server — True when VPN/network is up."""
+    try:
+        with socket.create_connection((NETWORK_CHECK_HOST, NETWORK_CHECK_PORT), timeout=5):
+            return True
+    except (socket.timeout, OSError):
+        return False
+
+
+def _wait_for_network_recovery(max_wait_sec: int = NETWORK_RECOVERY_MAX_WAIT_SEC) -> bool:
+    """Polls every NETWORK_RECOVERY_POLL_SEC seconds until connectivity returns.
+    Returns True when restored, False if the wait timed out or Stop was requested."""
+    logging.warning(
+        f"NETWORK: Waiting up to {max_wait_sec}s for VPN/network connectivity to restore..."
+    )
+    elapsed = 0
+    while elapsed < max_wait_sec:
+        if AUTOMATION_STOP_FLAG:
+            return False
+        if _is_network_reachable():
+            logging.info(f"NETWORK: Connectivity restored after ~{elapsed}s.")
+            return True
+        time.sleep(NETWORK_RECOVERY_POLL_SEC)
+        elapsed += NETWORK_RECOVERY_POLL_SEC
+        logging.info(f"NETWORK: Still waiting... ({elapsed}/{max_wait_sec}s elapsed)")
+    logging.error(f"NETWORK: Gave up waiting after {max_wait_sec}s — aborting.")
+    return False
+
+
+def _recover_from_network_stall(
+    page,
+    target_dt=None,
+    emp_filter_name: str = "",
+) -> bool:
+    """Called when the page-loading overlay is stuck (VPN/network stall suspected).
+
+    Steps:
+      1. TCP check — if unreachable, poll until restored (up to 5 min).
+      2. Reload the page; fall back to navigating to the login URL if reload fails.
+      3. Re-login if the session expired while the VPN was down.
+      4. Re-navigate to the Verify Hours payroll view.
+      5. Re-apply date + status filters when target_dt is supplied.
+      6. Re-select the current employee when emp_filter_name is supplied so the
+         caller's worker_filter locator resolves correctly on the next iteration.
+
+    Returns True when the session is fully restored, False if unrecoverable.
+    """
+    if not _is_network_reachable():
+        logging.warning("NETWORK: TCP check failed — VPN/network appears to be down.")
+        if not _wait_for_network_recovery():
+            return False
+        # Brief pause so the TCP layer stabilises before making browser requests.
+        time.sleep(3)
+    else:
+        logging.info(
+            "NETWORK: TCP check passed but page-loading overlay is stuck. "
+            "Reloading to clear state."
+        )
+        time.sleep(2)
+
+    logging.info("NETWORK: Reloading page to clear stuck loading overlay...")
+    try:
+        page.reload(timeout=30_000, wait_until="networkidle")
+        wait_for_loading(page, timeout_ms=30_000)
+    except Exception as e:
+        logging.warning(f"NETWORK: Page reload failed ({e}). Navigating to login URL.")
+        try:
+            page.goto(BYTECURVE_URL, timeout=30_000, wait_until="networkidle")
+        except Exception as e2:
+            logging.error(f"NETWORK: Could not reach app after reload failure: {e2}")
+            return False
+
+    # Re-login if the session expired while the VPN was down.
+    if "#/login" in page.url or page.url.rstrip("/").endswith("/login"):
+        logging.info("NETWORK: Session expired — re-logging in.")
+        try:
+            login(page)
+        except Exception as e:
+            logging.error(f"NETWORK: Re-login failed: {e}")
+            return False
+
+    # Re-navigate to the payroll view.
+    try:
+        navigate_to_payroll(page)
+    except Exception as e:
+        logging.error(f"NETWORK: Re-navigation to payroll failed: {e}")
+        return False
+
+    # Re-apply date + status filters.
+    if target_dt is not None:
+        try:
+            _setup_view_and_filters(page, target_dt)
+        except Exception as e:
+            logging.warning(f"NETWORK: Could not re-apply filters after recovery: {e}")
+
+    # Re-select the current employee so the worker_filter locator resolves.
+    if emp_filter_name:
+        try:
+            _filter_grid_by_employee(page, emp_filter_name)
+        except Exception as e:
+            logging.warning(
+                f"NETWORK: Could not re-select employee '{emp_filter_name}' after recovery: {e}"
+            )
+
+    logging.info("NETWORK: Session restored — resuming automation.")
+    return True
 
 
 # ===========================================================================
