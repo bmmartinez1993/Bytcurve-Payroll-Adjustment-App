@@ -10,6 +10,7 @@ secret.key
 
 # Runtime logs
 automation_activity.log
+employee_history.json
 
 # Playwright artifacts
 test-results/
