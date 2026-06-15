@@ -242,7 +242,26 @@ def login(page: Page) -> None:
     page.get_by_role("textbox", name=SELECTORS["login_password"]).fill(PASSWORD)
     page.get_by_role("button",  name=SELECTORS["login_submit"]).click()
     page.wait_for_load_state("networkidle")
-    logging.info("Logged in successfully.")
+
+    # Verify authentication actually succeeded instead of assuming it did.
+    # This SPA uses hash routing: a successful login navigates away from the
+    # "#/login" route. If we are still on it after the submit settles, the
+    # credentials were rejected (or an MFA/error interstitial is showing) — in
+    # that case fail loudly rather than logging a misleading success and then
+    # timing out later on a nav element that only exists once authenticated.
+    try:
+        page.wait_for_function(
+            "!window.location.href.includes('#/login')", timeout=15000
+        )
+    except Exception:
+        pass
+    if "#/login" in page.url:
+        raise RuntimeError(
+            f"Login failed — still on the login page after submit ({page.url}). "
+            f"Verify credentials.enc / secret.key decrypt to the correct "
+            f"username/password for user '{USERNAME}'."
+        )
+    logging.info(f"Logged in successfully as '{USERNAME}'. Landing URL: {page.url}")
 
 
 def navigate_to_payroll(page: Page) -> None:
