@@ -2034,8 +2034,10 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
 
         if digest_widget is not None:
             def _update_digest(text: str) -> None:
+                digest_widget.configure(state="normal")
                 digest_widget.delete(1.0, ctk.END)
                 digest_widget.insert(ctk.END, text)
+                digest_widget.configure(state="disabled")
 
             def _run_digest() -> None:
                 digest_widget.after(0, lambda: _update_digest("Analyzing run log with AI..."))
