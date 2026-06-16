@@ -19,8 +19,8 @@ Bytcurve-Payroll-Adjustment-App/
 ├── automation_core_refactored.py               # Core library: time utils, overlap resolution, grid interactions
 ├── cli.py                                      # Headless CLI runner — entry point for the portable executable
 ├── pyproject.toml                              # Package definition; installs the `bytecurve` shell command
-├── install.sh                                  # One-step setup for macOS / Linux
-├── install.ps1                                 # One-step setup for Windows (PowerShell)
+├── install.sh                                  # One-step remote/local setup for macOS / Linux
+├── install.ps1                                 # One-step remote/local setup for Windows (PowerShell)
 ├── employee_scorer.py                          # AI: employee priority scoring with exponential decay
 ├── log_digest.py                               # AI: post-run log analysis via Ollama LLM
 ├── task_classifier.py                          # AI: ML shadow classifier alongside keyword policy
@@ -73,7 +73,8 @@ Bytcurve-Payroll-Adjustment-App/
 
 ### Local (GUI or CLI)
 
-- Python 3.8+
+- Python 3.10+
+- Git
 - Google Chrome installed (the app runs `channel="chrome"` to ensure consistent rendering of cookie banners and portal UI)
 - A ByteCurve 360 portal account
 
@@ -86,123 +87,129 @@ Bytcurve-Payroll-Adjustment-App/
 
 ## Portable Executable — Terminal Install
 
-The `install.sh` / `install.ps1` scripts set up an isolated Python virtual environment and register a `bytecurve` shell command that can be run from any terminal without manually invoking Python. AI features (`employee_scorer`, `log_digest`, `task_classifier`) and the GUI packages are **optional extras** — the core CLI only requires `playwright` and `cryptography`.
+**No repo clone required.** Run a single command in your terminal and the installer fetches the code, sets up an isolated environment, downloads the Chrome driver, and registers a `bytecurve` command globally — exactly like `curl | bash` tools (Homebrew, nvm, rustup).
 
-### Prerequisites
+AI features (`employee_scorer`, `log_digest`, `task_classifier`) and GUI packages are **optional extras**. The core CLI only requires `playwright` and `cryptography`.
 
-- **Python 3.10+** (`python3 --version` / `python --version`)
-- **Google Chrome** installed on the machine (the app launches Chrome directly via `channel="chrome"` to ensure the cookie-accept banner on the ByteCurve 360 login page is handled correctly)
-- `git clone` or download the repository
-
-> **AI features** require an [Ollama](https://ollama.com) server running locally with the `llama3.2` model pulled (`ollama pull llama3.2`).
+> **AI features** additionally require [Ollama](https://ollama.com) running locally with `ollama pull llama3.2`.
 
 ---
 
 ### Windows (PowerShell)
 
-Open PowerShell in the project directory and run:
+Open PowerShell and paste one of the following:
 
 ```powershell
 # Core CLI only (no GUI, no AI)
-.\install.ps1
+irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
 
-# CLI + AI/ML extras (employee scorer, log digest, task classifier)
-.\install.ps1 -Ai
+# Core CLI + AI/ML features (employee scorer, log digest, task classifier)
+$env:BYTECURVE_EXTRAS="ai"; irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
 
-# Full install — GUI (CustomTkinter) + AI/ML extras
-.\install.ps1 -Full
+# Full install — GUI (CustomTkinter) + AI/ML features
+$env:BYTECURVE_EXTRAS="full"; irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
 ```
 
-After setup, activate the environment and run:
+**Restart the terminal** (PATH is updated automatically), then run:
 
 ```powershell
-.\.venv\Scripts\Activate.ps1
 bytecurve --help
-
-# Run against the previous business day
-bytecurve
-
-# Run against a specific date
 bytecurve --date 2026-06-13
+```
+
+To update to the latest version:
+
+```powershell
+$env:BYTECURVE_UPDATE="1"; irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
 ```
 
 ---
 
 ### macOS
 
-Open Terminal in the project directory and run:
+Open Terminal and paste one of the following:
 
 ```bash
 # Core CLI only (no GUI, no AI)
-bash install.sh
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash
 
-# CLI + AI/ML extras
-bash install.sh --ai
+# Core CLI + AI/ML features
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --ai
 
-# Full install — GUI + AI/ML extras
-bash install.sh --full
+# Full install — GUI + AI/ML features
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --full
 ```
 
-After setup, activate the environment and run:
+If the installer asks you to add `~/.local/bin` to your PATH, follow the printed instructions, then:
 
 ```bash
-source .venv/bin/activate
 bytecurve --help
-
-# Run against the previous business day
-bytecurve
-
-# Run against a specific date
 bytecurve --date 2026-06-13
 ```
 
-> On macOS, Chrome must be installed at the default path `/Applications/Google Chrome.app`. The setup script installs the Playwright Chrome driver with `playwright install chrome`.
+To update:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --update
+```
+
+> Chrome must be installed at `/Applications/Google Chrome.app`. The installer downloads the Playwright Chrome driver automatically.
 
 ---
 
 ### Linux
 
-Open a terminal in the project directory and run:
+Open a terminal and paste one of the following:
 
 ```bash
 # Core CLI only
-bash install.sh
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash
 
-# CLI + AI/ML extras
-bash install.sh --ai
+# Core CLI + AI/ML features
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --ai
 
 # Full install
-bash install.sh --full
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --full
 ```
 
-After setup:
+Then:
 
 ```bash
-source .venv/bin/activate
 bytecurve --help
-
 bytecurve --date 2026-06-13
 ```
 
-> On Linux headless servers, you may need to configure a virtual display (e.g. Xvfb) since Chrome opens a non-headless window. For fully headless environments, use the Docker deployment instead.
+> On headless Linux servers, Chrome requires a visible display. For fully headless environments use the Docker deployment instead.
 
 ---
 
-### What the install scripts do
+### What the installer does
 
 | Step | Action |
 |---|---|
-| 1 | Create `.venv/` virtual environment in the project directory |
-| 2 | `pip install .` — installs the `bytecurve` command and its core dependencies |
-| 3 | `playwright install chrome` — downloads the Chrome for Testing binary |
+| 1 | Clone the repo to `~/.bytecurve` (skipped if already inside the cloned repo) |
+| 2 | Create `.venv/` virtual environment inside the install directory |
+| 3 | `pip install .` with any requested extras |
+| 4 | `playwright install chrome` — downloads the Chrome for Testing binary |
+| 5 | Register a `bytecurve` wrapper in `~/.local/bin` (Mac/Linux) or `%USERPROFILE%\.local\bin` (Windows) and add it to PATH |
 
-The `bytecurve` command calls `cli.py`, which loads the main automation module without starting the GUI. All AI imports degrade gracefully to no-ops when AI extras are not installed.
+The app lives in `~/.bytecurve` and never touches system Python. Re-running with `--update` / `$env:BYTECURVE_UPDATE="1"` pulls the latest code and reinstalls without losing credentials.
 
 ---
 
-## Installation
+### Extras reference
 
-### Local (pip + requirements)
+| Tier | macOS / Linux flag | Windows env var | Adds |
+|---|---|---|---|
+| Core (default) | *(none)* | *(none)* | `playwright`, `cryptography` |
+| AI features | `--ai` | `$env:BYTECURVE_EXTRAS="ai"` | `ollama`, `scikit-learn` |
+| GUI + AI | `--full` | `$env:BYTECURVE_EXTRAS="full"` | `customtkinter`, `pyautogui` |
+
+---
+
+## Installation (manual / developer)
+
+### Local
 
 ```bash
 # 1. Clone or download the repository
@@ -288,7 +295,7 @@ The automation will:
 
 ### CLI (portable executable)
 
-After running `install.sh` / `install.ps1` and activating the virtual environment:
+After the remote install:
 
 ```bash
 # Run against the previous business day (default)
