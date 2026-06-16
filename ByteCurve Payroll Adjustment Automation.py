@@ -1239,6 +1239,15 @@ def _click_update_button(page: Page, task_code: str) -> bool:
         return False
 
 
+def _shadow_classify(task_code: str, task_name: str, keyword_policy) -> None:
+    """Runs the ML classifier alongside the keyword policy. Never raises."""
+    try:
+        from task_classifier import shadow_compare
+        shadow_compare(task_code, task_name, keyword_policy)
+    except Exception:
+        pass
+
+
 def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                          worker_id: str, target_dt: dt,
                          scroll_container=None, worker_name: str = "",
@@ -1373,6 +1382,7 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
             if task["verified"]:
                 continue
             task_policy = determine_task_policy(task["code"], task["name"])
+            _shadow_classify(task["code"], task["name"], task_policy)
             if task_policy is None:
                 continue  # Bridge Charter or similar — skip
 
@@ -2031,6 +2041,12 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
         stop_button.configure(state="disabled")
         AUTOMATION_STOP_FLAG = False
         logging.info("UI: Controls re-enabled.")
+
+        try:
+            from task_classifier import retrain_from_log
+            retrain_from_log()
+        except Exception:
+            pass
 
         if digest_widget is not None:
             def _update_digest(text: str) -> None:
