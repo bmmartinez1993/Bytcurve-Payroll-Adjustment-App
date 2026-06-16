@@ -173,6 +173,7 @@ def _build_feature_text(task_code: str, task_name: str) -> str:
 def _train_and_save(data: list) -> Optional[object]:
     """
     Trains a TF-IDF + Logistic Regression pipeline on *data* and saves it.
+
     Returns the fitted pipeline, or None if scikit-learn is not installed.
     """
     try:
@@ -250,7 +251,9 @@ def _get_model() -> Optional[object]:
 def predict(task_code: str, task_name: str) -> Tuple[str, float]:
     """
     Returns (predicted_label, confidence) for a task code/name pair.
-    Falls back to ("UNKNOWN", 0.0) if the model is unavailable.
+
+    Falls back to ("UNKNOWN", 0.0) if the model is unavailable or prediction
+    fails, so callers never need to handle exceptions from this function.
     """
     model = _get_model()
     if model is None:
@@ -300,9 +303,9 @@ def shadow_compare(task_code: str, task_name: str, keyword_policy) -> None:
     """
     Runs the ML classifier alongside the keyword-based policy and logs the result.
 
-    This is the only integration point needed in the main automation file.
-    It is intentionally silent — all exceptions are caught so the automation
-    flow is never interrupted.
+    This function is the only integration point needed in the main automation
+    file.  It is intentionally silent — all exceptions are caught so the
+    automation flow is never interrupted.
 
     Args:
         task_code:      The task code string from the grid row.

@@ -10,6 +10,9 @@ secret.key
 
 # Runtime logs
 automation_activity.log
+employee_history.json
+task_classifier_log.db
+task_classifier_model.pkl
 
 # Playwright artifacts
 test-results/
