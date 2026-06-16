@@ -7,10 +7,14 @@ import random
 import re
 import socket
 import time
-import pyautogui
 import logging
-import customtkinter as ctk
-from tkinter import messagebox
+
+_CLI_MODE = os.environ.get("BYTECURVE_CLI") == "1"
+
+if not _CLI_MODE:
+    import pyautogui
+    import customtkinter as ctk
+    from tkinter import messagebox
 import threading
 from playwright.sync_api import sync_playwright, Page
 from cryptography.fernet import Fernet
@@ -38,13 +42,22 @@ from automation_core_refactored import (
     COL_PAID_START,
     COL_PAID_END,
 )
-from employee_scorer import (
-    load_history,
-    save_history,
-    sort_employees_by_priority,
-    record_outcome,
-)
-from log_digest import generate_digest
+try:
+    from employee_scorer import (
+        load_history,
+        save_history,
+        sort_employees_by_priority,
+        record_outcome,
+    )
+    from log_digest import generate_digest
+    _AI_FEATURES = True
+except ImportError:
+    _AI_FEATURES = False
+    def load_history(): return {}
+    def save_history(h): pass
+    def sort_employees_by_priority(names, h): return names
+    def record_outcome(*a, **kw): pass
+    def generate_digest(): return ""
 
 # --- LOGGING CONFIGURATION ---
 

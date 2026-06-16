@@ -13,10 +13,14 @@ import argparse
 import importlib.util
 import logging
 import os
+import platform
 import signal
 import sys
 from datetime import datetime as dt
 from playwright.sync_api import sync_playwright
+
+# Tell the main module to skip GUI imports (customtkinter, pyautogui, tkinter).
+os.environ["BYTECURVE_CLI"] = "1"
 
 # ── Load the main automation module ──────────────────────────────────────────
 # exec_module runs all module-level code (logging setup, imports) but does NOT
@@ -29,6 +33,22 @@ _spec = importlib.util.spec_from_file_location(
 )
 _app = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_app)
+
+
+def _chrome_executable() -> str | None:
+    """Return the path to the system Chrome binary for the current OS, or None."""
+    candidates = {
+        "Windows": [
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+        ],
+        "Darwin": ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"],
+        "Linux": [
+            "/usr/bin/google-chrome",
+            "/usr/bin/google-chrome-stable",
+        ],
+    }.get(platform.system(), [])
+    return next((p for p in candidates if os.path.isfile(p)), None)
 
 
 # ── Signal handler (SIGTERM from docker stop, SIGINT from Ctrl-C) ─────────
@@ -112,16 +132,17 @@ def main() -> None:
     exit_code = 0
     try:
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(
-                headless=False,
-                channel="chrome",
-                # --start-maximized is a no-op under Xvfb (no window manager to
-                # honour it), so the window opens small and ByteCurve's Bootstrap
-                # navbar collapses behind the hamburger, hiding the PAYROLL link.
-                # Force an explicit desktop window size so the expanded navbar
-                # renders and nav links are directly clickable.
-                args=["--start-maximized", "--no-sandbox", "--window-size=1920,1080"],
-            )
+            _launch_kwargs: dict = {
+                "headless": False,
+                "channel": "chrome",
+                "args": ["--start-maximized", "--no-sandbox", "--window-size=1920,1080"],
+            }
+            # On Mac/Linux, Playwright may not auto-locate Chrome; supply the
+            # path explicitly so the cookie-accept banner is handled correctly.
+            _exe = _chrome_executable()
+            if _exe and platform.system() != "Windows":
+                _launch_kwargs["executable_path"] = _exe
+            browser = pw.chromium.launch(**_launch_kwargs)
             context = browser.new_context(no_viewport=True)
             page = context.new_page()
             try:
