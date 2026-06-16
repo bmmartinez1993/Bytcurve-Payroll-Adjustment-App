@@ -7,7 +7,7 @@ Supports two run modes:
 | Mode | Entry point | When to use |
 |---|---|---|
 | **GUI** | `ByteCurve Payroll Adjustment Automation.py` | Local development, manual runs |
-| **CLI / headless** | `cli.py` | Docker, cloud schedulers, CI |
+| **CLI / headless** | `bytecurve` command (via `cli.py`) | Terminal, Docker, cloud schedulers, CI |
 
 ---
 
@@ -17,11 +17,17 @@ Supports two run modes:
 Bytcurve-Payroll-Adjustment-App/
 ├── ByteCurve Payroll Adjustment Automation.py  # GUI app: orchestration + CustomTkinter UI
 ├── automation_core_refactored.py               # Core library: time utils, overlap resolution, grid interactions
-├── cli.py                                      # Headless CLI runner (Docker / server)
+├── cli.py                                      # Headless CLI runner — entry point for the portable executable
+├── pyproject.toml                              # Package definition; installs the `bytecurve` shell command
+├── install.sh                                  # One-step remote/local setup for macOS / Linux
+├── install.ps1                                 # One-step remote/local setup for Windows (PowerShell)
+├── employee_scorer.py                          # AI: employee priority scoring with exponential decay
+├── log_digest.py                               # AI: post-run log analysis via Ollama LLM
+├── task_classifier.py                          # AI: ML shadow classifier alongside keyword policy
 ├── test_automation_core.py                     # Unit tests for the core library (88 tests)
 ├── ByteCurve Inspector.py                      # Playwright Inspector launcher for selector debugging
 ├── diagnose_dialog.py                          # Dialog diagnostics utility
-├── requirements.txt                            # Python dependencies
+├── requirements.txt                            # Full Python dependencies (GUI + AI)
 ├── .env.example                                # Environment variable template
 ├── Dockerfile                                  # Container image definition
 ├── docker-compose.yml                          # Compose service definition
@@ -67,7 +73,8 @@ Bytcurve-Payroll-Adjustment-App/
 
 ### Local (GUI or CLI)
 
-- Python 3.8+
+- Python 3.10+
+- Git
 - Google Chrome installed (the app runs `channel="chrome"` to ensure consistent rendering of cookie banners and portal UI)
 - A ByteCurve 360 portal account
 
@@ -78,7 +85,129 @@ Bytcurve-Payroll-Adjustment-App/
 
 ---
 
-## Installation
+## Portable Executable — Terminal Install
+
+**No repo clone required.** Run a single command in your terminal and the installer fetches the code, sets up an isolated environment, downloads the Chrome driver, and registers a `bytecurve` command globally — exactly like `curl | bash` tools (Homebrew, nvm, rustup).
+
+AI features (`employee_scorer`, `log_digest`, `task_classifier`) and GUI packages are **optional extras**. The core CLI only requires `playwright` and `cryptography`.
+
+> **AI features** additionally require [Ollama](https://ollama.com) running locally with `ollama pull llama3.2`.
+
+---
+
+### Windows (PowerShell)
+
+Open PowerShell and paste one of the following:
+
+```powershell
+# Core CLI only (no GUI, no AI)
+irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
+
+# Core CLI + AI/ML features (employee scorer, log digest, task classifier)
+$env:BYTECURVE_EXTRAS="ai"; irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
+
+# Full install — GUI (CustomTkinter) + AI/ML features
+$env:BYTECURVE_EXTRAS="full"; irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
+```
+
+**Restart the terminal** (PATH is updated automatically), then run:
+
+```powershell
+bytecurve --help
+bytecurve --date 2026-06-13
+```
+
+To update to the latest version:
+
+```powershell
+$env:BYTECURVE_UPDATE="1"; irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
+```
+
+---
+
+### macOS
+
+Open Terminal and paste one of the following:
+
+```bash
+# Core CLI only (no GUI, no AI)
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash
+
+# Core CLI + AI/ML features
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --ai
+
+# Full install — GUI + AI/ML features
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --full
+```
+
+If the installer asks you to add `~/.local/bin` to your PATH, follow the printed instructions, then:
+
+```bash
+bytecurve --help
+bytecurve --date 2026-06-13
+```
+
+To update:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --update
+```
+
+> Chrome must be installed at `/Applications/Google Chrome.app`. The installer downloads the Playwright Chrome driver automatically.
+
+---
+
+### Linux
+
+Open a terminal and paste one of the following:
+
+```bash
+# Core CLI only
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash
+
+# Core CLI + AI/ML features
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --ai
+
+# Full install
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --full
+```
+
+Then:
+
+```bash
+bytecurve --help
+bytecurve --date 2026-06-13
+```
+
+> On headless Linux servers, Chrome requires a visible display. For fully headless environments use the Docker deployment instead.
+
+---
+
+### What the installer does
+
+| Step | Action |
+|---|---|
+| 1 | Clone the repo to `~/.bytecurve` (skipped if already inside the cloned repo) |
+| 2 | Create `.venv/` virtual environment inside the install directory |
+| 3 | `pip install .` with any requested extras |
+| 4 | `playwright install chrome` — downloads the Chrome for Testing binary |
+| 5 | Register a `bytecurve` wrapper in `~/.local/bin` (Mac/Linux) or `%USERPROFILE%\.local\bin` (Windows) and add it to PATH |
+
+The app lives in `~/.bytecurve` and never touches system Python. Re-running with `--update` / `$env:BYTECURVE_UPDATE="1"` pulls the latest code and reinstalls without losing credentials.
+
+---
+
+### Extras reference
+
+| Tier | macOS / Linux flag | Windows env var | Adds |
+|---|---|---|---|
+| Core (default) | *(none)* | *(none)* | `playwright`, `cryptography` |
+| AI features | `--ai` | `$env:BYTECURVE_EXTRAS="ai"` | `ollama`, `scikit-learn` |
+| GUI + AI | `--full` | `$env:BYTECURVE_EXTRAS="full"` | `customtkinter`, `pyautogui` |
+
+---
+
+## Installation (manual / developer)
 
 ### Local
 
@@ -164,13 +293,22 @@ The automation will:
 6. Enter adjusted times into the grid and save.
 7. Check all verification checkboxes and click **Verify**.
 
-### CLI (local headless or Docker)
+### CLI (portable executable)
+
+After the remote install:
 
 ```bash
 # Run against the previous business day (default)
-python cli.py
+bytecurve
 
 # Run against a specific date
+bytecurve --date 2026-06-10
+```
+
+Without the portable install (direct Python invocation):
+
+```bash
+python cli.py
 python cli.py --date 2026-06-10
 ```
 
