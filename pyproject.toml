@@ -1,0 +1,38 @@
+[project]
+name = "bytecurve-payroll"
+version = "1.2.0"
+description = "Headless payroll adjustment automation for ByteCurve 360"
+requires-python = ">=3.10"
+dependencies = [
+    "playwright==1.58.0",
+    "cryptography==46.0.6",
+]
+
+[project.optional-dependencies]
+# Full GUI desktop experience
+gui = [
+    "customtkinter==5.2.2",
+    "pyautogui==0.9.54",
+]
+# AI/ML features (employee scorer, log digest, task classifier)
+ai = [
+    "ollama>=0.3.0",
+    "scikit-learn>=1.3.0",
+]
+# Everything
+full = [
+    "customtkinter==5.2.2",
+    "pyautogui==0.9.54",
+    "ollama>=0.3.0",
+    "scikit-learn>=1.3.0",
+]
+
+[project.scripts]
+bytecurve = "cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.backends.legacy:build"
+
+[tool.setuptools]
+py-modules = ["cli", "automation_core_refactored"]
