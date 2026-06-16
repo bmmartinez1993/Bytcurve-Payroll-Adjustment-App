@@ -15,4 +15,12 @@ for i in $(seq 1 10); do
     sleep 0.5
 done
 
+# python-xlib (pulled in by pyautogui -> mouseinfo) opens the display at import
+# time and unconditionally reads ~/.Xauthority, raising XauthError if the file
+# is missing — even though Xvfb runs with -ac (access control disabled).
+# Create an empty authority file so Xlib finds zero entries and connects
+# without auth via -ac.
+export XAUTHORITY="${XAUTHORITY:-$HOME/.Xauthority}"
+touch "$XAUTHORITY"
+
 exec "$@"

@@ -37,6 +37,24 @@ def _stop_handler(sig: int, _frame) -> None:
     _app.AUTOMATION_STOP_FLAG = True
 
 
+def _capture_failure(page, tag: str = "failure") -> None:
+    """Save a screenshot + page HTML to logs/ so a headless failure can be
+    diagnosed after the fact (the container has no visible browser window)."""
+    try:
+        os.makedirs("logs", exist_ok=True)
+        stamp = dt.now().strftime("%Y%m%d_%H%M%S")
+        shot = os.path.join("logs", f"{tag}_{stamp}.png")
+        html = os.path.join("logs", f"{tag}_{stamp}.html")
+        page.screenshot(path=shot, full_page=True)
+        with open(html, "w", encoding="utf-8") as fh:
+            fh.write(page.content())
+        logging.error(
+            f"Captured failure artifacts at URL {page.url}: {shot}, {html}"
+        )
+    except Exception as cap_exc:
+        logging.error(f"Could not capture failure artifacts: {cap_exc}")
+
+
 def main() -> None:
     signal.signal(signal.SIGTERM, _stop_handler)
     signal.signal(signal.SIGINT, _stop_handler)
@@ -55,11 +73,13 @@ def main() -> None:
     # ── Credentials ───────────────────────────────────────────────────────────
     username = os.environ.get("BYTECURVE_USER", "").strip()
     password = os.environ.get("BYTECURVE_PASS", "").strip()
+    cred_source = "BYTECURVE_USER/PASS env vars" if (username and password) else None
 
     if not (username and password):
         try:
             key = _app.load_key()
             username, password = _app.decrypt_credentials(key)
+            cred_source = f"{_app.CREDENTIAL_FILE} + {_app.KEY_FILE}"
         except Exception as exc:
             logging.error(f"Could not load credentials from file: {exc}")
 
@@ -70,6 +90,12 @@ def main() -> None:
             "or mount credentials.enc + secret.key."
         )
         sys.exit(1)
+
+    # Prove which credentials were loaded without ever logging the password.
+    logging.info(
+        f"Credentials resolved from {cred_source}: "
+        f"username='{username}', password length={len(password)}."
+    )
 
     # Inject into module globals so login() and related functions find them.
     _app.USERNAME = username
@@ -89,7 +115,12 @@ def main() -> None:
             browser = pw.chromium.launch(
                 headless=False,
                 channel="chrome",
-                args=["--start-maximized", "--no-sandbox"],
+                # --start-maximized is a no-op under Xvfb (no window manager to
+                # honour it), so the window opens small and ByteCurve's Bootstrap
+                # navbar collapses behind the hamburger, hiding the PAYROLL link.
+                # Force an explicit desktop window size so the expanded navbar
+                # renders and nav links are directly clickable.
+                args=["--start-maximized", "--no-sandbox", "--window-size=1920,1080"],
             )
             context = browser.new_context(no_viewport=True)
             page = context.new_page()
@@ -105,6 +136,7 @@ def main() -> None:
                     logging.info("COMPLETE: Automation finished successfully.")
             except Exception as exc:
                 logging.critical(f"Automation error: {exc}", exc_info=True)
+                _capture_failure(page, "automation_error")
                 exit_code = 1
             finally:
                 browser.close()
