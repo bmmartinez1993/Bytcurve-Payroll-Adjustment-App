@@ -1,0 +1,10 @@
+README.md
+automation_core_refactored.py
+cli.py
+pyproject.toml
+bytecurve_payroll.egg-info/PKG-INFO
+bytecurve_payroll.egg-info/SOURCES.txt
+bytecurve_payroll.egg-info/dependency_links.txt
+bytecurve_payroll.egg-info/entry_points.txt
+bytecurve_payroll.egg-info/requires.txt
+bytecurve_payroll.egg-info/top_level.txt
