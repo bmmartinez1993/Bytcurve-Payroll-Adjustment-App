@@ -1,6 +1,6 @@
 [project]
 name = "bytecurve-payroll"
-version = "1.2.0"
+version = "1.2.1"
 description = "Headless payroll adjustment automation for ByteCurve 360"
 requires-python = ">=3.10"
 dependencies = [
@@ -32,7 +32,7 @@ bytecurve = "cli:main"
 
 [build-system]
 requires = ["setuptools>=61"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 py-modules = ["cli", "automation_core_refactored"]
