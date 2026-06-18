@@ -293,10 +293,8 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
 
         logging.info(f"VERIFY_BTN: Clicking Verify for {worker_name}")
         btn.click(force=True, timeout=5000)
-        page.wait_for_timeout(800)
 
         page.wait_for_selector("div[role='dialog'][aria-modal='true']", state="visible", timeout=15000)
-        page.wait_for_timeout(500)
 
         # Primary: the test-id the dialog ships with. If that is absent, fall back to
         # the generic Kendo confirm-dialog primary button (proven in diagnose_dialog.py),
@@ -315,11 +313,11 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
             return False
 
         ok_btn.first.scroll_into_view_if_needed()
-        page.wait_for_timeout(500)
-        ok_btn.first.click(force=True, timeout=5000, delay=100)
-        page.wait_for_timeout(3000)
+        ok_btn.first.click(force=True, timeout=5000)
+        # Wait for the dialog to close, then for the grid reload to finish.
+        page.wait_for_selector("div[role='dialog'][aria-modal='true']", state="hidden", timeout=8000)
         wait_for_loading(page)
-        page.wait_for_timeout(1500)
+        page.wait_for_timeout(300)
 
         # After the grid reloads, the platform may show an "Employee Conflict"
         # dialog if a verified task overlaps with another worker's already-verified
@@ -1230,7 +1228,6 @@ def _click_update_button(page: Page, task_code: str) -> bool:
 
         logging.info(f"UPDATE_BTN [{task_code}]: Clicking Update button.")
         update_btn.click(force=True)
-        page.wait_for_timeout(500)
         wait_for_loading(page)
 
         # Confirm the save landed: the edit row should disappear.
@@ -1293,7 +1290,7 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
         # from the DOM and every subsequent locator operation times out (30 s).
         if scroll_container is not None and worker_name:
             _scroll_worker_into_view(page, scroll_container, worker_name)
-            page.wait_for_timeout(400)
+            page.wait_for_timeout(150)
 
         wait_for_loading(page)
 
