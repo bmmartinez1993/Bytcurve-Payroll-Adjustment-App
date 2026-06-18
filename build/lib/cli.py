@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+"""
+Headless CLI runner for ByteCurve Payroll Adjustment Automation.
+
+Credentials are resolved in this order:
+    1. BYTECURVE_USER / BYTECURVE_PASS environment variables
+    2. credentials.enc + secret.key files in the current directory
+
+Usage:
+    python cli.py [--date YYYY-MM-DD]
+"""
+import argparse
+import importlib.util
+import logging
+import os
+import platform
+import signal
+import sys
+from datetime import datetime as dt
+from playwright.sync_api import sync_playwright
+
+# Tell the main module to skip GUI imports (customtkinter, pyautogui, tkinter).
+os.environ["BYTECURVE_CLI"] = "1"
+
+# ── Load the main automation module ──────────────────────────────────────────
+# exec_module runs all module-level code (logging setup, imports) but does NOT
+# launch the GUI — the if __name__ == "__main__" guard in the main file is
+# never entered when the module is loaded this way.
+_here = os.path.dirname(os.path.abspath(__file__))
+_spec = importlib.util.spec_from_file_location(
+    "bytecurve_automation",
+    os.path.join(_here, "ByteCurve Payroll Adjustment Automation.py"),
+)
+_app = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_app)
+
+
+def _chrome_executable() -> str | None:
+    """Return the path to the system Chrome binary for the current OS, or None."""
+    candidates = {
+        "Windows": [
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+        ],
+        "Darwin": ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"],
+        "Linux": [
+            "/usr/bin/google-chrome",
+            "/usr/bin/google-chrome-stable",
+        ],
+    }.get(platform.system(), [])
+    return next((p for p in candidates if os.path.isfile(p)), None)
+
+
+# ── Signal handler (SIGTERM from docker stop, SIGINT from Ctrl-C) ─────────
+def _stop_handler(sig: int, _frame) -> None:
+    logging.info(f"Signal {sig} received — setting stop flag.")
+    _app.AUTOMATION_STOP_FLAG = True
+
+
+def _capture_failure(page, tag: str = "failure") -> None:
+    """Save a screenshot + page HTML to logs/ so a headless failure can be
+    diagnosed after the fact (the container has no visible browser window)."""
+    try:
+        os.makedirs("logs", exist_ok=True)
+        stamp = dt.now().strftime("%Y%m%d_%H%M%S")
+        shot = os.path.join("logs", f"{tag}_{stamp}.png")
+        html = os.path.join("logs", f"{tag}_{stamp}.html")
+        page.screenshot(path=shot, full_page=True)
+        with open(html, "w", encoding="utf-8") as fh:
+            fh.write(page.content())
+        logging.error(
+            f"Captured failure artifacts at URL {page.url}: {shot}, {html}"
+        )
+    except Exception as cap_exc:
+        logging.error(f"Could not capture failure artifacts: {cap_exc}")
+
+
+def main() -> None:
+    signal.signal(signal.SIGTERM, _stop_handler)
+    signal.signal(signal.SIGINT, _stop_handler)
+
+    parser = argparse.ArgumentParser(
+        description="ByteCurve Payroll Adjustment — headless CLI runner"
+    )
+    parser.add_argument(
+        "--date",
+        metavar="YYYY-MM-DD",
+        default=None,
+        help="Target business date (default: previous business day)",
+    )
+    args = parser.parse_args()
+
+    # ── Credentials ───────────────────────────────────────────────────────────
+    username = os.environ.get("BYTECURVE_USER", "").strip()
+    password = os.environ.get("BYTECURVE_PASS", "").strip()
+    cred_source = "BYTECURVE_USER/PASS env vars" if (username and password) else None
+
+    if not (username and password):
+        try:
+            key = _app.load_key()
+            username, password = _app.decrypt_credentials(key)
+            cred_source = f"{_app.CREDENTIAL_FILE} + {_app.KEY_FILE}"
+        except Exception as exc:
+            logging.error(f"Could not load credentials from file: {exc}")
+
+    if not (username and password):
+        logging.critical(
+            "No credentials available. "
+            "Set BYTECURVE_USER / BYTECURVE_PASS env vars "
+            "or mount credentials.enc + secret.key."
+        )
+        sys.exit(1)
+
+    # Prove which credentials were loaded without ever logging the password.
+    logging.info(
+        f"Credentials resolved from {cred_source}: "
+        f"username='{username}', password length={len(password)}."
+    )
+
+    # Inject into module globals so login() and related functions find them.
+    _app.USERNAME = username
+    _app.PASSWORD = password
+
+    target_date = args.date or _app.get_previous_business_day()
+
+    # ── Run ───────────────────────────────────────────────────────────────────
+    logging.info("=" * 60)
+    logging.info(f"AUTOMATION RUN STARTED: {dt.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    logging.info(f"Target date: {target_date}")
+    logging.info("=" * 60)
+
+    exit_code = 0
+    try:
+        with sync_playwright() as pw:
+            _launch_kwargs: dict = {
+                "headless": False,
+                "channel": "chrome",
+                "args": ["--start-maximized", "--no-sandbox", "--window-size=1920,1080"],
+            }
+            # On Mac/Linux, Playwright may not auto-locate Chrome; supply the
+            # path explicitly so the cookie-accept banner is handled correctly.
+            _exe = _chrome_executable()
+            if _exe and platform.system() != "Windows":
+                _launch_kwargs["executable_path"] = _exe
+            browser = pw.chromium.launch(**_launch_kwargs)
+            context = browser.new_context(no_viewport=True)
+            page = context.new_page()
+            try:
+                page.on("dialog", lambda d: d.accept())
+                _app.login(page)
+                _app.navigate_to_payroll(page)
+                if not _app.AUTOMATION_STOP_FLAG:
+                    _app.validate_and_process_rows(page, target_date)
+                if _app.AUTOMATION_STOP_FLAG:
+                    logging.warning("STOP: Automation halted before completing.")
+                else:
+                    logging.info("COMPLETE: Automation finished successfully.")
+            except Exception as exc:
+                logging.critical(f"Automation error: {exc}", exc_info=True)
+                _capture_failure(page, "automation_error")
+                exit_code = 1
+            finally:
+                browser.close()
+    except Exception as exc:
+        logging.critical(f"Browser launch failed: {exc}", exc_info=True)
+        exit_code = 1
+
+    sys.exit(exit_code)
+
+
+if __name__ == "__main__":
+    main()

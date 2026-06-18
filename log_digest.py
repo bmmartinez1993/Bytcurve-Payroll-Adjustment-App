@@ -69,6 +69,14 @@ The app iterates through employees listed in a payroll portal, adjusts their
 paid start/end times according to task-type rules, resolves scheduling
 conflicts, and marks tasks as verified.
 
+Operational rules the analysis must account for:
+  1. The primary purpose of this app is to adjust employee schedule times
+     strictly according to the task policy currently assigned to each worker.
+     Any deviation from the assigned policy is a failure worth flagging.
+  2. This automation is designed to run every business day (Monday through
+     Friday). Flag any indication that a run was skipped, ran on a weekend,
+     or ran more than once in a single business day as a scheduling anomaly.
+
 Key log markers to look for:
   WORKER:          employee processing started
   SCORER:          employee priority order logged

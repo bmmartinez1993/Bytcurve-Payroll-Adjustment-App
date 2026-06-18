@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: bytecurve-payroll
+Version: 1.2.0
+Summary: Headless payroll adjustment automation for ByteCurve 360
+Requires-Python: >=3.10
+Requires-Dist: playwright==1.58.0
+Requires-Dist: cryptography==46.0.6
+Provides-Extra: gui
+Requires-Dist: customtkinter==5.2.2; extra == "gui"
+Requires-Dist: pyautogui==0.9.54; extra == "gui"
+Provides-Extra: ai
+Requires-Dist: ollama>=0.3.0; extra == "ai"
+Requires-Dist: scikit-learn>=1.3.0; extra == "ai"
+Provides-Extra: full
+Requires-Dist: customtkinter==5.2.2; extra == "full"
+Requires-Dist: pyautogui==0.9.54; extra == "full"
+Requires-Dist: ollama>=0.3.0; extra == "full"
+Requires-Dist: scikit-learn>=1.3.0; extra == "full"
