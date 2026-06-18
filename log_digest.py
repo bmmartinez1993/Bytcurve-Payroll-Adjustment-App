@@ -76,6 +76,7 @@ Key log markers to look for:
   MANUAL_FLAG:     employee needs human review (automation skipped verification)
   STUCK:           a task exceeded the retry limit and was abandoned
   SAVE_FAIL / ADJUST_FAIL: an individual save or cell-edit failure
+  HIDDEN_EMPLOYEE: dropdown filter returned empty — employee processed via unfiltered fallback
   COMPLETE:        full run finished successfully
   STOP:            run was interrupted by the user
 
