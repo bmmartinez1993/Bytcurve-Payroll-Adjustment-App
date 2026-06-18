@@ -1119,7 +1119,6 @@ def verify_task_checkbox(page: Page, row: Locator, task_code: str,
     try:
         # Ensure the grid is ready
         wait_for_loading(page)
-        page.wait_for_timeout(100)
 
         # Scroll the row into view to ensure checkbox isn't clipped
         row.scroll_into_view_if_needed()
@@ -1127,7 +1126,6 @@ def verify_task_checkbox(page: Page, row: Locator, task_code: str,
         # Locate the checkbox within the row
         checkbox = row.locator("input[kendocheckbox][aria-label='verify']")
         checkbox.wait_for(state="visible", timeout=10000)
-        page.wait_for_timeout(50)
 
         # Check current state before clicking
         was_checked_before = checkbox.is_checked()
@@ -1140,8 +1138,8 @@ def verify_task_checkbox(page: Page, row: Locator, task_code: str,
             return True  # Already verified, no action needed
 
         # Click the checkbox
-        checkbox.click(force=True, timeout=5000, delay=50)
-        page.wait_for_timeout(200)  # Wait for click to register and state to update
+        checkbox.click(force=True, timeout=5000)
+        page.wait_for_timeout(100)  # Wait for click to register and state to update
 
         # Verify the state actually changed
         is_checked_after = checkbox.is_checked()
@@ -1448,7 +1446,7 @@ def wait_for_loading(page: Page, timeout_ms: int = 20000) -> bool:
         page: Playwright Page object
         timeout_ms: Maximum time to wait for loading to complete
     """
-    page.wait_for_timeout(500)  # Brief pause to allow any dynamic loader to trigger
+    page.wait_for_timeout(100)  # Brief pause to allow any dynamic loader to trigger
     try:
         page.wait_for_selector(".page-loading", state="hidden", timeout=timeout_ms)
         return True
