@@ -1,0 +1,2 @@
+[console_scripts]
+bytecurve = cli:main

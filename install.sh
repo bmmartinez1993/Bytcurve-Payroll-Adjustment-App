@@ -1,47 +1,100 @@
 #!/usr/bin/env bash
-# ByteCurve Payroll Adjustment — one-step CLI setup (macOS / Linux)
-# Usage: bash install.sh [--full | --ai]
-#   --full   Install with GUI + AI/ML extras
-#   --ai     Install with AI/ML extras only (no GUI)
-#   (none)   Install CLI-only (no GUI, no AI)
+# ByteCurve Payroll Adjustment — self-contained installer (macOS / Linux)
+#
+# ── Remote install (no repo clone needed) ─────────────────────────────────────
+#   curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash
+#
+# With extras:
+#   curl -fsSL .../install.sh | bash -s -- --ai      # + AI/ML features
+#   curl -fsSL .../install.sh | bash -s -- --full    # + GUI + AI/ML features
+#   curl -fsSL .../install.sh | bash -s -- --update  # pull latest and reinstall
+#
+# ── Local install (inside a cloned repo) ──────────────────────────────────────
+#   bash install.sh [--ai | --full | --update]
 
 set -euo pipefail
 
+REPO_URL="https://github.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App.git"
+DEFAULT_INSTALL_DIR="${HOME}/.bytecurve"
+BIN_DIR="${HOME}/.local/bin"
+
+# ── Parse flags ───────────────────────────────────────────────────────────────
 EXTRAS=""
+UPDATE=false
 for arg in "$@"; do
     case "$arg" in
-        --full) EXTRAS="[full]" ;;
-        --ai)   EXTRAS="[ai]"   ;;
+        --full)   EXTRAS="[full]" ;;
+        --ai)     EXTRAS="[ai]"   ;;
+        --update) UPDATE=true     ;;
     esac
 done
 
-echo "=== ByteCurve Payroll — setup (macOS / Linux) ==="
-
-# 1. Create virtual environment
-if [ ! -d ".venv" ]; then
-    python3 -m venv .venv
-    echo "[1/4] Virtual environment created."
+# ── Local vs remote mode ──────────────────────────────────────────────────────
+# When piped from curl, the current directory is not the repo.
+if [ -f "${PWD}/pyproject.toml" ] && [ -f "${PWD}/cli.py" ]; then
+    INSTALL_DIR="${PWD}"
+    echo "=== ByteCurve Payroll — local setup ==="
+    echo "[1/5] Using existing repo at ${INSTALL_DIR}."
 else
-    echo "[1/4] Virtual environment already exists, skipping."
+    INSTALL_DIR="${DEFAULT_INSTALL_DIR}"
+    echo "=== ByteCurve Payroll — installing to ${INSTALL_DIR} ==="
+
+    if [ -d "${INSTALL_DIR}/.git" ]; then
+        if $UPDATE; then
+            echo "[1/5] Updating existing install..."
+            git -C "${INSTALL_DIR}" pull --ff-only
+        else
+            echo "[1/5] Found existing install (pass --update to refresh)."
+        fi
+    else
+        echo "[1/5] Downloading repository..."
+        git clone --depth 1 "${REPO_URL}" "${INSTALL_DIR}"
+    fi
 fi
 
-# 2. Activate and upgrade pip
-source .venv/bin/activate
-pip install --quiet --upgrade pip
+# ── Virtual environment ───────────────────────────────────────────────────────
+VENV="${INSTALL_DIR}/.venv"
+if [ ! -d "${VENV}" ]; then
+    echo "[2/5] Creating virtual environment..."
+    python3 -m venv "${VENV}"
+else
+    echo "[2/5] Virtual environment already exists."
+fi
 
-# 3. Install package
-echo "[2/4] Installing bytecurve-payroll${EXTRAS}..."
-pip install --quiet ".${EXTRAS}"
+"${VENV}/bin/pip" install --quiet --upgrade pip
 
-# 4. Install Playwright's Chromium + Chrome driver
-echo "[3/4] Installing Playwright browser (Chrome)..."
-playwright install chrome
+# ── Install package ───────────────────────────────────────────────────────────
+echo "[3/5] Installing bytecurve-payroll${EXTRAS}..."
+"${VENV}/bin/pip" install --quiet "${INSTALL_DIR}${EXTRAS}"
 
-echo "[4/4] Done."
+# ── Playwright Chrome ─────────────────────────────────────────────────────────
+echo "[4/5] Installing Playwright Chrome driver..."
+"${VENV}/bin/playwright" install chrome
+
+# ── Register global command ───────────────────────────────────────────────────
+echo "[5/5] Registering 'bytecurve' command in ${BIN_DIR}..."
+mkdir -p "${BIN_DIR}"
+cat > "${BIN_DIR}/bytecurve" <<WRAPPER
+#!/usr/bin/env bash
+exec "${VENV}/bin/python" "${INSTALL_DIR}/cli.py" "\$@"
+WRAPPER
+chmod +x "${BIN_DIR}/bytecurve"
+
+# ── PATH notice ───────────────────────────────────────────────────────────────
 echo ""
-echo "Activate the environment and run:"
-echo "  source .venv/bin/activate"
-echo "  bytecurve --help"
+echo "Installation complete!"
 echo ""
-echo "To run for a specific date:"
-echo "  bytecurve --date YYYY-MM-DD"
+
+SHELL_RC="${HOME}/.bashrc"
+[[ "${SHELL:-bash}" == *"zsh"* ]] && SHELL_RC="${HOME}/.zshrc"
+
+if echo ":${PATH}:" | grep -q ":${BIN_DIR}:"; then
+    echo "Run:  bytecurve --help"
+    echo "      bytecurve --date 2026-06-13"
+else
+    echo "${BIN_DIR} is not in your PATH yet. Add it:"
+    echo "  echo 'export PATH=\"\${HOME}/.local/bin:\${PATH}\"' >> ${SHELL_RC}"
+    echo "  source ${SHELL_RC}"
+    echo ""
+    echo "Then run:  bytecurve --help"
+fi

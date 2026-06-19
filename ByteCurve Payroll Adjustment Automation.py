@@ -1826,8 +1826,8 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
             continue
 
         # Identify the canonical worker_id / worker_name from the filtered grid rows.
-        task_rows     = page.locator(grid_rows_sel).all()
-        worker_id     = worker_name = worker_display = ""
+        task_rows  = page.locator(grid_rows_sel).all()
+        worker_id  = worker_name = worker_display = ""
         for row in task_rows:
             row_date = (row.locator(SELECTORS["row_date"]).text_content(timeout=2000) or "").strip()
             if row_date != target_date_full:
@@ -1841,7 +1841,56 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
             worker_display = f"{worker_name} ({emp_id})" if emp_id else worker_name
             break
 
-        if not worker_id or worker_id in processed_workers:
+        # active_processing_filter tracks whether the dropdown filter is applied.
+        # For normal employees it mirrors emp_filter_name; for hidden employees it
+        # is cleared so sub-functions do not try to re-apply the broken filter.
+        active_processing_filter = emp_filter_name
+
+        if not worker_id:
+            # The platform's own dropdown filter returned no rows for this employee.
+            # This is a known platform inconsistency: the name stored in the dropdown
+            # does not map to any task rows when that filter is applied.
+            # Strategy: clear the filter, scan every row in the unfiltered grid, and
+            # find this employee by a loose word-match on their display name.
+            _clear_employee_filter(page)
+            wait_for_loading(page)
+
+            filter_words = [w for w in emp_filter_name.lower().split() if len(w) > 2]
+            all_rows = page.locator(grid_rows_sel).all()
+            for row in all_rows:
+                try:
+                    row_date = (row.locator(SELECTORS["row_date"]).text_content(timeout=1500) or "").strip()
+                    if row_date != target_date_full:
+                        continue
+                    name_span = row.locator(SELECTORS["row_worker_name"]).locator("span[title]").first
+                    if name_span.count() == 0:
+                        continue
+                    candidate_name = (name_span.text_content(timeout=1500) or "").strip()
+                    if not candidate_name:
+                        continue
+                    if any(w in candidate_name.lower() for w in filter_words):
+                        emp_id_found   = (name_span.get_attribute("title", timeout=1500) or "").strip()
+                        worker_id      = emp_id_found or candidate_name
+                        worker_name    = candidate_name
+                        worker_display = f"{worker_name} ({emp_id_found})" if emp_id_found else worker_name
+                        active_processing_filter = ""  # no dropdown filter in effect
+                        logging.warning(
+                            f"HIDDEN_EMPLOYEE: '{emp_filter_name}' — platform dropdown filter "
+                            f"returned empty grid; found matching rows as '{worker_display}' in "
+                            f"unfiltered view. Processing without dropdown filter."
+                        )
+                        break
+                except Exception:
+                    continue
+
+            if not worker_id:
+                logging.warning(
+                    f"HIDDEN_EMPLOYEE: '{emp_filter_name}' — not found in unfiltered grid "
+                    f"for date '{target_date_full}' either. Skipping."
+                )
+                continue
+
+        if worker_id in processed_workers:
             continue
 
         # Build a live locator filtered to this worker's rows.
@@ -1854,13 +1903,13 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
 
         adjustments_ok = _adjust_worker_tasks(
             page, worker_filter, worker_display, worker_id, target_dt,
-            emp_filter_name=emp_filter_name,
+            emp_filter_name=active_processing_filter,
         )
 
         if adjustments_ok:
             _verify_worker_tasks(
                 page, worker_filter, worker_display,
-                emp_filter_name=emp_filter_name,
+                emp_filter_name=active_processing_filter,
             )
             logging.info(f"WORKER: Done with {worker_display}")
         else:
