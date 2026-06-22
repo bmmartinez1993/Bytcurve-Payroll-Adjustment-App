@@ -264,14 +264,26 @@ def login(page: Page) -> None:
     page.get_by_role("textbox", name=SELECTORS["login_password"]).fill(PASSWORD)
     page.get_by_role("button",  name=SELECTORS["login_submit"]).click()
     page.wait_for_load_state("networkidle")
+    # The app does a post-login redirect to /portal/dispatch/; wait for it to settle
+    # so navigate_to_payroll doesn't race against an in-flight navigation.
+    try:
+        page.wait_for_url("**/portal/dispatch/**", timeout=15000)
+        page.wait_for_load_state("networkidle")
+    except Exception:
+        pass
     logging.info("Logged in successfully.")
 
 
 def navigate_to_payroll(page: Page) -> None:
     logging.info("Navigating to Timesheets...")
     wait_for_loading(page)
-    page.get_by_role("link", name=SELECTORS["nav_payroll_section"]).click()
-    wait_for_loading(page)
+    # PAYROLL is a <button aria-expanded="false|true">, not a link.
+    # Only click to expand when the submenu is currently collapsed.
+    payroll_btn = page.get_by_role("button", name=SELECTORS["nav_payroll_section"])
+    payroll_btn.wait_for(state="visible", timeout=10000)
+    if payroll_btn.get_attribute("aria-expanded") != "true":
+        payroll_btn.click(timeout=10000)
+        wait_for_loading(page)
     link = page.get_by_role("link", name=SELECTORS["nav_timesheets"])
     link.wait_for(state="visible", timeout=10000)
     link.click()
