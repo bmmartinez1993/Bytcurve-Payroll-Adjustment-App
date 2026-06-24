@@ -1302,7 +1302,7 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
         # from the DOM and every subsequent locator operation times out (30 s).
         if scroll_container is not None and worker_name:
             _scroll_worker_into_view(page, scroll_container, worker_name)
-            page.wait_for_timeout(150)
+            page.wait_for_timeout(400)
 
         wait_for_loading(page)
 
@@ -1562,7 +1562,7 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
 
             # Dismiss any lingering dialog BEFORE touching cells so its overlay
             # does not intercept the dblclick on the paid-start/end cells.
-            _handle_confirm_changes_dialog(page, task["code"], timeout=400)
+            _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
 
             ok_s = adjust_time_entry(page, task["row"], COL_PAID_START, t_start) \
                    if not times_match(task["p_start"], t_start) else True
@@ -1592,7 +1592,7 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                     )
                     # Dismiss any schedule-conflict dialog ByteCurve fires back
                     # immediately after an individual save before the next iteration.
-                    _handle_confirm_changes_dialog(page, task["code"], timeout=400)
+                    _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
                     retry_tracking.pop(task_key, None)
                     adjustment_made = True
                     _saved_task_count += 1
@@ -1602,7 +1602,7 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                         f"SAVE_FAIL: Both Update button and navigation dialog failed "
                         f"for {task['code']} ({worker_display}). Retrying on next pass."
                     )
-                    _handle_confirm_changes_dialog(page, task["code"], timeout=400)
+                    _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
                     needs_retry = True
                 break  # Always break — grid state changed; re-read rows regardless
             else:
@@ -1647,7 +1647,7 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                         )
                         # Dismiss any schedule-conflict dialog ByteCurve fires back
                         # immediately after an individual save before the next iteration.
-                        _handle_confirm_changes_dialog(page, task["code"], timeout=400)
+                        _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
                         retry_tracking.pop(task_key, None)
                         adjustment_made = True
                         _saved_task_count += 1
@@ -1656,13 +1656,13 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                             f"SAVE_FAIL: Both Update button and navigation dialog failed "
                             f"for {task['code']} ({worker_display}) after VERIFY failure. Retrying."
                         )
-                        _handle_confirm_changes_dialog(page, task["code"], timeout=400)
+                        _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
                         needs_retry = True
                 else:
                     # Edit row is not open — cell could not be opened at all
                     # (e.g. a dialog overlay blocked the dblclick). Dismiss any
                     # lingering dialog and retry on the next pass.
-                    _handle_confirm_changes_dialog(page, task["code"], timeout=400)
+                    _handle_confirm_changes_dialog(page, task["code"], timeout=1500)
                     needs_retry = True
                 break  # Always break — grid state may have changed; re-read rows
 
