@@ -1446,7 +1446,7 @@ def wait_for_loading(page: Page, timeout_ms: int = 20000) -> bool:
         page: Playwright Page object
         timeout_ms: Maximum time to wait for loading to complete
     """
-    page.wait_for_timeout(100)  # Brief pause to allow any dynamic loader to trigger
+    page.wait_for_timeout(500)  # Pause long enough for the loading indicator to appear before checking
     try:
         page.wait_for_selector(".page-loading", state="hidden", timeout=timeout_ms)
         return True
