@@ -88,7 +88,26 @@ def main() -> None:
         default=None,
         help="Target business date (default: previous business day)",
     )
+    parser.add_argument(
+        "--rotate-key",
+        action="store_true",
+        help=(
+            "Rotate the Fernet encryption key: re-encrypt credentials.enc with a new key "
+            "and store it in the OS keychain (or secret.key file as fallback), then exit."
+        ),
+    )
     args = parser.parse_args()
+
+    # ── Key rotation (early exit — no browser needed) ─────────────────────────
+    if args.rotate_key:
+        import credential_store
+        try:
+            location = credential_store.rotate_key(_app.CREDENTIAL_FILE, _app.KEY_FILE)
+            print(f"Key rotation complete. New key stored in: {location}")
+        except (FileNotFoundError, ValueError) as exc:
+            logging.error("Key rotation failed: %s", exc)
+            sys.exit(1)
+        sys.exit(0)
 
     # ── Credentials ───────────────────────────────────────────────────────────
     username = os.environ.get("BYTECURVE_USER", "").strip()
