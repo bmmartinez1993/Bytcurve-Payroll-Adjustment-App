@@ -18,6 +18,7 @@ if not _CLI_MODE:
 import threading
 from playwright.sync_api import sync_playwright, Page
 from cryptography.fernet import Fernet
+import audit_log
 import credential_store
 
 from automation_core_refactored import (
@@ -62,19 +63,13 @@ except ImportError:
 
 # --- LOGGING CONFIGURATION ---
 
-class _LiveFileHandler(logging.FileHandler):
-    """FileHandler that flushes to disk after every record for live log tailing."""
-    def emit(self, record):
-        super().emit(record)
-        self.flush()
-
 _log_formatter = logging.Formatter(
     fmt='%(asctime)s [%(levelname)s] %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
 os.makedirs("logs", exist_ok=True)
-_file_handler = _LiveFileHandler(
+_file_handler = audit_log.HMACFileHandler(
     os.path.join("logs", "automation_activity.log"),
     mode='w',           # overwrite each run — keeps the file to the current session only
     encoding='utf-8',
@@ -2183,6 +2178,8 @@ def start_gui_and_automation() -> None:
 
     encryption_key       = load_key()
     saved_user, saved_pw = decrypt_credentials(encryption_key)
+    _file_handler.set_key(encryption_key)
+    logging.info("AUDIT: HMAC signing active.")
 
     ka_thread = threading.Thread(target=keep_active, args=(KEEP_ACTIVE_STOP_EVENT,), daemon=True)
     ka_thread.start()

@@ -7,9 +7,12 @@ Key lookup priority:
 """
 from __future__ import annotations
 
+import hashlib
+import hmac as _hmac
 import logging
 import os
 from pathlib import Path
+from typing import Optional
 
 from cryptography.fernet import Fernet, InvalidToken
 
@@ -137,3 +140,36 @@ def rotate_key(
     location = save_key(new_key, key_file)
     logging.info("Key rotation complete. New key stored in: %s", location)
     return location
+
+
+# ===========================================================================
+# Credential file integrity
+# ===========================================================================
+
+def hash_credential_file(credential_file: str = "credentials.enc") -> Optional[str]:
+    """
+    Return the SHA-256 hex digest of the credential file.
+
+    Returns ``None`` if the file does not exist, so callers can distinguish
+    "file absent" from "file present but empty".
+    """
+    cred_path = Path(credential_file)
+    if not cred_path.exists():
+        return None
+    return hashlib.sha256(cred_path.read_bytes()).hexdigest()
+
+
+def verify_credential_file_integrity(
+    expected_hash: str,
+    credential_file: str = "credentials.enc",
+) -> bool:
+    """
+    Return ``True`` if the credential file still matches *expected_hash*.
+
+    Returns ``False`` if the file is missing or its content has changed.
+    Uses a timing-safe comparison to prevent hash-oracle side-channel attacks.
+    """
+    current = hash_credential_file(credential_file)
+    if current is None:
+        return False
+    return _hmac.compare_digest(current, expected_hash)
