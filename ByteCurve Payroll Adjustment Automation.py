@@ -18,6 +18,7 @@ if not _CLI_MODE:
 import threading
 from playwright.sync_api import sync_playwright, Page
 from cryptography.fernet import Fernet
+import credential_store
 
 from automation_core_refactored import (
     # Time utilities
@@ -160,16 +161,12 @@ KEEP_ACTIVE_STOP_EVENT = threading.Event()
 
 def generate_key() -> bytes:
     key = Fernet.generate_key()
-    with open(KEY_FILE, "wb") as f:
-        f.write(key)
+    credential_store.save_key(key, KEY_FILE)
     return key
 
 
 def load_key() -> bytes:
-    if not os.path.exists(KEY_FILE):
-        return generate_key()
-    with open(KEY_FILE, "rb") as f:
-        return f.read()
+    return credential_store.load_key(KEY_FILE)
 
 
 def encrypt_credentials(username: str, password: str, key: bytes) -> None:
