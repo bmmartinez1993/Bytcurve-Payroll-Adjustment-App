@@ -382,5 +382,81 @@ class TestRoundTrip(_TempDirMixin):
         self.assertEqual(plaintext, "carol:p@$$")
 
 
+# ---------------------------------------------------------------------------
+# hash_credential_file and verify_credential_file_integrity
+# ---------------------------------------------------------------------------
+
+class TestCredentialFileIntegrity(_TempDirMixin):
+    def test_hash_returns_none_when_file_missing(self):
+        import credential_store
+        result = credential_store.hash_credential_file(self.cred_file)
+        self.assertIsNone(result)
+
+    def test_hash_returns_hex_string_for_existing_file(self):
+        import credential_store
+        key = Fernet.generate_key()
+        _write_cred_file(self.cred_file, "user", "pass", key)
+        result = credential_store.hash_credential_file(self.cred_file)
+        self.assertIsInstance(result, str)
+        self.assertEqual(len(result), 64)
+        int(result, 16)  # must be valid hex
+
+    def test_hash_is_deterministic(self):
+        import credential_store
+        key = Fernet.generate_key()
+        _write_cred_file(self.cred_file, "user", "pass", key)
+        h1 = credential_store.hash_credential_file(self.cred_file)
+        h2 = credential_store.hash_credential_file(self.cred_file)
+        self.assertEqual(h1, h2)
+
+    def test_hash_changes_when_file_content_changes(self):
+        import credential_store
+        key = Fernet.generate_key()
+        _write_cred_file(self.cred_file, "user", "pass", key)
+        h1 = credential_store.hash_credential_file(self.cred_file)
+        _write_cred_file(self.cred_file, "user", "different_pass", key)
+        h2 = credential_store.hash_credential_file(self.cred_file)
+        self.assertNotEqual(h1, h2)
+
+    def test_verify_returns_true_for_unchanged_file(self):
+        import credential_store
+        key = Fernet.generate_key()
+        _write_cred_file(self.cred_file, "user", "pass", key)
+        expected_hash = credential_store.hash_credential_file(self.cred_file)
+        self.assertTrue(
+            credential_store.verify_credential_file_integrity(expected_hash, self.cred_file)
+        )
+
+    def test_verify_returns_false_when_file_modified(self):
+        import credential_store
+        key = Fernet.generate_key()
+        _write_cred_file(self.cred_file, "user", "pass", key)
+        expected_hash = credential_store.hash_credential_file(self.cred_file)
+        # Modify the file after taking the baseline hash
+        _write_cred_file(self.cred_file, "attacker", "injected", key)
+        self.assertFalse(
+            credential_store.verify_credential_file_integrity(expected_hash, self.cred_file)
+        )
+
+    def test_verify_returns_false_when_file_deleted(self):
+        import credential_store
+        key = Fernet.generate_key()
+        _write_cred_file(self.cred_file, "user", "pass", key)
+        expected_hash = credential_store.hash_credential_file(self.cred_file)
+        os.remove(self.cred_file)
+        self.assertFalse(
+            credential_store.verify_credential_file_integrity(expected_hash, self.cred_file)
+        )
+
+    def test_verify_returns_false_for_wrong_expected_hash(self):
+        import credential_store
+        key = Fernet.generate_key()
+        _write_cred_file(self.cred_file, "user", "pass", key)
+        wrong_hash = "a" * 64
+        self.assertFalse(
+            credential_store.verify_credential_file_integrity(wrong_hash, self.cred_file)
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
