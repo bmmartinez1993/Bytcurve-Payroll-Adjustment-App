@@ -148,6 +148,7 @@ PASSWORD              = ""
 AUTOMATION_STOP_FLAG  = False
 AUTOMATION_THREAD     = None
 KEEP_ACTIVE_STOP_EVENT = threading.Event()
+SELECTED_EMPLOYEES: "list[str] | None" = None  # None = BAU (process all employees)
 
 
 # ===========================================================================
@@ -1803,6 +1804,22 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
     history = load_history()
     employee_names = sort_employees_by_priority(employee_names, history)
 
+    if SELECTED_EMPLOYEES:
+        selected_lower = {n.lower() for n in SELECTED_EMPLOYEES}
+        employee_names = [n for n in employee_names if n.lower() in selected_lower]
+        if not employee_names:
+            logging.warning(
+                "EMP_FILTER: None of the uploaded employee names matched the portal "
+                "dropdown — verify the names and try again."
+            )
+            return
+        logging.info(
+            f"EMP_FILTER: List uploaded — processing {len(employee_names)} employee(s): "
+            + ", ".join(employee_names)
+        )
+    else:
+        logging.info(f"EMP_FILTER: No filter — processing all {len(employee_names)} employees (BAU).")
+
     processed_workers: set[str] = set()
     grid_rows_sel = f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row"
 
@@ -2173,7 +2190,7 @@ def start_gui_and_automation() -> None:
 
     root = ctk.CTk()
     root.title("ByteCurve Payroll Adjustment Automation")
-    root.geometry("800x860")
+    root.geometry("800x960")
     root.configure(fg_color=BS_GRAY_100)
 
     encryption_key       = load_key()
@@ -2237,6 +2254,65 @@ def start_gui_and_automation() -> None:
         state="disabled", command=stop_automation,
     )
     stop_button.pack(side=ctk.LEFT, padx=5)
+
+    # --- Employee filter frame ---
+    emp_frame = ctk.CTkFrame(root, fg_color=BS_GRAY_200, corner_radius=10)
+    emp_frame.pack(pady=(0, 0), padx=10, fill=ctk.X)
+
+    ctk.CTkLabel(
+        emp_frame, text="Employee Filter",
+        text_color=BS_GRAY_900, font=ctk.CTkFont(size=13, weight="bold"),
+    ).pack(pady=(6, 2))
+
+    emp_inner = ctk.CTkFrame(emp_frame, fg_color="transparent")
+    emp_inner.pack(pady=(0, 8), padx=10, fill=ctk.X)
+
+    emp_status_var = ctk.StringVar(value="No filter — all employees will run (BAU)")
+    ctk.CTkLabel(
+        emp_inner, textvariable=emp_status_var,
+        text_color=BS_GRAY_900, font=ctk.CTkFont(size=11),
+        anchor="w",
+    ).pack(side=ctk.LEFT, padx=(0, 10), expand=True, fill=ctk.X)
+
+    def _browse_employee_list() -> None:
+        global SELECTED_EMPLOYEES
+        from tkinter import filedialog
+        path = filedialog.askopenfilename(
+            title="Select Employee List",
+            filetypes=[("CSV / Text files", "*.csv *.txt"), ("All files", "*.*")],
+        )
+        if not path:
+            return
+        names: list[str] = []
+        with open(path, encoding="utf-8-sig") as fh:
+            for line in fh:
+                for cell in line.split(","):
+                    name = cell.strip().strip('"')
+                    if name and not name.startswith("#"):
+                        names.append(name)
+        if names:
+            SELECTED_EMPLOYEES = names
+            emp_status_var.set(f"{len(names)} employee(s) loaded — only these will run")
+        else:
+            SELECTED_EMPLOYEES = None
+            emp_status_var.set("File was empty — all employees will run (BAU)")
+
+    def _clear_employee_list() -> None:
+        global SELECTED_EMPLOYEES
+        SELECTED_EMPLOYEES = None
+        emp_status_var.set("No filter — all employees will run (BAU)")
+
+    ctk.CTkButton(
+        emp_inner, text="Browse...",
+        fg_color=BS_PRIMARY, text_color=BS_WHITE, hover_color=BS_BLUE,
+        width=100, command=_browse_employee_list,
+    ).pack(side=ctk.LEFT, padx=(0, 5))
+
+    ctk.CTkButton(
+        emp_inner, text="Clear List",
+        fg_color=BS_GRAY_800, text_color=BS_WHITE, hover_color=BS_GRAY_900,
+        width=90, command=_clear_employee_list,
+    ).pack(side=ctk.LEFT)
 
     # --- Log frame ---
     log_frame = ctk.CTkFrame(root, fg_color=BS_GRAY_100, corner_radius=10)
