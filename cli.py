@@ -88,7 +88,55 @@ def main() -> None:
         default=None,
         help="Target business date (default: previous business day)",
     )
+    parser.add_argument(
+        "--rotate-key",
+        action="store_true",
+        help=(
+            "Rotate the Fernet encryption key: re-encrypt credentials.enc with a new key "
+            "and store it in the OS keychain (or secret.key file as fallback), then exit."
+        ),
+    )
+    parser.add_argument(
+        "--verify-log",
+        metavar="LOG_PATH",
+        nargs="?",
+        const=os.path.join("logs", "automation_activity.log"),
+        help=(
+            "Verify HMAC signatures in a log file and report valid/unsigned/tampered counts. "
+            "Defaults to logs/automation_activity.log when no path is given."
+        ),
+    )
     args = parser.parse_args()
+
+    # ── Log verification (early exit — no browser needed) ─────────────────────
+    if args.verify_log:
+        import audit_log
+        import credential_store
+        try:
+            key = credential_store.load_key(_app.KEY_FILE)
+            result = audit_log.verify_log(args.verify_log, key)
+            print(
+                f"Log verification: {result['valid']} valid, "
+                f"{result['unsigned']} unsigned, {result['tampered']} tampered"
+            )
+            if result["tampered"] > 0:
+                print(f"WARNING: {result['tampered']} tampered line(s) detected in {args.verify_log}")
+                sys.exit(1)
+        except Exception as exc:
+            logging.error("Log verification failed: %s", exc)
+            sys.exit(1)
+        sys.exit(0)
+
+    # ── Key rotation (early exit — no browser needed) ─────────────────────────
+    if args.rotate_key:
+        import credential_store
+        try:
+            location = credential_store.rotate_key(_app.CREDENTIAL_FILE, _app.KEY_FILE)
+            print(f"Key rotation complete. New key stored in: {location}")
+        except (FileNotFoundError, ValueError) as exc:
+            logging.error("Key rotation failed: %s", exc)
+            sys.exit(1)
+        sys.exit(0)
 
     # ── Credentials ───────────────────────────────────────────────────────────
     username = os.environ.get("BYTECURVE_USER", "").strip()
@@ -120,6 +168,23 @@ def main() -> None:
     # Inject into module globals so login() and related functions find them.
     _app.USERNAME = username
     _app.PASSWORD = password
+
+    # ── HMAC audit log activation ──────────────────────────────────────────────
+    # Always attempt to load the Fernet key so HMAC signing is active even when
+    # credentials came from env vars (which bypass the key file path above).
+    import audit_log
+    import credential_store
+    try:
+        _hmac_fernet_key = credential_store.load_key(_app.KEY_FILE)
+        _app._file_handler.set_key(_hmac_fernet_key)
+        logging.info("AUDIT: HMAC signing active.")
+    except Exception:
+        logging.warning("AUDIT: HMAC signing unavailable — key could not be loaded.")
+
+    # ── Credential file integrity baseline ────────────────────────────────────
+    _cred_hash = credential_store.hash_credential_file(_app.CREDENTIAL_FILE)
+    if _cred_hash:
+        logging.info("INTEGRITY: Credential file hash recorded for post-run verification.")
 
     target_date = args.date or _app.get_previous_business_day()
 
@@ -163,6 +228,15 @@ def main() -> None:
                 browser.close()
     except Exception as exc:
         logging.critical(f"Browser launch failed: {exc}", exc_info=True)
+        exit_code = 1
+
+    # ── Post-run integrity check ───────────────────────────────────────────────
+    if _cred_hash and not credential_store.verify_credential_file_integrity(
+        _cred_hash, _app.CREDENTIAL_FILE
+    ):
+        logging.critical(
+            "INTEGRITY_VIOLATION: credentials.enc was modified during the automation run."
+        )
         exit_code = 1
 
     sys.exit(exit_code)

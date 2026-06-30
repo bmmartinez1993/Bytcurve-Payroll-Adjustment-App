@@ -20,6 +20,8 @@ Bytcurve-Payroll-Adjustment-App/
 ├── ByteCurve Payroll Adjustment Automation.py  # GUI app: orchestration + CustomTkinter UI
 ├── automation_core_refactored.py               # Core library: time utils, overlap resolution, grid interactions
 ├── cli.py                                      # Headless CLI runner — entry point for the portable executable
+├── credential_store.py                         # Security: OS keychain integration, key rotation, integrity checks
+├── audit_log.py                                # Security: HMAC-signed audit log handler + log verifier
 ├── pyproject.toml                              # Package definition; installs the `bytecurve` shell command
 ├── install.sh                                  # One-step remote/local setup for macOS / Linux
 ├── install.ps1                                 # One-step remote/local setup for Windows (PowerShell)
@@ -27,9 +29,11 @@ Bytcurve-Payroll-Adjustment-App/
 ├── log_digest.py                               # AI: post-run log analysis via Ollama LLM
 ├── task_classifier.py                          # AI: ML shadow classifier alongside keyword policy
 ├── test_automation_core.py                     # Unit tests for the core library (88 tests)
+├── test_credential_store.py                    # Unit tests for credential_store (34 tests)
+├── test_audit_log.py                           # Unit tests for audit_log (18 tests)
 ├── ByteCurve Inspector.py                      # Playwright Inspector launcher for selector debugging
 ├── diagnose_dialog.py                          # Dialog diagnostics utility
-├── requirements.txt                            # Full Python dependencies (GUI + AI) — dev convenience
+├── requirements.txt                            # Full Python dependencies (GUI + AI + security) — dev convenience
 ├── .env.example                                # Environment variable template
 ├── Dockerfile                                  # Container image definition
 ├── docker-compose.yml                          # Compose service definition
@@ -113,7 +117,10 @@ irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment
 # Core CLI + AI/ML features (employee scorer, log digest, task classifier)
 $env:BYTECURVE_EXTRAS="ai"; irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
 
-# Full install — GUI (CustomTkinter) + AI/ML features
+# Core CLI + OS keychain integration
+$env:BYTECURVE_EXTRAS="security"; irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
+
+# Full install — GUI (CustomTkinter) + AI/ML features + OS keychain
 $env:BYTECURVE_EXTRAS="full"; irm https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.ps1 | iex
 ```
 
@@ -143,7 +150,10 @@ curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adj
 # Core CLI + AI/ML features
 curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --ai
 
-# Full install — GUI + AI/ML features
+# Core CLI + OS keychain integration
+curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --security
+
+# Full install — GUI + AI/ML features + OS keychain
 curl -fsSL https://raw.githubusercontent.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App/main/install.sh | bash -s -- --full
 ```
 
@@ -186,7 +196,7 @@ bytecurve --help
 bytecurve --date 2026-06-13
 ```
 
-> On headless Linux servers, Chrome requires a visible display. For fully headless environments use the Docker deployment instead.
+> On headless Linux servers, Chrome requires a visible display. For fully headless environments use the Docker deployment instead. The OS keychain extra (`--security`) requires `libsecret` (`apt install libsecret-1-0`). Without it, the key falls back automatically to the `secret.key` file.
 
 ---
 
@@ -210,7 +220,8 @@ The app lives in `~/.bytecurve` and never touches system Python. Re-running with
 |---|---|---|---|
 | Core (default) | *(none)* | *(none)* | `playwright`, `cryptography` |
 | AI features | `--ai` | `$env:BYTECURVE_EXTRAS="ai"` | `ollama`, `scikit-learn` |
-| GUI + AI | `--full` | `$env:BYTECURVE_EXTRAS="full"` | `customtkinter`, `pyautogui` |
+| Security | `--security` | `$env:BYTECURVE_EXTRAS="security"` | `keyring` (OS keychain) |
+| GUI + AI + Security | `--full` | `$env:BYTECURVE_EXTRAS="full"` | `customtkinter`, `pyautogui`, `keyring` |
 
 ---
 
@@ -224,9 +235,10 @@ git clone https://github.com/bmmartinez1993/Bytcurve-Payroll-Adjustment-App.git
 cd Bytcurve-Payroll-Adjustment-App
 
 # 2. Install dependencies via pyproject.toml (choose one tier)
-pip install .           # Core only — playwright + cryptography
-pip install .[ai]       # Core + AI/ML features (ollama, scikit-learn)
-pip install .[full]     # Core + AI/ML + GUI (customtkinter, pyautogui)
+pip install .                    # Core only — playwright + cryptography
+pip install .[ai]                # Core + AI/ML features (ollama, scikit-learn)
+pip install .[security]          # Core + OS keychain integration (keyring)
+pip install .[full]              # Core + AI/ML + GUI + OS keychain
 
 # 3. Install Chrome for Testing (used by Playwright's channel="chrome")
 playwright install chrome
@@ -252,7 +264,7 @@ The image is based on `mcr.microsoft.com/playwright/python:v1.58.0-jammy`, which
 
 ### GUI mode
 
-On first launch, enter your credentials and check **Save Credentials Encrypted**. The app encrypts them with Fernet and writes `credentials.enc` + `secret.key` to the project directory. Both files are gitignored.
+On first launch, enter your credentials and check **Save Credentials Encrypted**. The app encrypts them with Fernet (AES-128 CBC) and stores them in `credentials.enc`. The Fernet key is saved to the OS keychain (Windows Credential Manager, macOS Keychain, or libsecret on Linux) when the `security` extra is installed. Without it, the key falls back to a `secret.key` file in the project directory. Both files are gitignored.
 
 ### CLI / Docker mode
 
@@ -260,7 +272,7 @@ Credentials are resolved in priority order:
 
 **Option A — Encrypted files (recommended)**
 
-Place `credentials.enc` and `secret.key` next to `docker-compose.yml`. The compose file mounts them as read-only volumes:
+Place `credentials.enc` and the Fernet key (from keychain or `secret.key`) next to `docker-compose.yml`. The compose file mounts them as read-only volumes:
 
 ```bash
 docker compose up
@@ -284,6 +296,90 @@ docker compose up
 `docker-compose.yml` passes `BYTECURVE_USER` / `BYTECURVE_PASS` from the host environment (or `.env` file) into the container. When set, these take priority over the encrypted files.
 
 > `.env` is gitignored. Never commit it.
+
+---
+
+## Security
+
+### OS Keychain Integration
+
+The Fernet encryption key that protects `credentials.enc` is stored in the OS native keychain when the `security` extra (`keyring>=24.0.0`) is installed:
+
+| Platform | Backend |
+|---|---|
+| Windows | Windows Credential Manager |
+| macOS | macOS Keychain |
+| Linux | libsecret (GNOME Keyring) / kwallet |
+
+Without `keyring`, or in environments with no keychain daemon (Docker, CI), the key falls back automatically to the `secret.key` file — same behavior as before this feature. No configuration change is required.
+
+### Key Rotation
+
+Rotate the Fernet key without losing your saved credentials:
+
+```bash
+# Installed command
+bytecurve --rotate-key
+
+# Direct invocation
+python cli.py --rotate-key
+```
+
+This command:
+1. Loads the current key from the keychain (or `secret.key`).
+2. Decrypts `credentials.enc` with the current key.
+3. Generates a fresh Fernet key.
+4. Re-encrypts `credentials.enc` with the new key.
+5. Saves the new key to the keychain (or `secret.key`).
+
+Rotate periodically or immediately after any suspected key exposure. The old key is discarded and the old `secret.key` file is overwritten.
+
+### HMAC-Signed Audit Log
+
+Every line written to `logs/automation_activity.log` after the Fernet key is loaded is tagged with an HMAC-SHA256 signature:
+
+```
+2026-06-25 09:12:34 [INFO] COMPLETE: Automation finished successfully. |hmac=3a7f...e9c1
+```
+
+The HMAC key is derived from the Fernet key via `SHA-256("bytecurve-audit:" + fernet_key)`, so no additional secret is needed. Lines written before the key is available (early boot messages) are stored without a tag.
+
+To verify a log file after a run:
+
+```bash
+# Verify the default log
+bytecurve --verify-log
+
+# Verify a specific file
+bytecurve --verify-log path/to/automation_activity.log
+python cli.py --verify-log logs/automation_activity.log
+```
+
+Output:
+
+```
+Log verification: 142 valid, 3 unsigned, 0 tampered
+```
+
+A non-zero `tampered` count means one or more lines were modified after the run. The command exits with code `1` if tampering is detected.
+
+### Session Integrity Check
+
+At the start of each automation run, the CLI records a SHA-256 hash of `credentials.enc`. After the run completes, it verifies the file has not changed. If a modification is detected mid-run, `INTEGRITY_VIOLATION` is logged at CRITICAL level and the process exits with code `1`:
+
+```
+2026-06-25 09:45:01 [CRITICAL] INTEGRITY_VIOLATION: credentials.enc was modified during the automation run.
+```
+
+### Dependency Vulnerability Scanning
+
+The CI pipeline runs `pip-audit` on every push and pull request to `main`. Any package in `requirements.txt` with a known CVE blocks the build:
+
+```bash
+# Run locally before a PR
+pip install pip-audit
+pip-audit -r requirements.txt --desc on
+```
 
 ---
 
@@ -317,6 +413,15 @@ bytecurve
 
 # Run against a specific date
 bytecurve --date 2026-06-10
+
+# Rotate the Fernet encryption key
+bytecurve --rotate-key
+
+# Verify HMAC signatures in the last run's log
+bytecurve --verify-log
+
+# Verify a specific log file
+bytecurve --verify-log logs/automation_activity.log
 ```
 
 Without the portable install (direct Python invocation):
@@ -324,6 +429,8 @@ Without the portable install (direct Python invocation):
 ```bash
 python cli.py
 python cli.py --date 2026-06-10
+python cli.py --rotate-key
+python cli.py --verify-log
 ```
 
 In Docker:
@@ -350,6 +457,8 @@ docker compose logs -f
 tail -f logs/automation_activity.log
 ```
 
+Log lines written after the Fernet key is loaded include an HMAC tag. Use `--verify-log` to check integrity after any run.
+
 ### Debug selectors with the Inspector
 
 ```bash
@@ -373,12 +482,27 @@ Runs targeted checks against confirmation/save dialogs to verify button presence
 ### Unit tests (no browser required)
 
 ```bash
+# Core automation logic (88 tests)
 python -m pytest test_automation_core.py -v
-# or
-python test_automation_core.py
+
+# Credential store — keychain integration, key rotation, integrity checks (34 tests)
+python -m pytest test_credential_store.py -v
+
+# Audit log — HMAC handler and log verifier (18 tests)
+python -m pytest test_audit_log.py -v
+
+# All test suites at once (140 tests)
+python -m pytest test_automation_core.py test_credential_store.py test_audit_log.py -v
 ```
 
-88 unit tests cover time parsing, interval/overlap logic, data models, task classification, and proposed-time calculation.
+### Dependency vulnerability scan
+
+```bash
+pip install pip-audit
+pip-audit -r requirements.txt --desc on
+```
+
+This same check runs automatically in CI on every push to `main`.
 
 ### Container smoke tests (Docker required)
 

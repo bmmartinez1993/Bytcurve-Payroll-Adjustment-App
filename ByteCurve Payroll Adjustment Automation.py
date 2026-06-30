@@ -18,6 +18,8 @@ if not _CLI_MODE:
 import threading
 from playwright.sync_api import sync_playwright, Page
 from cryptography.fernet import Fernet
+import audit_log
+import credential_store
 
 from automation_core_refactored import (
     # Time utilities
@@ -61,19 +63,13 @@ except ImportError:
 
 # --- LOGGING CONFIGURATION ---
 
-class _LiveFileHandler(logging.FileHandler):
-    """FileHandler that flushes to disk after every record for live log tailing."""
-    def emit(self, record):
-        super().emit(record)
-        self.flush()
-
 _log_formatter = logging.Formatter(
     fmt='%(asctime)s [%(levelname)s] %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
 os.makedirs("logs", exist_ok=True)
-_file_handler = _LiveFileHandler(
+_file_handler = audit_log.HMACFileHandler(
     os.path.join("logs", "automation_activity.log"),
     mode='w',           # overwrite each run — keeps the file to the current session only
     encoding='utf-8',
@@ -152,6 +148,8 @@ PASSWORD              = ""
 AUTOMATION_STOP_FLAG  = False
 AUTOMATION_THREAD     = None
 KEEP_ACTIVE_STOP_EVENT = threading.Event()
+SELECTED_EMPLOYEES: "list[str] | None" = None  # None = BAU (process all employees)
+SELECTED_DATE: "str | None" = None              # None = previous business day (auto)
 
 
 # ===========================================================================
@@ -160,16 +158,12 @@ KEEP_ACTIVE_STOP_EVENT = threading.Event()
 
 def generate_key() -> bytes:
     key = Fernet.generate_key()
-    with open(KEY_FILE, "wb") as f:
-        f.write(key)
+    credential_store.save_key(key, KEY_FILE)
     return key
 
 
 def load_key() -> bytes:
-    if not os.path.exists(KEY_FILE):
-        return generate_key()
-    with open(KEY_FILE, "rb") as f:
-        return f.read()
+    return credential_store.load_key(KEY_FILE)
 
 
 def encrypt_credentials(username: str, password: str, key: bytes) -> None:
@@ -1811,6 +1805,22 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
     history = load_history()
     employee_names = sort_employees_by_priority(employee_names, history)
 
+    if SELECTED_EMPLOYEES:
+        selected_lower = {n.lower() for n in SELECTED_EMPLOYEES}
+        employee_names = [n for n in employee_names if n.lower() in selected_lower]
+        if not employee_names:
+            logging.warning(
+                "EMP_FILTER: None of the uploaded employee names matched the portal "
+                "dropdown — verify the names and try again."
+            )
+            return
+        logging.info(
+            f"EMP_FILTER: List uploaded — processing {len(employee_names)} employee(s): "
+            + ", ".join(employee_names)
+        )
+    else:
+        logging.info(f"EMP_FILTER: No filter — processing all {len(employee_names)} employees (BAU).")
+
     processed_workers: set[str] = set()
     grid_rows_sel = f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row"
 
@@ -2089,7 +2099,11 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
                     logging.critical("Credentials not set. Aborting.")
                     return
 
-                target_date = get_previous_business_day()
+                target_date = SELECTED_DATE if SELECTED_DATE else get_previous_business_day()
+                logging.info(
+                    f"TARGET DATE: {target_date}"
+                    f"{'  (custom)' if SELECTED_DATE else '  (auto: previous business day)'}"
+                )
                 login(page)
                 navigate_to_payroll(page)
 
@@ -2136,8 +2150,8 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
 
 def start_automation_thread(log_text_widget, username_entry, password_entry,
                             save_creds_var, start_button, stop_button,
-                            digest_widget=None) -> None:
-    global AUTOMATION_STOP_FLAG, AUTOMATION_THREAD
+                            digest_widget=None, date_entry=None) -> None:
+    global AUTOMATION_STOP_FLAG, AUTOMATION_THREAD, SELECTED_DATE
 
     username = username_entry.get()
     password = password_entry.get()
@@ -2145,11 +2159,28 @@ def start_automation_thread(log_text_widget, username_entry, password_entry,
         messagebox.showwarning("Missing Credentials", "Please enter both username and password.")
         return
 
+    date_str = date_entry.get().strip() if date_entry else ""
+    if date_str:
+        try:
+            datetime.date.fromisoformat(date_str)
+            SELECTED_DATE = date_str
+        except ValueError:
+            messagebox.showwarning(
+                "Invalid Date",
+                "Date must be in YYYY-MM-DD format (e.g. 2026-06-27).\n"
+                "Leave blank to use the previous business day automatically.",
+            )
+            return
+    else:
+        SELECTED_DATE = None
+
     if save_creds_var.get():
         encrypt_credentials(username, password, load_key())
 
     username_entry.configure(state="disabled")
     password_entry.configure(state="disabled")
+    if date_entry:
+        date_entry.configure(state="disabled")
     start_button.configure(state="disabled")
     stop_button.configure(state="normal")
     log_text_widget.delete(1.0, ctk.END)
@@ -2181,11 +2212,13 @@ def start_gui_and_automation() -> None:
 
     root = ctk.CTk()
     root.title("ByteCurve Payroll Adjustment Automation")
-    root.geometry("800x860")
+    root.geometry("800x960")
     root.configure(fg_color=BS_GRAY_100)
 
     encryption_key       = load_key()
     saved_user, saved_pw = decrypt_credentials(encryption_key)
+    _file_handler.set_key(encryption_key)
+    logging.info("AUDIT: HMAC signing active.")
 
     ka_thread = threading.Thread(target=keep_active, args=(KEEP_ACTIVE_STOP_EVENT,), daemon=True)
     ka_thread.start()
@@ -2230,10 +2263,6 @@ def start_gui_and_automation() -> None:
     start_button = ctk.CTkButton(
         btn_frame, text="Start Automation",
         fg_color=BS_PRIMARY, text_color=BS_WHITE, hover_color=BS_BLUE,
-        command=lambda: start_automation_thread(
-            log_text_widget, username_entry, password_entry,
-            save_creds_var, start_button, stop_button, digest_text_widget
-        ),
     )
     start_button.pack(side=ctk.LEFT, padx=5)
 
@@ -2243,6 +2272,94 @@ def start_gui_and_automation() -> None:
         state="disabled", command=stop_automation,
     )
     stop_button.pack(side=ctk.LEFT, padx=5)
+
+    # --- Employee filter frame ---
+    emp_frame = ctk.CTkFrame(root, fg_color=BS_GRAY_200, corner_radius=10)
+    emp_frame.pack(pady=(0, 0), padx=10, fill=ctk.X)
+
+    ctk.CTkLabel(
+        emp_frame, text="Employee Filter",
+        text_color=BS_GRAY_900, font=ctk.CTkFont(size=13, weight="bold"),
+    ).pack(pady=(6, 2))
+
+    emp_inner = ctk.CTkFrame(emp_frame, fg_color="transparent")
+    emp_inner.pack(pady=(0, 8), padx=10, fill=ctk.X)
+
+    emp_status_var = ctk.StringVar(value="No filter — all employees will run (BAU)")
+    ctk.CTkLabel(
+        emp_inner, textvariable=emp_status_var,
+        text_color=BS_GRAY_900, font=ctk.CTkFont(size=11),
+        anchor="w",
+    ).pack(side=ctk.LEFT, padx=(0, 10), expand=True, fill=ctk.X)
+
+    def _browse_employee_list() -> None:
+        global SELECTED_EMPLOYEES
+        from tkinter import filedialog
+        path = filedialog.askopenfilename(
+            title="Select Employee List",
+            filetypes=[("CSV / Text files", "*.csv *.txt"), ("All files", "*.*")],
+        )
+        if not path:
+            return
+        names: list[str] = []
+        with open(path, encoding="utf-8-sig") as fh:
+            for line in fh:
+                for cell in line.split(","):
+                    name = cell.strip().strip('"')
+                    if name and not name.startswith("#"):
+                        names.append(name)
+        if names:
+            SELECTED_EMPLOYEES = names
+            emp_status_var.set(f"{len(names)} employee(s) loaded — only these will run")
+        else:
+            SELECTED_EMPLOYEES = None
+            emp_status_var.set("File was empty — all employees will run (BAU)")
+
+    def _clear_employee_list() -> None:
+        global SELECTED_EMPLOYEES
+        SELECTED_EMPLOYEES = None
+        emp_status_var.set("No filter — all employees will run (BAU)")
+
+    ctk.CTkButton(
+        emp_inner, text="Browse...",
+        fg_color=BS_PRIMARY, text_color=BS_WHITE, hover_color=BS_BLUE,
+        width=100, command=_browse_employee_list,
+    ).pack(side=ctk.LEFT, padx=(0, 5))
+
+    ctk.CTkButton(
+        emp_inner, text="Clear List",
+        fg_color=BS_GRAY_800, text_color=BS_WHITE, hover_color=BS_GRAY_900,
+        width=90, command=_clear_employee_list,
+    ).pack(side=ctk.LEFT)
+
+    # --- Date row (inside emp_frame) ---
+    date_row = ctk.CTkFrame(emp_frame, fg_color="transparent")
+    date_row.pack(pady=(0, 8), padx=10, fill=ctk.X)
+
+    ctk.CTkLabel(
+        date_row, text="Target Date:",
+        text_color=BS_GRAY_900, font=ctk.CTkFont(size=11),
+    ).pack(side=ctk.LEFT, padx=(0, 6))
+
+    date_entry = ctk.CTkEntry(
+        date_row, width=120, fg_color=BS_WHITE, text_color=BS_BLACK,
+        placeholder_text="YYYY-MM-DD",
+    )
+    date_entry.pack(side=ctk.LEFT, padx=(0, 8))
+
+    ctk.CTkLabel(
+        date_row,
+        text="(blank = previous business day)",
+        text_color=BS_GRAY_900, font=ctk.CTkFont(size=10),
+    ).pack(side=ctk.LEFT)
+
+    # Wire up Start button now that date_entry is defined.
+    start_button.configure(
+        command=lambda: start_automation_thread(
+            log_text_widget, username_entry, password_entry,
+            save_creds_var, start_button, stop_button, digest_text_widget, date_entry,
+        )
+    )
 
     # --- Log frame ---
     log_frame = ctk.CTkFrame(root, fg_color=BS_GRAY_100, corner_radius=10)
