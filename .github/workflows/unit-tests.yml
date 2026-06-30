@@ -22,7 +22,7 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install "playwright==1.58.0" "cryptography==46.0.6" "keyring>=24.0.0" pytest pip-audit
+        run: pip install "playwright==1.58.0" "cryptography>=48.0.1" "keyring>=24.0.0" pytest pip-audit
 
       - name: Run unit tests
         run: python -m pytest test_automation_core.py test_credential_store.py test_audit_log.py -v --tb=short
