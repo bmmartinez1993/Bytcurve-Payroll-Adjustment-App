@@ -149,6 +149,7 @@ AUTOMATION_STOP_FLAG  = False
 AUTOMATION_THREAD     = None
 KEEP_ACTIVE_STOP_EVENT = threading.Event()
 SELECTED_EMPLOYEES: "list[str] | None" = None  # None = BAU (process all employees)
+SELECTED_DATE: "str | None" = None              # None = previous business day (auto)
 
 
 # ===========================================================================
@@ -2098,7 +2099,11 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
                     logging.critical("Credentials not set. Aborting.")
                     return
 
-                target_date = get_previous_business_day()
+                target_date = SELECTED_DATE if SELECTED_DATE else get_previous_business_day()
+                logging.info(
+                    f"TARGET DATE: {target_date}"
+                    f"{'  (custom)' if SELECTED_DATE else '  (auto: previous business day)'}"
+                )
                 login(page)
                 navigate_to_payroll(page)
 
@@ -2145,8 +2150,8 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
 
 def start_automation_thread(log_text_widget, username_entry, password_entry,
                             save_creds_var, start_button, stop_button,
-                            digest_widget=None) -> None:
-    global AUTOMATION_STOP_FLAG, AUTOMATION_THREAD
+                            digest_widget=None, date_entry=None) -> None:
+    global AUTOMATION_STOP_FLAG, AUTOMATION_THREAD, SELECTED_DATE
 
     username = username_entry.get()
     password = password_entry.get()
@@ -2154,11 +2159,28 @@ def start_automation_thread(log_text_widget, username_entry, password_entry,
         messagebox.showwarning("Missing Credentials", "Please enter both username and password.")
         return
 
+    date_str = date_entry.get().strip() if date_entry else ""
+    if date_str:
+        try:
+            datetime.date.fromisoformat(date_str)
+            SELECTED_DATE = date_str
+        except ValueError:
+            messagebox.showwarning(
+                "Invalid Date",
+                "Date must be in YYYY-MM-DD format (e.g. 2026-06-27).\n"
+                "Leave blank to use the previous business day automatically.",
+            )
+            return
+    else:
+        SELECTED_DATE = None
+
     if save_creds_var.get():
         encrypt_credentials(username, password, load_key())
 
     username_entry.configure(state="disabled")
     password_entry.configure(state="disabled")
+    if date_entry:
+        date_entry.configure(state="disabled")
     start_button.configure(state="disabled")
     stop_button.configure(state="normal")
     log_text_widget.delete(1.0, ctk.END)
@@ -2241,10 +2263,6 @@ def start_gui_and_automation() -> None:
     start_button = ctk.CTkButton(
         btn_frame, text="Start Automation",
         fg_color=BS_PRIMARY, text_color=BS_WHITE, hover_color=BS_BLUE,
-        command=lambda: start_automation_thread(
-            log_text_widget, username_entry, password_entry,
-            save_creds_var, start_button, stop_button, digest_text_widget
-        ),
     )
     start_button.pack(side=ctk.LEFT, padx=5)
 
@@ -2313,6 +2331,35 @@ def start_gui_and_automation() -> None:
         fg_color=BS_GRAY_800, text_color=BS_WHITE, hover_color=BS_GRAY_900,
         width=90, command=_clear_employee_list,
     ).pack(side=ctk.LEFT)
+
+    # --- Date row (inside emp_frame) ---
+    date_row = ctk.CTkFrame(emp_frame, fg_color="transparent")
+    date_row.pack(pady=(0, 8), padx=10, fill=ctk.X)
+
+    ctk.CTkLabel(
+        date_row, text="Target Date:",
+        text_color=BS_GRAY_900, font=ctk.CTkFont(size=11),
+    ).pack(side=ctk.LEFT, padx=(0, 6))
+
+    date_entry = ctk.CTkEntry(
+        date_row, width=120, fg_color=BS_WHITE, text_color=BS_BLACK,
+        placeholder_text="YYYY-MM-DD",
+    )
+    date_entry.pack(side=ctk.LEFT, padx=(0, 8))
+
+    ctk.CTkLabel(
+        date_row,
+        text="(blank = previous business day)",
+        text_color=BS_GRAY_900, font=ctk.CTkFont(size=10),
+    ).pack(side=ctk.LEFT)
+
+    # Wire up Start button now that date_entry is defined.
+    start_button.configure(
+        command=lambda: start_automation_thread(
+            log_text_widget, username_entry, password_entry,
+            save_creds_var, start_button, stop_button, digest_text_widget, date_entry,
+        )
+    )
 
     # --- Log frame ---
     log_frame = ctk.CTkFrame(root, fg_color=BS_GRAY_100, corner_radius=10)
