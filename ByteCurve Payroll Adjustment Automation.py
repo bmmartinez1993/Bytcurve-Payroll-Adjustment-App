@@ -61,6 +61,11 @@ except ImportError:
     def record_outcome(*a, **kw): pass
     def generate_digest(): return ""
 
+try:
+    from rapidfuzz import fuzz as _rfuzz
+except ImportError:
+    _rfuzz = None
+
 # --- LOGGING CONFIGURATION ---
 
 _log_formatter = logging.Formatter(
@@ -88,8 +93,8 @@ _root_logger.addHandler(_stream_handler)
 # --- ByteCurve Color Palette ---
 BS_BLUE    = "#0d6efd"
 BS_RED     = "#dc3545"
-BS_WHITE   = "#fff"
-BS_BLACK   = "#000"
+BS_WHITE   = "#ffffff"
+BS_BLACK   = "#000000"
 BS_GRAY_100 = "#f8f9fa"
 BS_GRAY_200 = "#e9ecef"
 BS_GRAY_800 = "#343a40"
@@ -1781,6 +1786,76 @@ def _verify_worker_tasks(page: Page, worker_filter, worker_display: str,
         logging.info(f"VERIFY: No new checkboxes needed for {worker_display}.")
 
 
+_FUZZY_MATCH_THRESHOLD = 85
+
+
+def _resolve_employee_names(uploaded: list[str], portal: list[str]) -> list[str]:
+    """
+    Fuzzy-match each uploaded name against the full portal name list.
+
+    Uses token_sort_ratio so name-order differences ("Smith, John A." vs
+    "John Smith") and missing middle initials are handled transparently.
+
+    Outcomes per uploaded name:
+      • Exactly one portal name ≥ threshold → accepted silently.
+      • Multiple portal names ≥ threshold  → all included, AMBIGUOUS warning logged.
+      • No portal name ≥ threshold         → UNMATCHED warning logged.
+
+    Returns portal names that matched, in the original portal order so the
+    caller's priority sort is preserved.  Duplicates (same portal name matched
+    by two uploaded names) are deduplicated.
+    """
+    def _normalize(name: str) -> str:
+        tokens = re.sub(r"[^a-z ]", "", name.lower()).split()
+        return " ".join(sorted(tokens))
+
+    if _rfuzz is None:
+        # Graceful fallback: exact lowercase match with a clear warning.
+        logging.warning(
+            "EMP_FILTER: rapidfuzz not installed — falling back to exact name match. "
+            "Run 'pip install rapidfuzz>=3.0.0' to enable fuzzy matching."
+        )
+        selected_lower = {n.lower() for n in uploaded}
+        return [p for p in portal if p.lower() in selected_lower]
+
+    resolved: dict[str, str] = {}  # portal_name → match description
+
+    for uploaded_name in uploaded:
+        norm_up = _normalize(uploaded_name)
+        scored = [
+            (portal_name, _rfuzz.token_sort_ratio(norm_up, _normalize(portal_name)))
+            for portal_name in portal
+        ]
+        hits = sorted(
+            [(p, s) for p, s in scored if s >= _FUZZY_MATCH_THRESHOLD],
+            key=lambda x: x[1], reverse=True,
+        )
+
+        if not hits:
+            best_name, best_score = max(scored, key=lambda x: x[1])
+            logging.warning(
+                f"EMP_FILTER: UNMATCHED — '{uploaded_name}' had no portal name above "
+                f"{_FUZZY_MATCH_THRESHOLD} (best: '{best_name}' at {best_score}). "
+                "Check spelling or increase threshold."
+            )
+        elif len(hits) == 1:
+            portal_name, score = hits[0]
+            resolved[portal_name] = f"matched '{uploaded_name}' (score {score})"
+        else:
+            logging.warning(
+                f"EMP_FILTER: AMBIGUOUS — '{uploaded_name}' matched multiple portal names: "
+                + ", ".join(f"'{p}' ({s})" for p, s in hits)
+                + " — all included; verify manually."
+            )
+            for portal_name, score in hits:
+                resolved.setdefault(portal_name, f"ambiguous match for '{uploaded_name}' (score {score})")
+
+    for portal_name, reason in resolved.items():
+        logging.info(f"EMP_FILTER: '{portal_name}' — {reason}")
+
+    return [p for p in portal if p in resolved]
+
+
 def validate_and_process_rows(page: Page, target_date: str) -> None:
     """
     Main orchestration loop.
@@ -1806,16 +1881,15 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
     employee_names = sort_employees_by_priority(employee_names, history)
 
     if SELECTED_EMPLOYEES:
-        selected_lower = {n.lower() for n in SELECTED_EMPLOYEES}
-        employee_names = [n for n in employee_names if n.lower() in selected_lower]
+        employee_names = _resolve_employee_names(SELECTED_EMPLOYEES, employee_names)
         if not employee_names:
             logging.warning(
-                "EMP_FILTER: None of the uploaded employee names matched the portal "
-                "dropdown — verify the names and try again."
+                "EMP_FILTER: No uploaded names matched any portal employee — "
+                "verify the list and try again."
             )
             return
         logging.info(
-            f"EMP_FILTER: List uploaded — processing {len(employee_names)} employee(s): "
+            f"EMP_FILTER: List resolved — processing {len(employee_names)} employee(s): "
             + ", ".join(employee_names)
         )
     else:
