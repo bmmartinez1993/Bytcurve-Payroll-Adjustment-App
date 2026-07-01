@@ -2,13 +2,14 @@
 Post-run AI log digest using a local Ollama model.
 
 After automation completes this module reads the session log and asks a
-local LLM (qwen2.5:7b by default) to summarise outcomes, surface failure
+local LLM (qwen2.5:7b by default or llama3.2 as alternative) to summarise outcomes, surface failure
 patterns, and suggest improvements.  The result is displayed in the
 "AI Run Analysis" panel in the GUI.
 
 Requirements:
   - Ollama desktop app running in the background  (https://ollama.com)
   - qwen2.5:7b model pulled:  ollama pull qwen2.5:7b
+  - llama3.2 model pulled:  ollama pull llama3.2
   - Python package installed:  pip install ollama
 """
 
@@ -18,6 +19,7 @@ import os
 LOG_FILE      = os.path.join("logs", "automation_activity.log")
 MAX_LOG_CHARS = 20_000   # trim very long logs to stay within the model's context
 DEFAULT_MODEL = "qwen2.5:7b" # Ollama model to use for analysis
+ALTERNATIVE_MODEL = "llama3.2" # Alternative Ollama model to use for analysis
 
 
 # ---------------------------------------------------------------------------
@@ -40,7 +42,7 @@ def _read_log(max_chars: int = MAX_LOG_CHARS) -> str:
 # Digest generation
 # ---------------------------------------------------------------------------
 
-def generate_digest(model: str = DEFAULT_MODEL) -> str:
+def generate_digest(model: str = DEFAULT_MODEL or ALTERNATIVE_MODEL) -> str:
     """
     Calls a local Ollama model to analyse the session log.
 
