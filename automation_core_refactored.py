@@ -150,6 +150,8 @@ class TaskPolicy(Enum):
     """
     EXTRA_WORK = "Extra Work"
     S2S_CHARTER = "S2S Charter"
+    S2S_SHUTTLE = "S2S Shuttle"
+    S2S_ACTIVITY = "S2S Activity"
     SPARE_CDL = "Spare CDL"
     SPARE_MONITOR = "Spare Monitor"
     HTS_UNITS = "HTS Units"
@@ -159,7 +161,7 @@ class TaskPolicy(Enum):
     @property
     def max_allowed_hours(self) -> float:
         """Returns the maximum allowed adjustment duration in hours."""
-        if self in (TaskPolicy.EXTRA_WORK, TaskPolicy.S2S_CHARTER):
+        if self in (TaskPolicy.EXTRA_WORK, TaskPolicy.S2S_CHARTER, TaskPolicy.S2S_SHUTTLE, TaskPolicy.S2S_ACTIVITY):
             return 0.016666666666666666  # 1 minute
         return 4.0
 
@@ -180,7 +182,7 @@ class TaskPolicy(Enum):
     @property
     def is_one_minute_only(self) -> bool:
         """Whether this task type should only have a 1-minute duration."""
-        return self in (TaskPolicy.EXTRA_WORK, TaskPolicy.S2S_CHARTER)
+        return self in (TaskPolicy.EXTRA_WORK, TaskPolicy.S2S_CHARTER, TaskPolicy.S2S_SHUTTLE, TaskPolicy.S2S_ACTIVITY)
 
 
 # ============================================================================
@@ -197,7 +199,7 @@ MAX_TIME_SHIFT_MINUTES = 15  # Maximum minutes a task can be shifted before requ
 TIME_ENTRY_TIMEOUT_MS = 10000  # Timeout for time entry operations
 
 # Task type keywords for classification
-ONE_MINUTE_TASK_KEYWORDS = ["Extra Work", "S2S Charter"]
+ONE_MINUTE_TASK_KEYWORDS = ["Extra Work", "S2S Charter", "S2S Shuttle", "S2S Activity"]
 SCHEDULE_MATCH_TASK_KEYWORDS = ["Spare CDL", "Spare Monitor"]
 HTS_TASK_KEYWORDS = ["Units", "Hrs", "Hours"]
 SKIP_TASK_KEYWORDS = ["Bridge Charter", "BridgeCharter"]
@@ -606,10 +608,17 @@ def determine_task_policy(task_code: str, task_name: str) -> Optional[TaskPolicy
         if skip_keyword.lower() in combined_text:
             return None  # Skip this task
 
-    # Check for one-minute tasks (Extra Work, S2S Charter)
+    # Check for one-minute tasks (Extra Work, S2S Charter, S2S Shuttle, S2S Activity)
     for keyword in ONE_MINUTE_TASK_KEYWORDS:
         if keyword.lower() in task_code.lower():
-            return TaskPolicy.EXTRA_WORK if keyword == "Extra Work" else TaskPolicy.S2S_CHARTER
+            if keyword == "Extra Work":
+                return TaskPolicy.EXTRA_WORK
+            elif keyword == "S2S Charter":
+                return TaskPolicy.S2S_CHARTER
+            elif keyword == "S2S Shuttle":
+                return TaskPolicy.S2S_SHUTTLE
+            elif keyword == "S2S Activity":
+                return TaskPolicy.S2S_ACTIVITY
 
     # Check for schedule-match tasks (Spare CDL, Spare Monitor)
     for keyword in SCHEDULE_MATCH_TASK_KEYWORDS:
