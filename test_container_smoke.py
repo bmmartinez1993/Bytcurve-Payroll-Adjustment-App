@@ -2,8 +2,8 @@
 """
 Container smoke tests — verify the Docker environment is correctly wired up.
 
-Run inside the container via docker-compose.test.yml:
-    docker compose -f docker-compose.test.yml run --rm smoke-test
+Run inside the container via compose.test.yml:
+    docker compose -f compose.test.yml run --rm smoke-test
 
 These tests do NOT log into the ByteCurve portal. They validate that every
 dependency the automation needs is present and reachable before a live run.
@@ -83,7 +83,7 @@ class TestChrome:
 
 # ---------------------------------------------------------------------------
 # 3. Log directory
-#    docker-compose.yml mounts ./logs:/app/logs. If the mount is missing or
+#    compose.yml mounts ./logs:/app/logs. If the mount is missing or
 #    the container user lacks write permission the file handler will throw on
 #    the first log write.
 # ---------------------------------------------------------------------------
