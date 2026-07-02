@@ -163,7 +163,7 @@ class TaskPolicy(Enum):
         """Returns the maximum allowed adjustment duration in hours."""
         if self in (TaskPolicy.EXTRA_WORK, TaskPolicy.S2S_CHARTER, TaskPolicy.S2S_SHUTTLE, TaskPolicy.S2S_ACTIVITY):
             return 0.016666666666666666  # 1 minute
-        return 4.0
+        return 3.5
 
     @property
     def require_schedule_match(self) -> bool:
