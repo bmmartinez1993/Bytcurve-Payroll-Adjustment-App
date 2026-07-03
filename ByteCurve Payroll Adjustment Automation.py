@@ -2461,7 +2461,7 @@ def start_gui_and_automation() -> None:
     digest_text_widget.insert(
         ctk.END,
         "AI analysis will appear here after the run completes.\n"
-        "Powered by Ollama (llama3.2) — make sure the Ollama desktop app is running.",
+        "Powered by Ollama — make sure the Ollama desktop app is running.",
     )
     digest_text_widget.configure(state="disabled")
 
