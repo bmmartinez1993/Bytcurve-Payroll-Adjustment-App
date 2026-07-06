@@ -1,7 +1,7 @@
 # Smoke-test compose file — runs test_container_smoke.py inside the image.
 #
 # Usage:
-#   docker compose -f docker-compose.test.yml run --rm smoke-test
+#   docker compose -f compose.test.yml run --rm smoke-test
 #
 # No real credentials are needed. BYTECURVE_USER / BYTECURVE_PASS are set to
 # placeholder values so the module-load fixture does not exit early.
@@ -21,5 +21,7 @@ services:
       - DISPLAY=:99
       - BYTECURVE_USER=smoke_test_user
       - BYTECURVE_PASS=smoke_test_pass
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - ./logs:/app/logs

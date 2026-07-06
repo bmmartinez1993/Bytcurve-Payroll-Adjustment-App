@@ -36,7 +36,7 @@ Bytcurve-Payroll-Adjustment-App/
 ├── requirements.txt                            # Full Python dependencies (GUI + AI + security) — dev convenience
 ├── .env.example                                # Environment variable template
 ├── Dockerfile                                  # Container image definition
-├── docker-compose.yml                          # Compose service definition
+├── compose.yml                                  # Compose service definition
 ├── docker-entrypoint.sh                        # Container startup (starts Xvfb, then exec app)
 ├── .dockerignore                               # Files excluded from the build context
 ├── build/                                      # Generated build artifacts (do not edit manually)
@@ -272,7 +272,7 @@ Credentials are resolved in priority order:
 
 **Option A — Encrypted files (recommended)**
 
-Place `credentials.enc` and the Fernet key (from keychain or `secret.key`) next to `docker-compose.yml`. The compose file mounts them as read-only volumes:
+Place `credentials.enc` and the Fernet key (from keychain or `secret.key`) next to `compose.yml`. The compose file mounts them as read-only volumes:
 
 ```bash
 docker compose up
@@ -293,7 +293,7 @@ Then run:
 docker compose up
 ```
 
-`docker-compose.yml` passes `BYTECURVE_USER` / `BYTECURVE_PASS` from the host environment (or `.env` file) into the container. When set, these take priority over the encrypted files.
+`compose.yml` passes `BYTECURVE_USER` / `BYTECURVE_PASS` from the host environment (or `.env` file) into the container. When set, these take priority over the encrypted files. Env vars are readable via `docker inspect` and `/proc/<pid>/environ` on the host, so prefer Option A above for any shared or cloud host.
 
 > `.env` is gitignored. Never commit it.
 
@@ -333,6 +333,13 @@ This command:
 5. Saves the new key to the keychain (or `secret.key`).
 
 Rotate periodically or immediately after any suspected key exposure. The old key is discarded and the old `secret.key` file is overwritten.
+
+### Non-Root Container
+
+The container runs Xvfb, Chrome, and the Python process as the unprivileged `pwuser` account (built into the Playwright base image), not root. `compose.yml` also sets `security_opt: no-new-privileges:true`. Two things follow from this:
+
+- `./logs` is chowned to `pwuser` automatically at container start (it's bind-mounted from the host, so its original ownership varies by machine) — no setup needed.
+- `credentials.enc` and `secret.key` are read-only mounts the container can't chown, so they need to already be readable by `pwuser` on the host: `chmod 644 credentials.enc secret.key` is the simple option, or `chmod 640` after chowning them to `pwuser`'s host-visible UID/GID (`docker compose run --rm --entrypoint id bytecurve-app pwuser`) for tighter permissions.
 
 ### HMAC-Signed Audit Log
 
@@ -509,7 +516,7 @@ This same check runs automatically in CI on every push to `main`.
 Verifies the container environment before a live run: Xvfb is running, Chrome for Testing launches, the log directory is writable, `cli.py --help` exits cleanly, the main module loads via importlib, and both credential paths (env vars + encrypted files) resolve correctly.
 
 ```bash
-docker compose -f docker-compose.test.yml run --rm smoke-test
+docker compose -f compose.test.yml run --rm smoke-test
 ```
 
 No real credentials are needed — the smoke tests use throwaway Fernet keys generated in `/tmp`. Run this after every `docker compose build` or before deploying a new image to Cloud Run.

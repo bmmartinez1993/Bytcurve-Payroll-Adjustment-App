@@ -1,0 +1,37 @@
+services:
+  bytecurve-app:
+    build: .
+    volumes:
+      # Credentials are never baked into the image.
+      # Option A (recommended): mount pre-encrypted files.
+      # secret.key decrypts credentials.enc, so treat both files as one unit,
+      # and never store them in the same location as a backup/export of the
+      # other. The container reads them as the unprivileged "pwuser" account
+      # (not root, not your host user), so they need at least world-read
+      # permission on the host — `chmod 644 credentials.enc secret.key` — or,
+      # for tighter permissions, chown them to pwuser's host-visible UID/GID
+      # (run `docker compose run --rm --entrypoint id bytecurve-app pwuser`
+      # to find it) and use `chmod 640` instead.
+      - ./credentials.enc:/app/credentials.enc:ro
+      - ./secret.key:/app/secret.key:ro
+      # Persist session logs on the host so they survive container restarts.
+      - ./logs:/app/logs
+    environment:
+      - DISPLAY=:99
+      # Option B: pass credentials as plain-text env vars instead of mounting
+      # files.  When set, these take priority over credentials.enc.
+      # Populate them in a .env file next to this compose file (never commit it).
+      # WARNING: env vars are visible to anyone who can run `docker inspect`
+      # or read /proc/<pid>/environ on this host, and to most orchestrator
+      # dashboards (ECS, GCE, Azure Container Instances). Prefer Option A
+      # (the mounted encrypted files above) for any shared or cloud host;
+      # only use Option B on a single-tenant machine you fully trust.
+      - BYTECURVE_USER=${BYTECURVE_USER:-}
+      - BYTECURVE_PASS=${BYTECURVE_PASS:-}
+    # Prevent the process (and anything it execs, including Chromium) from
+    # gaining privileges beyond what the image already grants at build time.
+    security_opt:
+      - no-new-privileges:true
+    # Automatically restart the container if it exits unexpectedly in a
+    # cloud environment (e.g. ECS, GCE, Azure Container Instances).
+    restart: unless-stopped

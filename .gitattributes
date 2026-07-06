@@ -3,7 +3,8 @@
 docker-entrypoint.sh    text eol=lf
 Dockerfile              text eol=lf
 .dockerignore           text eol=lf
-docker-compose.yml      text eol=lf
+compose.yml             text eol=lf
+compose.test.yml        text eol=lf
 
 # Default: let git auto-detect everything else
 *                       text=auto

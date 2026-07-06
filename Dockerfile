@@ -36,13 +36,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 # that bundled Chromium does not reproduce.
 RUN python -m playwright install chrome
 
-# Copy application source.
+# Copy application source, owned by the unprivileged "pwuser" account that
+# the Playwright base image already provides (it also owns /ms-playwright,
+# chmod 777 by that image, so pwuser can launch Chrome without root).
 # credentials.enc and secret.key are excluded via .dockerignore and must be
-# mounted as read-only volumes at runtime (see docker-compose.yml).
-COPY . .
+# mounted as read-only volumes at runtime (see compose.yml).
+COPY --chown=pwuser:pwuser . .
 
 # Ensure the logs directory exists so the volume mount and log file path both work.
-RUN mkdir -p /app/logs
+RUN mkdir -p /app/logs && chown pwuser:pwuser /app/logs
 
 # Strip Windows line-endings in case the file was committed with CRLF, then
 # make the script executable.
@@ -54,6 +56,11 @@ RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh \
 # and the Playwright browser launched by the app.
 ENV DISPLAY=:99
 
+# The image still starts as root (no USER here) because docker-entrypoint.sh
+# needs one root-only step first: chown-ing ./logs when it's bind-mounted
+# from the host with a different UID. The entrypoint then drops to pwuser via
+# setpriv before starting Xvfb, Chrome, or the Python process — see that
+# script for the actual privilege drop.
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 # cli.py is the headless entry point used in Docker / cloud.
 # To run the GUI instead (e.g. with VNC): override CMD at runtime.
