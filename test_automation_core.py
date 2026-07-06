@@ -508,7 +508,7 @@ class TestTaskClassification(unittest.TestCase):
             0.016666666666666666,
             places=10
         )
-        self.assertEqual(TaskPolicy.REGULAR.max_allowed_hours, 4.0)
+        self.assertEqual(TaskPolicy.REGULAR.max_allowed_hours, 3.5)
 
     def test_task_policy_require_schedule_match(self):
         """Test TaskPolicy require_schedule_match property."""

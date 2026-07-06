@@ -52,6 +52,7 @@ try:
         record_outcome,
     )
     from log_digest import generate_digest
+    from summary_report import generate_summary_report
     _AI_FEATURES = True
 except ImportError:
     _AI_FEATURES = False
@@ -60,6 +61,7 @@ except ImportError:
     def sort_employees_by_priority(names, h): return names
     def record_outcome(*a, **kw): pass
     def generate_digest(): return ""
+    def generate_summary_report(): return ""
 
 try:
     from rapidfuzz import fuzz as _rfuzz
@@ -824,11 +826,23 @@ def _filter_grid_by_employee(page: Page, employee_name: str) -> bool:
         return False
     try:
         # JS click: exact text match, robust against any internal span structure.
+        # Kendo's list-item selection is wired to mousedown (so the item is picked
+        # before the popup's blur/close race), not click. A bare li.click() only
+        # fires the click event, so the grid still filters (a different listener
+        # catches it) but Kendo's own "currently selected" state never updates —
+        # the popup then renders scrolled to the top on every subsequent open
+        # instead of remembering the employee just picked. Dispatching the full
+        # mousedown/mouseup/click sequence mirrors a real user click and fixes it.
         clicked: bool = page.evaluate(
             """(name) => {
                 const items = document.querySelectorAll('kendo-popup li.k-list-item');
                 for (const li of items) {
-                    if ((li.textContent || '').trim() === name) { li.click(); return true; }
+                    if ((li.textContent || '').trim() === name) {
+                        li.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                        li.dispatchEvent(new MouseEvent('mouseup',   { bubbles: true }));
+                        li.click();
+                        return true;
+                    }
                 }
                 return false;
             }""",
@@ -861,9 +875,17 @@ def _clear_employee_filter(page: Page) -> None:
         return
     try:
         # The Kendo defaultItem ("Select employee") is always the first list item.
+        # Full mousedown/mouseup/click sequence — see _filter_grid_by_employee for why
+        # a bare .click() doesn't update Kendo's internal selection state.
         page.evaluate(
-            "() => { const first = document.querySelector('kendo-popup li.k-list-item');"
-            " if (first) first.click(); }"
+            """() => {
+                const first = document.querySelector('kendo-popup li.k-list-item');
+                if (first) {
+                    first.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                    first.dispatchEvent(new MouseEvent('mouseup',   { bubbles: true }));
+                    first.click();
+                }
+            }"""
         )
         wait_for_loading(page)
     except Exception as e:
@@ -2141,7 +2163,7 @@ def _recover_from_network_stall(page, target_dt=None, emp_filter_name: str = "")
 
 def run_playwright_automation(log_text_widget, username: str, password: str,
                               start_button, stop_button,
-                              digest_widget=None) -> None:
+                              digest_widget=None, report_button=None) -> None:
     global USERNAME, PASSWORD, AUTOMATION_STOP_FLAG
     USERNAME = username
     PASSWORD = password
@@ -2221,10 +2243,13 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
 
             threading.Thread(target=_run_digest, daemon=True).start()
 
+        if report_button is not None:
+            report_button.after(0, lambda: report_button.configure(state="normal"))
+
 
 def start_automation_thread(log_text_widget, username_entry, password_entry,
                             save_creds_var, start_button, stop_button,
-                            digest_widget=None, date_entry=None) -> None:
+                            digest_widget=None, date_entry=None, report_button=None) -> None:
     global AUTOMATION_STOP_FLAG, AUTOMATION_THREAD, SELECTED_DATE
 
     username = username_entry.get()
@@ -2257,12 +2282,14 @@ def start_automation_thread(log_text_widget, username_entry, password_entry,
         date_entry.configure(state="disabled")
     start_button.configure(state="disabled")
     stop_button.configure(state="normal")
+    if report_button is not None:
+        report_button.configure(state="disabled")
     log_text_widget.delete(1.0, ctk.END)
 
     AUTOMATION_STOP_FLAG = False
     t = threading.Thread(
         target=run_playwright_automation,
-        args=(log_text_widget, username, password, start_button, stop_button, digest_widget),
+        args=(log_text_widget, username, password, start_button, stop_button, digest_widget, report_button),
         daemon=True,
     )
     AUTOMATION_THREAD = t
@@ -2427,14 +2454,6 @@ def start_gui_and_automation() -> None:
         text_color=BS_GRAY_900, font=ctk.CTkFont(size=10),
     ).pack(side=ctk.LEFT)
 
-    # Wire up Start button now that date_entry is defined.
-    start_button.configure(
-        command=lambda: start_automation_thread(
-            log_text_widget, username_entry, password_entry,
-            save_creds_var, start_button, stop_button, digest_text_widget, date_entry,
-        )
-    )
-
     # --- Log frame ---
     log_frame = ctk.CTkFrame(root, fg_color=BS_GRAY_100, corner_radius=10)
     log_frame.pack(pady=10, padx=10, fill=ctk.BOTH, expand=True)
@@ -2462,9 +2481,61 @@ def start_gui_and_automation() -> None:
     digest_text_widget.insert(
         ctk.END,
         "AI analysis will appear here after the run completes.\n"
-        "Powered by Ollama (llama3.2) — make sure the Ollama desktop app is running.",
+        "Powered by Ollama — make sure the Ollama desktop app is running.",
     )
     digest_text_widget.configure(state="disabled")
+
+    report_button = ctk.CTkButton(
+        digest_frame, text="Download Report",
+        fg_color=BS_PRIMARY, text_color=BS_WHITE, hover_color=BS_BLUE,
+        state="disabled",
+    )
+    report_button.pack(pady=(0, 10))
+
+    def _download_report() -> None:
+        from tkinter import filedialog
+
+        default_name = f"Summary_Report_{dt.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        path = filedialog.asksaveasfilename(
+            title="Save Summary Report",
+            initialfile=default_name,
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
+        )
+        if not path:
+            return
+
+        report_button.configure(state="disabled", text="Generating...")
+
+        def _generate() -> None:
+            try:
+                content = generate_summary_report()
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(content)
+                report_button.after(0, lambda: messagebox.showinfo(
+                    "Report Saved", f"Summary report saved to:\n{path}"
+                ))
+            except Exception as e:
+                report_button.after(0, lambda: messagebox.showerror(
+                    "Report Failed", f"Could not generate or save the report:\n{e}"
+                ))
+            finally:
+                report_button.after(
+                    0, lambda: report_button.configure(state="normal", text="Download Report")
+                )
+
+        threading.Thread(target=_generate, daemon=True).start()
+
+    report_button.configure(command=_download_report)
+
+    # Wire up Start button now that report_button is defined.
+    start_button.configure(
+        command=lambda: start_automation_thread(
+            log_text_widget, username_entry, password_entry,
+            save_creds_var, start_button, stop_button, digest_text_widget, date_entry,
+            report_button,
+        )
+    )
 
     root.mainloop()
 
