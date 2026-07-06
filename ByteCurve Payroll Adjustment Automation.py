@@ -826,11 +826,23 @@ def _filter_grid_by_employee(page: Page, employee_name: str) -> bool:
         return False
     try:
         # JS click: exact text match, robust against any internal span structure.
+        # Kendo's list-item selection is wired to mousedown (so the item is picked
+        # before the popup's blur/close race), not click. A bare li.click() only
+        # fires the click event, so the grid still filters (a different listener
+        # catches it) but Kendo's own "currently selected" state never updates —
+        # the popup then renders scrolled to the top on every subsequent open
+        # instead of remembering the employee just picked. Dispatching the full
+        # mousedown/mouseup/click sequence mirrors a real user click and fixes it.
         clicked: bool = page.evaluate(
             """(name) => {
                 const items = document.querySelectorAll('kendo-popup li.k-list-item');
                 for (const li of items) {
-                    if ((li.textContent || '').trim() === name) { li.click(); return true; }
+                    if ((li.textContent || '').trim() === name) {
+                        li.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                        li.dispatchEvent(new MouseEvent('mouseup',   { bubbles: true }));
+                        li.click();
+                        return true;
+                    }
                 }
                 return false;
             }""",
@@ -863,9 +875,17 @@ def _clear_employee_filter(page: Page) -> None:
         return
     try:
         # The Kendo defaultItem ("Select employee") is always the first list item.
+        # Full mousedown/mouseup/click sequence — see _filter_grid_by_employee for why
+        # a bare .click() doesn't update Kendo's internal selection state.
         page.evaluate(
-            "() => { const first = document.querySelector('kendo-popup li.k-list-item');"
-            " if (first) first.click(); }"
+            """() => {
+                const first = document.querySelector('kendo-popup li.k-list-item');
+                if (first) {
+                    first.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                    first.dispatchEvent(new MouseEvent('mouseup',   { bubbles: true }));
+                    first.click();
+                }
+            }"""
         )
         wait_for_loading(page)
     except Exception as e:
