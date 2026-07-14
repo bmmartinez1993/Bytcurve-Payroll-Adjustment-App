@@ -51,16 +51,18 @@ try:
         sort_employees_by_priority,
         record_outcome,
     )
-    from log_digest import generate_digest
+    from log_digest import generate_digest, DEFAULT_MODEL, ALTERNATIVE_MODEL
     from summary_report import generate_summary_report
     _AI_FEATURES = True
 except ImportError:
     _AI_FEATURES = False
+    DEFAULT_MODEL = "qwen2.5:7b"
+    ALTERNATIVE_MODEL = "llama3.2"
     def load_history(): return {}
     def save_history(h): pass
     def sort_employees_by_priority(names, h): return names
     def record_outcome(*a, **kw): pass
-    def generate_digest(): return ""
+    def generate_digest(model=None): return ""
     def generate_summary_report(): return ""
 
 try:
@@ -94,7 +96,7 @@ _root_logger.addHandler(_stream_handler)
 
 # --- ByteCurve Color Palette ---
 BS_BLUE    = "#0d6efd"
-BS_RED     = "#dc3545"
+BS_PINK     = "#dc359c"
 BS_WHITE   = "#ffffff"
 BS_BLACK   = "#000000"
 BS_GRAY_100 = "#f8f9fa"
@@ -272,6 +274,12 @@ def login(page: Page) -> None:
         page.wait_for_load_state("networkidle")
     except Exception:
         pass
+
+    # If we're still on the login screen, the credentials were rejected (or the
+    # portal reported some other sign-in error). Fail loudly here instead of
+    # letting navigate_to_payroll blow up later with an unrelated error.
+    if "#/login" in page.url or page.url.rstrip("/").endswith("/login"):
+        raise RuntimeError("Login failed: still on the login page after submit — check username/password.")
     logging.info("Logged in successfully.")
 
 
@@ -2193,7 +2201,9 @@ def _recover_from_network_stall(page, target_dt=None, emp_filter_name: str = "")
 
 def run_playwright_automation(log_text_widget, username: str, password: str,
                               start_button, stop_button,
-                              digest_widget=None, report_button=None) -> None:
+                              digest_widget=None, report_button=None,
+                              username_entry=None, password_entry=None, date_entry=None,
+                              digest_model: str = DEFAULT_MODEL) -> None:
     global USERNAME, PASSWORD, AUTOMATION_STOP_FLAG
     USERNAME = username
     PASSWORD = password
@@ -2250,6 +2260,12 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
     finally:
         start_button.configure(state="normal")
         stop_button.configure(state="disabled")
+        if username_entry is not None:
+            username_entry.configure(state="normal")
+        if password_entry is not None:
+            password_entry.configure(state="normal")
+        if date_entry is not None:
+            date_entry.configure(state="normal")
         AUTOMATION_STOP_FLAG = False
         logging.info("UI: Controls re-enabled.")
 
@@ -2267,8 +2283,8 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
                 digest_widget.configure(state="disabled")
 
             def _run_digest() -> None:
-                digest_widget.after(0, lambda: _update_digest("Analyzing run log with AI..."))
-                result = generate_digest()
+                digest_widget.after(0, lambda: _update_digest(f"Analyzing run log with AI ({digest_model})..."))
+                result = generate_digest(model=digest_model)
                 digest_widget.after(0, lambda: _update_digest(result))
 
             threading.Thread(target=_run_digest, daemon=True).start()
@@ -2279,7 +2295,8 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
 
 def start_automation_thread(log_text_widget, username_entry, password_entry,
                             save_creds_var, start_button, stop_button,
-                            digest_widget=None, date_entry=None, report_button=None) -> None:
+                            digest_widget=None, date_entry=None, report_button=None,
+                            model_var=None) -> None:
     global AUTOMATION_STOP_FLAG, AUTOMATION_THREAD, SELECTED_DATE
 
     username = username_entry.get()
@@ -2316,10 +2333,13 @@ def start_automation_thread(log_text_widget, username_entry, password_entry,
         report_button.configure(state="disabled")
     log_text_widget.delete(1.0, ctk.END)
 
+    digest_model = model_var.get() if model_var is not None else DEFAULT_MODEL
+
     AUTOMATION_STOP_FLAG = False
     t = threading.Thread(
         target=run_playwright_automation,
-        args=(log_text_widget, username, password, start_button, stop_button, digest_widget, report_button),
+        args=(log_text_widget, username, password, start_button, stop_button, digest_widget, report_button,
+              username_entry, password_entry, date_entry, digest_model),
         daemon=True,
     )
     AUTOMATION_THREAD = t
@@ -2399,7 +2419,7 @@ def start_gui_and_automation() -> None:
 
     stop_button = ctk.CTkButton(
         btn_frame, text="Stop Automation",
-        fg_color=BS_RED, text_color=BS_WHITE, hover_color="#c82333",
+        fg_color=BS_PINK, text_color=BS_WHITE, hover_color=BS_PINK,
         state="disabled", command=stop_automation,
     )
     stop_button.pack(side=ctk.LEFT, padx=5)
@@ -2503,6 +2523,17 @@ def start_gui_and_automation() -> None:
         digest_frame, text="AI Run Analysis", text_color=BS_GRAY_900,
     ).pack(pady=(6, 2))
 
+    model_row = ctk.CTkFrame(digest_frame, fg_color="transparent")
+    model_row.pack(pady=(0, 6))
+    ctk.CTkLabel(model_row, text="Model:", text_color=BS_GRAY_900).pack(side=ctk.LEFT, padx=(0, 6))
+    model_var = ctk.StringVar(value=DEFAULT_MODEL)
+    model_menu = ctk.CTkOptionMenu(
+        model_row, values=[DEFAULT_MODEL, ALTERNATIVE_MODEL],
+        variable=model_var, fg_color=BS_PRIMARY, button_color=BS_BLUE,
+        width=140,
+    )
+    model_menu.pack(side=ctk.LEFT)
+
     digest_text_widget = ctk.CTkTextbox(
         digest_frame, width=780, height=165,
         fg_color=BS_GRAY_800, text_color=BS_WHITE,
@@ -2563,7 +2594,7 @@ def start_gui_and_automation() -> None:
         command=lambda: start_automation_thread(
             log_text_widget, username_entry, password_entry,
             save_creds_var, start_button, stop_button, digest_text_widget, date_entry,
-            report_button,
+            report_button, model_var,
         )
     )
 
