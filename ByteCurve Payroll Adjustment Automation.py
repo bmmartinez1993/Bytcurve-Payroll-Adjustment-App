@@ -306,7 +306,13 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
         logging.info(f"VERIFY_BTN: Clicking Verify for {worker_name}")
         btn.click(force=True, timeout=5000)
 
-        page.wait_for_selector("div[role='dialog'][aria-modal='true']", state="visible", timeout=15000)
+        dialog_loc = page.locator("div[role='dialog'][aria-modal='true']").first
+        dialog_loc.wait_for(state="visible", timeout=15000)
+        # Pin to this exact dialog node. A follow-up dialog (e.g. 'Employee
+        # Conflict') can open the instant this one closes; a re-queried
+        # generic selector would latch onto that new dialog and the
+        # "hidden" wait below would never resolve, timing out instead.
+        dialog_handle = dialog_loc.element_handle()
 
         # Primary: the test-id the dialog ships with. If that is absent, fall back to
         # the generic Kendo confirm-dialog primary button (proven in diagnose_dialog.py),
@@ -326,8 +332,12 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
 
         ok_btn.first.scroll_into_view_if_needed()
         ok_btn.first.click(force=True, timeout=5000)
-        # Wait for the dialog to close, then for the grid reload to finish.
-        page.wait_for_selector("div[role='dialog'][aria-modal='true']", state="hidden", timeout=8000)
+        # Wait for THIS dialog (not just "some dialog") to close, then for
+        # the grid reload to finish.
+        if dialog_handle is not None:
+            dialog_handle.wait_for_element_state("hidden", timeout=8000)
+        else:
+            page.wait_for_selector("div[role='dialog'][aria-modal='true']", state="hidden", timeout=8000)
         wait_for_loading(page)
         page.wait_for_timeout(100)
 
@@ -342,12 +352,19 @@ def click_verify_button(page: Page, worker_name: str) -> bool:
                 f"for {worker_name}. Clicking Ok."
             )
             try:
+                conflict_dialog_loc = page.locator(
+                    "div[role='dialog'][aria-modal='true'].k-dialog"
+                ).first
+                conflict_dialog_handle = conflict_dialog_loc.element_handle()
                 conflict_btn.first.scroll_into_view_if_needed()
                 conflict_btn.first.click(force=True)
-                page.wait_for_selector(
-                    "div[role='dialog'][aria-modal='true'].k-dialog",
-                    state="hidden", timeout=6000
-                )
+                if conflict_dialog_handle is not None:
+                    conflict_dialog_handle.wait_for_element_state("hidden", timeout=6000)
+                else:
+                    page.wait_for_selector(
+                        "div[role='dialog'][aria-modal='true'].k-dialog",
+                        state="hidden", timeout=6000
+                    )
                 page.wait_for_timeout(800)
                 wait_for_loading(page)
             except Exception as ce:
@@ -957,9 +974,16 @@ def _handle_confirm_changes_dialog(page: Page, task_code: str,
             "Clicking Ok to acknowledge."
         )
         try:
+            # Pin to this exact dialog node before dismissing it — a follow-up
+            # dialog can open immediately after and a re-queried generic
+            # selector would latch onto that one instead, hanging until timeout.
+            dialog_handle = page.locator(any_dlg_sel).first.element_handle()
             conflict_btn.scroll_into_view_if_needed()
             conflict_btn.click(force=True)
-            page.wait_for_selector(any_dlg_sel, state="hidden", timeout=8000)
+            if dialog_handle is not None:
+                dialog_handle.wait_for_element_state("hidden", timeout=8000)
+            else:
+                page.wait_for_selector(any_dlg_sel, state="hidden", timeout=8000)
             return True
         except Exception as e:
             logging.warning(
@@ -998,8 +1022,14 @@ def _handle_confirm_changes_dialog(page: Page, task_code: str,
     close_btn = page.locator(SELECTORS["btn_dialog_close"]).first
     try:
         close_btn.wait_for(state="visible", timeout=3000)
+        # Pin to this exact dialog node — see comment in the conflict-dialog
+        # branch above for why a re-queried generic selector is unsafe here.
+        dialog_handle = page.locator(any_dlg_sel).first.element_handle()
         close_btn.click(force=True)
-        page.wait_for_selector(any_dlg_sel, state="hidden", timeout=8000)
+        if dialog_handle is not None:
+            dialog_handle.wait_for_element_state("hidden", timeout=8000)
+        else:
+            page.wait_for_selector(any_dlg_sel, state="hidden", timeout=8000)
         logging.info(f"DIALOG: '{title_text}' dialog dismissed for {task_code}.")
         return True
     except Exception as e:
