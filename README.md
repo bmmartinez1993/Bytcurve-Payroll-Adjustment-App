@@ -1,8 +1,8 @@
 # ByteCurve Payroll Adjustment Automation
 
-> **v1.2.2** — Docker container hardened to run as the unprivileged `pwuser` (not root); Fernet key now stored in the OS keychain with rotation support, protected by an HMAC-signed audit log.
+> **v1.3.0** — AI-generated stakeholder **Summary Report** (Download Report button), a GUI **Employee Filter** with fuzzy name matching, a **Target Date** picker, and a choice of Ollama model (`qwen2.5:7b` / `llama3.2`) for the AI Run Analysis panel. Each run now writes its own timestamped log file instead of overwriting a shared one, employees with no timesheet tasks are no longer flagged for manual review (only genuine task-policy violations are), and a plain-text manual-review list is saved automatically after every run.
 >
-> Since v1.2.2 (on `main`, not yet tagged): AI-generated stakeholder **Summary Report** (Download Report button), a GUI **Employee Filter** with fuzzy name matching, a **Target Date** picker, and a choice of Ollama model (`qwen2.5:7b` / `llama3.2`) for the AI Run Analysis panel.
+> **v1.2.2** — Docker container hardened to run as the unprivileged `pwuser` (not root); Fernet key now stored in the OS keychain with rotation support, protected by an HMAC-signed audit log.
 
 Playwright-based automation tool that logs into the ByteCurve 360 portal, validates employee timesheet entries against task-specific policies, adjusts paid time ranges where needed, and bulk-verifies completed records.
 

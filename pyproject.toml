@@ -1,6 +1,6 @@
 [project]
 name = "bytecurve-payroll"
-version = "1.2.1"
+version = "1.3.0"
 description = "Headless payroll adjustment automation for ByteCurve 360"
 requires-python = ">=3.10"
 dependencies = [
