@@ -26,28 +26,32 @@ ALTERNATIVE_MODEL = "llama3.2" # Alternative Ollama model to use for analysis
 # Log reading
 # ---------------------------------------------------------------------------
 
-def _read_log(max_chars: int = MAX_LOG_CHARS) -> str:
+def _read_log(max_chars: int = MAX_LOG_CHARS, log_file: str | None = None) -> str:
     """Reads the session log, trimming from the top if it exceeds *max_chars*."""
+    if log_file is None:
+        log_file = LOG_FILE
     try:
-        with open(LOG_FILE, "r", encoding="utf-8") as f:
+        with open(log_file, "r", encoding="utf-8") as f:
             content = f.read()
         if len(content) > max_chars:
             content = "...[earlier portion trimmed]...\n" + content[-max_chars:]
         return content
     except Exception as e:
-        return f"[Could not read log file '{LOG_FILE}': {e}]"
+        return f"[Could not read log file '{log_file}': {e}]"
 
 
 # ---------------------------------------------------------------------------
 # Digest generation
 # ---------------------------------------------------------------------------
 
-def generate_digest(model: str = DEFAULT_MODEL or ALTERNATIVE_MODEL) -> str:
+def generate_digest(model: str = DEFAULT_MODEL or ALTERNATIVE_MODEL, log_file: str | None = None) -> str:
     """
     Calls a local Ollama model to analyse the session log.
 
     Args:
         model: Ollama model name to use (default: "qwen2.5:7b").
+        log_file: Path to the run's log file (defaults to the module constant,
+            but the caller should pass the current run's timestamped log path).
 
     Returns:
         A formatted multi-section analysis string, or a human-readable
@@ -62,7 +66,7 @@ def generate_digest(model: str = DEFAULT_MODEL or ALTERNATIVE_MODEL) -> str:
             "  pip install ollama"
         )
 
-    log_content = _read_log()
+    log_content = _read_log(log_file=log_file)
 
     prompt = f"""You are a quality-assurance analyst reviewing the run log of the
 ByteCurve Payroll Adjustment Automation app.

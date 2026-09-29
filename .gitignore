@@ -10,6 +10,8 @@ secret.key
 
 # Runtime logs
 automation_activity.log
+logs/automation_run_*.log
+logs/manual_review_*.txt
 employee_history.json
 task_classifier_log.db
 task_classifier_model.pkl

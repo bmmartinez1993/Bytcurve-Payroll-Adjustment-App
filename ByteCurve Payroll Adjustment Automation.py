@@ -62,8 +62,8 @@ except ImportError:
     def save_history(h): pass
     def sort_employees_by_priority(names, h): return names
     def record_outcome(*a, **kw): pass
-    def generate_digest(model=None): return ""
-    def generate_summary_report(): return ""
+    def generate_digest(model=None, log_file=None): return ""
+    def generate_summary_report(model=None, log_file=None): return ""
 
 try:
     from rapidfuzz import fuzz as _rfuzz
@@ -71,16 +71,32 @@ except ImportError:
     _rfuzz = None
 
 # --- LOGGING CONFIGURATION ---
+#
+# Every automation run gets its own timestamped log file (logs/automation_run_
+# <YYYYMMDD_HHMMSS>.log) instead of a single file that gets overwritten each
+# time — this keeps a full history of past runs on disk. _start_new_run_log()
+# swaps in a fresh file at the top of each run (needed because the GUI can run
+# the automation more than once per process); the file created here at import
+# time only covers early-boot messages logged before a run actually starts.
 
 _log_formatter = logging.Formatter(
     fmt='%(asctime)s [%(levelname)s] %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
-os.makedirs("logs", exist_ok=True)
+_hmac_fernet_key: bytes | None = None  # cached so a new per-run file handler can re-sign
+
+
+def _make_run_log_path() -> str:
+    os.makedirs("logs", exist_ok=True)
+    stamp = dt.now().strftime("%Y%m%d_%H%M%S")
+    return os.path.join("logs", f"automation_run_{stamp}.log")
+
+
+CURRENT_LOG_PATH = _make_run_log_path()
 _file_handler = audit_log.HMACFileHandler(
-    os.path.join("logs", "automation_activity.log"),
-    mode='w',           # overwrite each run — keeps the file to the current session only
+    CURRENT_LOG_PATH,
+    mode='w',           # new file per run, so 'w' just opens it for the first time
     encoding='utf-8',
 )
 _file_handler.setFormatter(_log_formatter)
@@ -93,6 +109,72 @@ _root_logger.setLevel(logging.INFO)
 _root_logger.handlers.clear()          # remove any handlers set by imported modules
 _root_logger.addHandler(_file_handler)
 _root_logger.addHandler(_stream_handler)
+
+
+def _set_hmac_key(fernet_key: bytes) -> None:
+    """Activates HMAC signing on the active file handler and caches the key so
+    _start_new_run_log() can re-activate it on the next per-run file."""
+    global _hmac_fernet_key
+    _hmac_fernet_key = fernet_key
+    _file_handler.set_key(fernet_key)
+
+
+def _start_new_run_log() -> str:
+    """Opens a fresh timestamped log file for a new automation run and swaps it
+    in as the active file handler, preserving the console/GUI handlers."""
+    global _file_handler, CURRENT_LOG_PATH
+    CURRENT_LOG_PATH = _make_run_log_path()
+    new_handler = audit_log.HMACFileHandler(CURRENT_LOG_PATH, mode='w', encoding='utf-8')
+    new_handler.setFormatter(_log_formatter)
+    if _hmac_fernet_key is not None:
+        new_handler.set_key(_hmac_fernet_key)
+    logging.root.removeHandler(_file_handler)
+    _file_handler.close()
+    _file_handler = new_handler
+    logging.root.addHandler(_file_handler)
+    return CURRENT_LOG_PATH
+
+
+_MANUAL_FLAG_RE = re.compile(r"MANUAL_FLAG: Skipping verification for (.+)")
+
+
+def _write_manual_review_file(log_path: str) -> tuple[str, list[str]]:
+    """
+    Extracts the employees flagged with a MANUAL_FLAG marker from this run's
+    log and writes them to a plain-text list next to it, so manual review can
+    start immediately without needing the optional Ollama-based summary report.
+
+    Returns (output_path, employee_names).
+    """
+    seen: list[str] = []
+    try:
+        with open(log_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if audit_log.HMAC_TAG in line:
+                    line = line.split(audit_log.HMAC_TAG, 1)[0]
+                m = _MANUAL_FLAG_RE.search(line)
+                if m:
+                    name = m.group(1).strip()
+                    if name and name not in seen:
+                        seen.append(name)
+    except Exception as e:
+        logging.error(f"MANUAL_REVIEW_LIST: Could not read '{log_path}' for extraction: {e}")
+
+    out_path = re.sub(r"automation_run_(.+)\.log$", r"manual_review_\1.txt", log_path)
+    header = (
+        "ByteCurve Payroll Adjustment Automation — Manual Review List\n"
+        f"Generated: {dt.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        f"Source log: {os.path.basename(log_path)}\n"
+        + "=" * 60 + "\n\n"
+    )
+    body = (
+        "\n".join(f"- {name}" for name in seen)
+        if seen else
+        "None — no employees required manual review this run."
+    )
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write(header + body + "\n")
+    return out_path, seen
 
 # --- ByteCurve Color Palette ---
 BS_BLUE    = "#0d6efd"
@@ -1332,7 +1414,7 @@ def _shadow_classify(task_code: str, task_name: str, keyword_policy) -> None:
 def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                          worker_id: str, target_dt: dt,
                          scroll_container=None, worker_name: str = "",
-                         emp_filter_name: str = "") -> bool:
+                         emp_filter_name: str = "") -> tuple[bool, bool]:
     """
     Adjusts all unadjusted paid-time tasks for one worker, then signals
     readiness for verification.
@@ -1344,11 +1426,19 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
       3. The grid reloads after each save, so rows are re-read fresh and the
          next unadjusted task is located for the next iteration.
     Verification (checkbox marking + Verify button) is handled by the caller
-    ONLY after this function returns True — i.e., after ALL tasks for this
-    worker have been adjusted.
+    ONLY after this function returns (True, ...) — i.e., after ALL tasks for
+    this worker have been adjusted.
 
-    Returns True when no more adjustments are needed, False when the worker
-    must be skipped (repeated failures or manual-review flag).
+    Returns a (proceed, manual_review) tuple:
+      proceed=True          — no more adjustments needed; caller should verify.
+      proceed=False,
+        manual_review=True  — the worker has tasks but the automation could not
+                               set them per the task-policy rules (invalid/oversized
+                               shift, unresolved conflict, retry exhaustion, or a
+                               network-recovery failure) — needs human review.
+        manual_review=False — the worker had nothing to adjust (no task rows for
+                               the date) or the run was stopped — not a policy
+                               violation, so it is NOT flagged for manual review.
     """
     retry_tracking: dict[str, int] = {}
     manual_flag = False
@@ -1375,7 +1465,11 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
             if not _recover_from_network_stall(
                 page, target_dt=target_dt, emp_filter_name=emp_filter_name
             ):
-                return False
+                logging.warning(
+                    f"MANUAL_FLAG: Skipping verification for {worker_display} "
+                    "— network recovery failed."
+                )
+                return False, True
             continue  # re-read rows from the restored session
 
         worker_rows = worker_filter.all()
@@ -1400,8 +1494,12 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
                     f"STALE: {_saved_task_count} task(s) saved for {worker_display} "
                     "— rows filtered out post-save. Proceeding to verification."
                 )
-                return True
-            return False
+                return True, False
+            logging.info(
+                f"NO_TASKS: No timesheet rows found for {worker_display} — "
+                "nothing to adjust. Not flagging for manual review."
+            )
+            return False, False
 
         _stale_budget = 3  # reset on successful read so later iterations get fresh budget
 
@@ -1612,7 +1710,8 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
 
             if retry_tracking[task_key] > MAX_RETRY_ATTEMPTS:
                 logging.error(f"STUCK: {task['code']} failed {MAX_RETRY_ATTEMPTS} times. Skipping worker.")
-                return False
+                logging.warning(f"MANUAL_FLAG: Skipping verification for {worker_display}")
+                return False, True
 
             logging.info(
                 f"STEP1: Adjusting paid cells — {task['code']} for {worker_display} "
@@ -1733,16 +1832,16 @@ def _adjust_worker_tasks(page: Page, worker_filter, worker_display: str,
         # (or were skipped due to policy/overlap).
         if manual_flag:
             logging.info(f"MANUAL_FLAG: Skipping verification for {worker_display}")
-            return False
+            return False, True
 
         # STEP4: All adjustments done — caller will mark checkboxes and verify.
         logging.info(
             f"STEP4: All paid-time adjustments complete for {worker_display}. "
             "Proceeding to verification."
         )
-        return True
+        return True, False
 
-    return False  # Stopped
+    return False, False  # Stopped
 
 
 def _reapply_grid_filters(page: Page) -> None:
@@ -2057,7 +2156,7 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
 
         logging.info(f"WORKER: Processing {worker_display}")
 
-        adjustments_ok = _adjust_worker_tasks(
+        adjustments_ok, needs_manual_review = _adjust_worker_tasks(
             page, worker_filter, worker_display, worker_id, target_dt,
             emp_filter_name=active_processing_filter,
         )
@@ -2068,13 +2167,15 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
                 emp_filter_name=active_processing_filter,
             )
             logging.info(f"WORKER: Done with {worker_display}")
-        else:
+        elif needs_manual_review:
             logging.warning(
                 f"WORKER: Skipping verification for {worker_display} (manual review needed)"
             )
+        else:
+            logging.info(f"WORKER: No tasks to adjust for {worker_display} — skipping.")
 
         record_outcome(emp_filter_name, success=adjustments_ok,
-                       manual_flag=not adjustments_ok, history=history)
+                       manual_flag=needs_manual_review, history=history)
         logging.info(f"STEP5: Moving to next employee after completing {worker_display}.")
         processed_workers.add(worker_id)
 
@@ -2219,8 +2320,11 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
     tkinter_handler.setFormatter(_log_formatter)   # timestamps in the UI match the file
     logging.root.addHandler(tkinter_handler)
 
+    run_log_path = _start_new_run_log()
+
     logging.info("=" * 60)
     logging.info(f"AUTOMATION RUN STARTED: {dt.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    logging.info(f"RUN LOG: {run_log_path}")
     logging.info("=" * 60)
 
     try:
@@ -2270,6 +2374,20 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
         logging.info("UI: Controls re-enabled.")
 
         try:
+            manual_review_path, flagged = _write_manual_review_file(run_log_path)
+            if flagged:
+                logging.warning(
+                    f"MANUAL_REVIEW_LIST: {len(flagged)} employee(s) need manual review "
+                    f"— saved to {manual_review_path}"
+                )
+            else:
+                logging.info(
+                    f"MANUAL_REVIEW_LIST: No employees flagged this run — saved to {manual_review_path}"
+                )
+        except Exception as e:
+            logging.error(f"MANUAL_REVIEW_LIST: Failed to write manual review file: {e}")
+
+        try:
             from task_classifier import retrain_from_log
             retrain_from_log()
         except Exception:
@@ -2284,7 +2402,7 @@ def run_playwright_automation(log_text_widget, username: str, password: str,
 
             def _run_digest() -> None:
                 digest_widget.after(0, lambda: _update_digest(f"Analyzing run log with AI ({digest_model})..."))
-                result = generate_digest(model=digest_model)
+                result = generate_digest(model=digest_model, log_file=run_log_path)
                 digest_widget.after(0, lambda: _update_digest(result))
 
             threading.Thread(target=_run_digest, daemon=True).start()
@@ -2368,7 +2486,7 @@ def start_gui_and_automation() -> None:
 
     encryption_key       = load_key()
     saved_user, saved_pw = decrypt_credentials(encryption_key)
-    _file_handler.set_key(encryption_key)
+    _set_hmac_key(encryption_key)
     logging.info("AUDIT: HMAC signing active.")
 
     ka_thread = threading.Thread(target=keep_active, args=(KEEP_ACTIVE_STOP_EVENT,), daemon=True)
@@ -2570,7 +2688,7 @@ def start_gui_and_automation() -> None:
 
         def _generate() -> None:
             try:
-                content = generate_summary_report()
+                content = generate_summary_report(log_file=CURRENT_LOG_PATH)
                 with open(path, "w", encoding="utf-8") as f:
                     f.write(content)
                 report_button.after(0, lambda: messagebox.showinfo(
