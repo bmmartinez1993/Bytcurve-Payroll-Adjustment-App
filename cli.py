@@ -100,27 +100,37 @@ def main() -> None:
         "--verify-log",
         metavar="LOG_PATH",
         nargs="?",
-        const=os.path.join("logs", "automation_activity.log"),
+        const="__latest__",
         help=(
             "Verify HMAC signatures in a log file and report valid/unsigned/tampered counts. "
-            "Defaults to logs/automation_activity.log when no path is given."
+            "Defaults to the most recent logs/automation_run_*.log file when no path is given."
         ),
     )
     args = parser.parse_args()
 
     # ── Log verification (early exit — no browser needed) ─────────────────────
     if args.verify_log:
+        import glob
         import audit_log
         import credential_store
+
+        verify_path = args.verify_log
+        if verify_path == "__latest__":
+            candidates = sorted(glob.glob(os.path.join("logs", "automation_run_*.log")))
+            if not candidates:
+                logging.error("No logs/automation_run_*.log files found to verify.")
+                sys.exit(1)
+            verify_path = candidates[-1]
+
         try:
             key = credential_store.load_key(_app.KEY_FILE)
-            result = audit_log.verify_log(args.verify_log, key)
+            result = audit_log.verify_log(verify_path, key)
             print(
                 f"Log verification: {result['valid']} valid, "
                 f"{result['unsigned']} unsigned, {result['tampered']} tampered"
             )
             if result["tampered"] > 0:
-                print(f"WARNING: {result['tampered']} tampered line(s) detected in {args.verify_log}")
+                print(f"WARNING: {result['tampered']} tampered line(s) detected in {verify_path}")
                 sys.exit(1)
         except Exception as exc:
             logging.error("Log verification failed: %s", exc)
@@ -176,7 +186,7 @@ def main() -> None:
     import credential_store
     try:
         _hmac_fernet_key = credential_store.load_key(_app.KEY_FILE)
-        _app._file_handler.set_key(_hmac_fernet_key)
+        _app._set_hmac_key(_hmac_fernet_key)
         logging.info("AUDIT: HMAC signing active.")
     except Exception:
         logging.warning("AUDIT: HMAC signing unavailable — key could not be loaded.")
@@ -229,6 +239,21 @@ def main() -> None:
     except Exception as exc:
         logging.critical(f"Browser launch failed: {exc}", exc_info=True)
         exit_code = 1
+
+    # ── Manual review list ──────────────────────────────────────────────────────
+    try:
+        manual_review_path, flagged = _app._write_manual_review_file(_app.CURRENT_LOG_PATH)
+        if flagged:
+            logging.warning(
+                f"MANUAL_REVIEW_LIST: {len(flagged)} employee(s) need manual review "
+                f"— saved to {manual_review_path}"
+            )
+        else:
+            logging.info(
+                f"MANUAL_REVIEW_LIST: No employees flagged this run — saved to {manual_review_path}"
+            )
+    except Exception as exc:
+        logging.error(f"MANUAL_REVIEW_LIST: Failed to write manual review file: {exc}")
 
     # ── Post-run integrity check ───────────────────────────────────────────────
     if _cred_hash and not credential_store.verify_credential_file_integrity(
