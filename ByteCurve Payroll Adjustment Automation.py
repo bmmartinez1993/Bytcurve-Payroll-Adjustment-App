@@ -1,5 +1,6 @@
 # ByteCurve Payroll Adjustment Automation App
 
+from collections import Counter
 import datetime
 from datetime import datetime as dt
 import os
@@ -918,7 +919,21 @@ def _get_all_employees_from_dropdown(page: Page) -> list:
     page.keyboard.press("Escape")
     page.wait_for_timeout(300)
     logging.info(f"EMP_FILTER: {len(names)} employees found in dropdown.")
+
+    counts = Counter(names)
+    dupes = {n: c for n, c in counts.items() if c > 1}
+    if dupes:
+        logging.warning(
+            f"EMP_FILTER: DUPLICATE_NAMES — {len(dupes)} name(s) appear more than once in the "
+            "dropdown; each occurrence will be selected by position: "
+            + ", ".join(f"'{n}' x{c}" for n, c in sorted(dupes.items()))
+        )
     return names
+
+
+# name -> 0-based occurrence among identically named dropdown entries.  Set by the
+# main loop so every re-select (recovery, retries) picks the same duplicate.
+_EMP_OCCURRENCE: dict[str, int] = {}
 
 
 def _filter_grid_by_employee(page: Page, employee_name: str) -> bool:
@@ -926,8 +941,11 @@ def _filter_grid_by_employee(page: Page, employee_name: str) -> bool:
     Selects employee_name in the emp-input dropdown so the grid shows only
     that employee's rows.  Eliminates virtual-scroll stale-DOM issues because
     all rows for the selected employee are always in the DOM render buffer.
+    When several dropdown entries share the name, _EMP_OCCURRENCE decides which
+    one is clicked.
     Returns True when the item was found and clicked.
     """
+    occurrence = _EMP_OCCURRENCE.get(employee_name, 0)
     if not _open_employee_dropdown(page):
         logging.warning(f"EMP_FILTER: Could not open dropdown to filter by '{employee_name}'.")
         return False
@@ -941,10 +959,12 @@ def _filter_grid_by_employee(page: Page, employee_name: str) -> bool:
         # instead of remembering the employee just picked. Dispatching the full
         # mousedown/mouseup/click sequence mirrors a real user click and fixes it.
         clicked: bool = page.evaluate(
-            """(name) => {
+            """([name, nth]) => {
                 const items = document.querySelectorAll('kendo-popup li.k-list-item');
+                let seen = 0;
                 for (const li of items) {
                     if ((li.textContent || '').trim() === name) {
+                        if (seen++ < nth) continue;
                         li.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
                         li.dispatchEvent(new MouseEvent('mouseup',   { bubbles: true }));
                         li.click();
@@ -953,8 +973,15 @@ def _filter_grid_by_employee(page: Page, employee_name: str) -> bool:
                 }
                 return false;
             }""",
-            employee_name,
+            [employee_name, occurrence],
         )
+        if not clicked and occurrence > 0:
+            # Never fall back to the first match: that would re-process the wrong duplicate.
+            page.keyboard.press("Escape")
+            logging.warning(
+                f"EMP_FILTER: Duplicate #{occurrence + 1} of '{employee_name}' not found in popup."
+            )
+            return False
         if not clicked:
             # Fallback: Playwright locator with partial-text match.
             item = (
@@ -2057,9 +2084,19 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
     processed_workers: set[str] = set()
     grid_rows_sel = f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row"
 
+    _EMP_OCCURRENCE.clear()
+    seen_names: Counter = Counter()
     for emp_filter_name in employee_names:
         if AUTOMATION_STOP_FLAG:
             break
+
+        _EMP_OCCURRENCE[emp_filter_name] = seen_names[emp_filter_name]
+        seen_names[emp_filter_name] += 1
+        if _EMP_OCCURRENCE[emp_filter_name]:
+            logging.info(
+                f"EMP_FILTER: '{emp_filter_name}' is duplicate #{_EMP_OCCURRENCE[emp_filter_name] + 1} "
+                "in the dropdown — selecting by position."
+            )
 
         # Guard against a VPN drop that occurred between employees: the
         # page-loading overlay would block the employee-filter click and
