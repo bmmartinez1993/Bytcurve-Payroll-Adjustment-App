@@ -2043,6 +2043,7 @@ def _resolve_employee_names(uploaded: list[str], portal: list[str]) -> list[str]
 
 
 _HIDDEN_SCAN_MAX_STEPS = 400
+_HIDDEN_SETTLE_TRIES = 10
 
 
 def _build_unfiltered_worker_index(page: Page, target_date_full: str) -> tuple[dict, bool]:
@@ -2075,8 +2076,27 @@ def _build_unfiltered_worker_index(page: Page, target_date_full: str) -> tuple[d
     rows_seen = 0
     complete = False
     try:
+        # The grid reloads asynchronously after the employee filter is cleared; reading it
+        # too early returns the previous (filtered) view.  Wait until the row count is
+        # stable across two reads one second apart.
+        count_js = "(g) => document.querySelectorAll(g + ' tbody tr.k-master-row').length"
+        last_count = -1
+        for _ in range(_HIDDEN_SETTLE_TRIES):
+            wait_for_loading(page)
+            count = page.evaluate(count_js, grid_sel)
+            if count == last_count and count > 0:
+                break
+            last_count = count
+            page.wait_for_timeout(1000)
         container.evaluate("el => { el.scrollTop = 0; }")
         page.wait_for_timeout(500)
+        metrics = container.evaluate(
+            "el => [el.scrollHeight, el.clientHeight]"
+        )
+        logging.info(
+            f"HIDDEN_EMPLOYEE: Scan start — {last_count} rows rendered, "
+            f"scrollHeight={metrics[0]} clientHeight={metrics[1]}."
+        )
         bottom_hits = 0
         for _ in range(_HIDDEN_SCAN_MAX_STEPS):
             if AUTOMATION_STOP_FLAG:
@@ -2270,12 +2290,20 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
                 scanned, complete = _build_unfiltered_worker_index(page, target_date_full)
                 # Only a complete, non-empty scan is reusable; otherwise retry next time
                 # (an empty result usually means the filter was not actually cleared).
-                if complete and scanned:
+                # Sanity: processed workers' rows stay in the grid, so a healthy index
+                # holds most of them.  A far smaller index means the grid was still
+                # showing a filtered/partial view.
+                in_index = len(processed_workers & set(scanned))
+                plausible = len(processed_workers) < 10 or in_index >= 0.5 * len(processed_workers)
+                if complete and scanned and plausible:
                     hidden_index = scanned
                 else:
+                    why = ("incomplete" if not complete else
+                           "returned no rows" if not scanned else
+                           f"implausible ({len(scanned)} worker(s), only {in_index} of "
+                           f"{len(processed_workers)} already-processed workers present)")
                     logging.warning(
-                        f"HIDDEN_EMPLOYEE: '{emp_filter_name}' — full-grid scan "
-                        f"{'incomplete' if not complete else 'returned no rows'}; "
+                        f"HIDDEN_EMPLOYEE: '{emp_filter_name}' — full-grid scan {why}; "
                         "cannot decide whether this employee has shifts. Skipping, "
                         "will retry the scan for the next hidden employee."
                     )

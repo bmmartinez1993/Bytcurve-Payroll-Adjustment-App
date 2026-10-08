@@ -109,10 +109,15 @@ class TestBuildIndex(unittest.TestCase):
         """Fake page: each scroll advances one 'page' of rows; bottom reached on the last."""
         state = {"i": 0}
         page = MagicMock()
-        page.evaluate.side_effect = lambda js, args: pages_of_rows[min(state["i"], len(pages_of_rows) - 1)]
+        def page_ev(js, args):
+            rows = pages_of_rows[min(state["i"], len(pages_of_rows) - 1)]
+            return len(rows) if "length" in js else rows
+        page.evaluate.side_effect = page_ev
         container = MagicMock()
 
         def ev(js):
+            if "[el.scrollHeight" in js:
+                return [1000, 500]
             if "scrollHeight" in js:
                 return state["i"] >= len(pages_of_rows) - 1
             if "+= el.clientHeight" in js:
