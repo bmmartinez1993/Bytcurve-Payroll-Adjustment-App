@@ -460,6 +460,18 @@ class TestTaskClassification(unittest.TestCase):
         result = determine_task_policy('S2S Charter', 'Charter')
         self.assertEqual(result, TaskPolicy.S2S_CHARTER)
 
+    def test_determine_task_policy_plain_charter(self):
+        """Plain 'Charter' codes (no S2S prefix) are one-minute tasks, case-insensitive."""
+        for code in ('Charter', 'Charter 2', 'charter'):
+            self.assertEqual(determine_task_policy(code, 'Trip'), TaskPolicy.CHARTER, code)
+        self.assertTrue(TaskPolicy.CHARTER.is_one_minute_only)
+        self.assertAlmostEqual(TaskPolicy.CHARTER.max_allowed_hours, 1 / 60)
+
+    def test_determine_task_policy_charter_does_not_override_others(self):
+        """S2S Charter stays S2S_CHARTER and Bridge Charter is still skipped."""
+        self.assertEqual(determine_task_policy('S2S Charter', 'x'), TaskPolicy.S2S_CHARTER)
+        self.assertIsNone(determine_task_policy('Bridge Charter', 'x'))
+
     def test_determine_task_policy_spare_cdl(self):
         """Test Spare CDL task classification."""
         result = determine_task_policy('Spare CDL', 'CDL')
@@ -573,6 +585,18 @@ class TestCalculateProposedTimeRange(unittest.TestCase):
         start, end = result
         self.assertEqual(start, dt(2026, 6, 4, 6, 0))
         self.assertEqual(end, dt(2026, 6, 4, 6, 1))  # 1 minute duration
+
+    def test_charter_one_minute_duration(self):
+        """Plain Charter task gets 1-minute duration."""
+        schedule = TimeRange(
+            start_dt=dt(2026, 6, 4, 6, 0),
+            end_dt=dt(2026, 6, 4, 8, 0),
+            start_str='06:00 AM',
+            end_str='08:00 AM'
+        )
+        actual = TimeRange(start_str='', end_str='')
+        result = calculate_proposed_time_range('Charter', 'Trip', schedule, actual, self.ref_date)
+        self.assertEqual(result, (dt(2026, 6, 4, 6, 0), dt(2026, 6, 4, 6, 1)))
 
     def test_spare_cdl_exact_schedule(self):
         """Test Spare CDL task uses exact schedule time."""
