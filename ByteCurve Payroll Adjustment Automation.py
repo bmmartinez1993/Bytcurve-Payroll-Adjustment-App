@@ -999,7 +999,7 @@ def _filter_grid_by_employee(page: Page, employee_name: str) -> bool:
         return False
 
 
-def _clear_employee_filter(page: Page) -> None:
+def _clear_employee_filter(page: Page, diagnostics: bool = False) -> None:
     """
     Resets the emp-input dropdown to 'Select employee' so the grid shows all rows.
     Uses JS to click the first popup item (the Kendo defaultItem placeholder).
@@ -1012,6 +1012,8 @@ def _clear_employee_filter(page: Page) -> None:
         # clear, so record what the popup's first item really is and what the grid and
         # dropdown show afterwards.
         try:
+            if not diagnostics:
+                raise RuntimeError
             first_txt = page.evaluate(
                 "() => { const li = document.querySelector('kendo-popup li.k-list-item');"
                 " return li ? (li.textContent || '').trim() : null; }"
@@ -1033,7 +1035,8 @@ def _clear_employee_filter(page: Page) -> None:
             }"""
         )
         wait_for_loading(page)
-        _log_grid_snapshot(page, "CLEAR_DIAG: after clear")
+        if diagnostics:
+            _log_grid_snapshot(page, "CLEAR_DIAG: after clear")
     except Exception as e:
         page.keyboard.press("Escape")
         logging.warning(f"EMP_FILTER: Could not clear filter: {e}")
@@ -2167,18 +2170,17 @@ def _build_unfiltered_worker_index(page: Page, target_date_full: str) -> tuple[d
     return index, complete
 
 
-def _index_is_plausible(scanned: dict, processed: set, dropdown_total: int) -> bool:
+def _index_is_plausible(scanned: dict, processed: set) -> bool:
     """
     True when a full-grid index looks like the real unfiltered grid.
 
-    With processed workers, their rows stay in the grid, so most must be present.
-    Before any worker is processed, compare against the dropdown size instead: every
-    dropdown name that has shifts appears in the grid, and only a minority of names
-    (no shift that day) are absent, so a healthy index holds at least half of them.
+    Processed workers' rows stay in the grid, so once 10 or more are processed most of
+    them must be present; a far smaller index means the grid was still showing a
+    filtered/partial view.  Before that there is nothing to compare against.
     """
-    if len(processed) >= 10:
-        return len(processed & set(scanned)) >= 0.5 * len(processed)
-    return len(scanned) >= 0.5 * dropdown_total if dropdown_total >= 10 else bool(scanned)
+    if len(processed) < 10:
+        return True
+    return len(processed & set(scanned)) >= 0.5 * len(processed)
 
 
 def _name_key(name: str) -> str:
@@ -2252,7 +2254,7 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
 
     history = load_history()
     employee_names = sort_employees_by_priority(employee_names, history)
-    dropdown_total = len(employee_names)
+    all_dropdown_names = list(employee_names)
 
     if SELECTED_EMPLOYEES:
         employee_names = _resolve_employee_names(SELECTED_EMPLOYEES, employee_names)
@@ -2271,7 +2273,8 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
 
     processed_workers: set[str] = set()
     hidden_index: "dict | None" = None   # built lazily on the first hidden employee
-    skipped_hidden: list[str] = []
+    confirmed_hidden: list[str] = []
+    unverified_hidden: list[str] = []
     grid_rows_sel = f"{SELECTORS['payload_task_grid']} tbody tr.k-master-row"
 
     # Index the whole grid now, while no employee filter has been applied, so deciding
@@ -2281,16 +2284,16 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
     # as a fallback.
     _log_grid_snapshot(page, "PRESCAN_DIAG: before scan")
     scanned, complete = _build_unfiltered_worker_index(page, target_date_full)
-    if complete and scanned and _index_is_plausible(scanned, processed_workers, dropdown_total):
+    if complete and scanned:
         hidden_index = scanned
         logging.info(
             f"HIDDEN_EMPLOYEE: Start-of-run index trusted — {len(scanned)} worker(s) with "
-            f"rows for '{target_date_full}' vs {dropdown_total} dropdown name(s)."
+            f"rows for '{target_date_full}' vs {len(all_dropdown_names)} dropdown name(s)."
         )
     else:
         logging.warning(
             f"HIDDEN_EMPLOYEE: Start-of-run index not trusted ({len(scanned)} worker(s), "
-            f"{'complete' if complete else 'INCOMPLETE'}, {dropdown_total} dropdown name(s)); "
+            f"{'complete' if complete else 'INCOMPLETE'}, {len(all_dropdown_names)} dropdown name(s)); "
             "falling back to a per-employee scan."
         )
 
@@ -2356,7 +2359,7 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
             # find this employee by a loose word-match on their display name.
             filter_cleared = False
             if hidden_index is None:
-                _clear_employee_filter(page)
+                _clear_employee_filter(page, diagnostics=True)
                 wait_for_loading(page)
                 filter_cleared = True
                 scanned, complete = _build_unfiltered_worker_index(page, target_date_full)
@@ -2366,7 +2369,7 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
                 # holds most of them.  A far smaller index means the grid was still
                 # showing a filtered/partial view.
                 in_index = len(processed_workers & set(scanned))
-                plausible = _index_is_plausible(scanned, processed_workers, dropdown_total)
+                plausible = _index_is_plausible(scanned, processed_workers)
                 if complete and scanned and plausible:
                     hidden_index = scanned
                 else:
@@ -2379,15 +2382,15 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
                         "cannot decide whether this employee has shifts. Skipping, "
                         "will retry the scan for the next hidden employee."
                     )
-                    skipped_hidden.append(f"{emp_filter_name} (UNVERIFIED)")
+                    unverified_hidden.append(emp_filter_name)
                     continue
-            reserved = frozenset(_name_key(n) for n in employee_names) - {_name_key(emp_filter_name)}
+            reserved = frozenset(_name_key(n) for n in all_dropdown_names) - {_name_key(emp_filter_name)}
             match = _match_hidden_employee(emp_filter_name, hidden_index, processed_workers, reserved)
             if match["kind"]:
                 if not filter_cleared:
                     # Index came from the start-of-run scan; the grid is still showing
                     # this employee's empty filter, so clear it before processing.
-                    _clear_employee_filter(page)
+                    _clear_employee_filter(page, diagnostics=True)
                     wait_for_loading(page)
                 worker_id      = match["id"]
                 worker_name    = match["name"]
@@ -2405,7 +2408,7 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
                     f"'{target_date_full}' in the full grid ({len(hidden_index)} worker(s) scanned; "
                     f"closest: '{match['best_name']}' at {match['best_score']}). Skipping."
                 )
-                skipped_hidden.append(emp_filter_name)
+                confirmed_hidden.append(emp_filter_name)
                 continue
 
         if worker_id in processed_workers:
@@ -2442,17 +2445,15 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
         logging.info(f"STEP5: Moving to next employee after completing {worker_display}.")
         processed_workers.add(worker_id)
 
-    unverified = [n for n in skipped_hidden if n.endswith(" (UNVERIFIED)")]
-    confirmed = [n for n in skipped_hidden if not n.endswith(" (UNVERIFIED)")]
-    if confirmed:
+    if confirmed_hidden:
         logging.info(
-            f"HIDDEN_SUMMARY: {len(confirmed)} dropdown name(s) confirmed to have no rows for "
-            f"'{target_date_full}' in the full grid: " + ", ".join(confirmed)
+            f"HIDDEN_SUMMARY: {len(confirmed_hidden)} dropdown name(s) confirmed to have no rows for "
+            f"'{target_date_full}' in the full grid: " + ", ".join(confirmed_hidden)
         )
-    if unverified:
+    if unverified_hidden:
         logging.warning(
-            f"HIDDEN_SUMMARY: {len(unverified)} dropdown name(s) could NOT be checked for "
-            f"'{target_date_full}' (full-grid scan failed): " + ", ".join(unverified)
+            f"HIDDEN_SUMMARY: {len(unverified_hidden)} dropdown name(s) could NOT be checked for "
+            f"'{target_date_full}' (full-grid scan failed): " + ", ".join(unverified_hidden)
         )
     save_history(history)
 
