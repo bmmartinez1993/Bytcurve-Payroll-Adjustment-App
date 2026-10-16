@@ -146,5 +146,24 @@ class TestBuildIndex(unittest.TestCase):
         self.assertFalse(complete)
 
 
+@unittest.skipIf(_LOAD_ERROR, f"main module not importable: {_LOAD_ERROR}")
+class TestIndexPlausible(unittest.TestCase):
+    def test_start_of_run_full_grid_is_plausible(self):
+        scanned = {str(i): f"W{i}" for i in range(340)}
+        self.assertTrue(app._index_is_plausible(scanned, set(), 390))
+
+    def test_start_of_run_one_worker_grid_is_implausible(self):
+        self.assertFalse(app._index_is_plausible({"1": "A"}, set(), 390))
+
+    def test_with_processed_workers_requires_most_present(self):
+        processed = {str(i) for i in range(40)}
+        self.assertFalse(app._index_is_plausible({"1": "A"}, processed, 390))
+        self.assertTrue(app._index_is_plausible({str(i): "x" for i in range(40)}, processed, 390))
+
+    def test_small_dropdown_only_needs_a_row(self):
+        self.assertTrue(app._index_is_plausible({"1": "A"}, set(), 5))
+        self.assertFalse(app._index_is_plausible({}, set(), 5))
+
+
 if __name__ == "__main__":
     unittest.main()
