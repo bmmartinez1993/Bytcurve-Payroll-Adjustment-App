@@ -2121,7 +2121,8 @@ def _build_unfiltered_worker_index(page: Page, target_date_full: str) -> tuple[d
         count_js = "(g) => document.querySelectorAll(g + ' tbody tr.k-master-row').length"
         last_count = -1
         for _ in range(_HIDDEN_SETTLE_TRIES):
-            wait_for_loading(page)
+            if not wait_for_loading(page):
+                raise RuntimeError("page-loading overlay still visible; grid may be stale")
             count = page.evaluate(count_js, grid_sel)
             if count == last_count and count > 0:
                 break
@@ -2153,7 +2154,8 @@ def _build_unfiltered_worker_index(page: Page, target_date_full: str) -> tuple[d
             )
             bottom_hits = bottom_hits + 1 if at_end else 0
             if bottom_hits >= 2:
-                complete = True
+                # A stuck loading overlay means the rows just read may be stale.
+                complete = wait_for_loading(page)
                 break
             if not at_end:
                 container.evaluate("el => { el.scrollTop += el.clientHeight; }")
@@ -2181,6 +2183,14 @@ def _index_is_plausible(scanned: dict, processed: set) -> bool:
     if len(processed) < 10:
         return True
     return len(processed & set(scanned)) >= 0.5 * len(processed)
+
+
+# Connecting words and suffixes shared by unrelated people ("de la", "van", "jr"); they
+# must not count toward a loose name overlap.
+_NAME_PARTICLES = frozenset({
+    "de", "del", "la", "las", "los", "el", "y", "da", "do", "dos", "das", "di", "du",
+    "van", "von", "der", "den", "bin", "al", "jr", "sr", "ii", "iii", "iv",
+})
 
 
 def _name_key(name: str) -> str:
@@ -2218,7 +2228,7 @@ def _match_hidden_employee(emp_name: str, index: dict, processed: set,
         result.update(kind="fuzzy", id=best_id, name=best_name)
         return result
 
-    words = set(target.split())
+    words = set(target.split()) - _NAME_PARTICLES
     need = min(2, len(words))
     if need:
         best_overlap, loose = 0, None
@@ -2422,15 +2432,34 @@ def validate_and_process_rows(page: Page, target_date: str) -> None:
 
         logging.info(f"WORKER: Processing {worker_display}")
 
+        # Without a dropdown filter the grid is virtualised: the worker's rows are only in
+        # the DOM once scrolled into view, so hand the helpers the scroll context.
+        scroll_ctx = {}
+        if not active_processing_filter:
+            scroll_ctx = {
+                "scroll_container": page.locator(
+                    f"{SELECTORS['payload_task_grid']} div.k-grid-content").first,
+                "worker_name": worker_name,
+            }
+
         adjustments_ok, needs_manual_review = _adjust_worker_tasks(
             page, worker_filter, worker_display, worker_id, target_dt,
-            emp_filter_name=active_processing_filter,
+            emp_filter_name=active_processing_filter, **scroll_ctx,
         )
+
+        if scroll_ctx and not adjustments_ok and not needs_manual_review:
+            # The scan saw rows for this worker, so "nothing to adjust" means the rows
+            # could not be reached — never report that as done.
+            needs_manual_review = True
+            logging.warning(
+                f"MANUAL_FLAG: Skipping verification for {worker_display} "
+                "— indexed rows could not be reached in the unfiltered grid."
+            )
 
         if adjustments_ok:
             _verify_worker_tasks(
                 page, worker_filter, worker_display,
-                emp_filter_name=active_processing_filter,
+                emp_filter_name=active_processing_filter, **scroll_ctx,
             )
             logging.info(f"WORKER: Done with {worker_display}")
         elif needs_manual_review:

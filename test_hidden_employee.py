@@ -50,6 +50,11 @@ class TestMatchHiddenEmployee(unittest.TestCase):
         m = app._match_hidden_employee("zeralva iscania alvarez de los  santos", index, set())
         self.assertEqual((m["kind"], m["id"]), ("loose", "1"))
 
+    def test_name_particles_alone_do_not_match(self):
+        index = {"2": "Maria de la Rosa"}
+        m = app._match_hidden_employee("Ana de la Cruz", index, set())
+        self.assertIsNone(m["kind"])
+
     def test_name_owned_by_another_dropdown_entry_is_not_taken(self):
         reserved = frozenset({app._name_key("Carmen (City Driver) Perez")})
         index = {"000017": "Carmen (City Driver) Perez"}
@@ -136,6 +141,16 @@ class TestBuildIndex(unittest.TestCase):
         index, complete = app._build_unfiltered_worker_index(self._page(rows), "10/06/2026")
         self.assertTrue(complete)
         self.assertEqual(index, {"1": "Ann Lee", "2": "Bob Ray", "3": "Cy Poe"})
+
+    def test_stuck_loading_overlay_marks_scan_incomplete(self):
+        orig = app.wait_for_loading
+        app.wait_for_loading = lambda page, *a, **k: False
+        try:
+            index, complete = app._build_unfiltered_worker_index(
+                self._page([[("10/06/2026", "Ann Lee", "1")]]), "10/06/2026")
+        finally:
+            app.wait_for_loading = orig
+        self.assertFalse(complete)
 
     def test_stop_flag_marks_scan_incomplete(self):
         app.AUTOMATION_STOP_FLAG = True
