@@ -32,6 +32,9 @@ LABELS = [
     "SKIP",
     "EXTRA_WORK",
     "S2S_CHARTER",
+    "S2S_SHUTTLE",
+    "S2S_ACTIVITY",
+    "CHARTER",
     "SPARE_CDL",
     "SPARE_MONITOR",
     "HTS_UNITS",
@@ -91,6 +94,37 @@ def _bootstrap_training_data() -> list:
         ("S2S",         "Charter"),
         ("S2S Charter", "Run"),
     ], "S2S_CHARTER")
+
+    add([
+        ("S2S Shuttle", ""),
+        ("S2S Shuttle", "S2S Shuttle"),
+        ("S2S Shuttle", "AM Shuttle"),
+        ("S2S Shuttle", "Shuttle Run"),
+        ("S2S",         "S2S Shuttle"),
+        ("S2S",         "Shuttle"),
+        ("S2S Shuttle", "Run"),
+    ], "S2S_SHUTTLE")
+
+    add([
+        ("S2S Activity", ""),
+        ("S2S Activity", "S2S Activity"),
+        ("S2S Activity", "AM Activity"),
+        ("S2S Activity", "Activity Run"),
+        ("S2S",          "S2S Activity"),
+        ("S2S",          "Activity"),
+        ("S2S Activity", "Run"),
+    ], "S2S_ACTIVITY")
+
+    add([
+        ("Charter",   ""),
+        ("Charter",   "Charter"),
+        ("Charter",   "Charter Run"),
+        ("Charter",   "Trip"),
+        ("Charter 2", "Trip"),
+        ("CHARTER",   "AM Charter"),
+        ("Charter",   "PM Charter"),
+        ("Charter",   "Field Trip"),
+    ], "CHARTER")
 
     add([
         ("Spare CDL", ""),
