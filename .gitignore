@@ -22,3 +22,6 @@ playwright-report/
 blob-report/
 videos/
 screenshots/
+
+#Miscelaneous
+.vscode/
